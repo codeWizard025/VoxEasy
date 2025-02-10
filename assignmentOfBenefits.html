@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment of Benefits</title>
+    <style>
+        :root {
+            --background-color: white;
+            --text-color: black;
+        }
+
+        [data-theme="dark"] {
+            --background-color: black;
+            --text-color: white;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        p, ul {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Assignment of Benefits</h1>
+
+    <h2>Purpose</h2>
+    <p>This form authorizes healthcare providers to bill and receive payments directly from your insurance company for medical services rendered, simplifying the payment process for both parties.</p>
+
+    <h2>Patient Information</h2>
+    <ul>
+        <li>Full Name: _____________________________</li>
+        <li>Date of Birth: _____________________________</li>
+        <li>Address: _____________________________</li>
+        <li>Insurance Provider: _____________________________</li>
+        <li>Policy Number: _____________________________</li>
+    </ul>
+
+    <h2>Assignment Agreement</h2>
+    <p>I, [Patient’s Full Name], hereby assign all benefits payable by my insurance provider to:</p>
+    <p>[Healthcare Provider’s Name]</p>
+    <p>Address: [Provider’s Address]</p>
+    <p>Contact Information: [Phone Number, Email]</p>
+
+    <h2>Terms and Conditions</h2>
+    <h3>Scope of Assignment:</h3>
+    <p>This assignment applies to all medical services rendered by [Healthcare Provider’s Name] from [Start Date] to [End Date].</p>
+
+    <h3>Payment Authorization:</h3>
+    <p>I authorize my insurance provider to release payments directly to the healthcare provider for covered services. I understand that I am responsible for any deductibles, copayments, or services not covered by my insurance.</p>
+
+    <h3>Revocation:</h3>
+    <p>I reserve the right to revoke this assignment in writing at any time, except to the extent that payment has already been made to the provider.</p>
+
+    <h3>Compliance:</h3>
+    <p>This assignment complies with all applicable federal and state laws governing health insurance and patient privacy.</p>
+
+    <h2>Acknowledgment</h2>
+    <p>I acknowledge that I have read and understand this Assignment of Benefits and agree to its terms.</p>
+
+    <h2>Signatures</h2>
+    <p>Patient’s Signature:</p>
+    <p>Date: _____________________</p>
+
+    <h3>Insurance Provider’s Authorization (if required):</h3>
+    <p>I, [Insurance Representative’s Name], authorize the assignment of benefits as described above.</p>
+    <p>Representative’s Signature: _____________________________</p>
+    <p>Date: _____________________</p>
+
+    <script>
+        // Check the theme set in documents.html and apply it
+        const theme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+    </script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Living Will</title>
+    <style>
+        :root {
+            --background-color: white;
+            --text-color: black;
+        }
+
+        [data-theme="dark"] {
+            --background-color: black;
+            --text-color: white;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        p, ul {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Living Will</h1>
+
+    <h2>Purpose</h2>
+    <p>A Living Will outlines a person’s preferences regarding medical treatments and life-sustaining measures in the event they become incapacitated and unable to communicate their wishes.</p>
+
+    <h2>Declaration of Living Will</h2>
+    <p>I, [Your Full Name], being of sound mind, make this statement as a directive to be followed if I become unable to participate in decisions about my medical care. These directions express my legal right to refuse or accept medical treatment.</p>
+
+    <h3>1. Designation of Health Care Proxy (Optional)</h3>
+    <p>If I become unable to make decisions about my medical care, I designate the following person as my health care proxy:</p>
+    <ul>
+        <li>Name: _____________________________</li>
+        <li>Relationship: _____________________________</li>
+        <li>Contact Information: _____________________________</li>
+    </ul>
+
+    <h3>2. Statement of Desires, Special Provisions, and Limitations</h3>
+    <ul>
+        <li><strong>Life-Sustaining Treatments:</strong> I direct that life-sustaining treatments, including but not limited to mechanical ventilation, artificial nutrition and hydration, and CPR, be withheld or withdrawn if I am in an irreversible vegetative state or if the treatments would only prolong the dying process.</li>
+        <li><strong>Pain Relief:</strong> I wish to receive adequate pain relief, even if it may hasten the moment of my death, provided that the intent is solely to relieve pain and not to cause death.</li>
+        <li><strong>Organ Donation (Optional):</strong> Upon my death, I wish to donate any organs or tissues that may help others in need. [Specify any particular organs or tissues if desired.]</li>
+        <li><strong>Additional Instructions:</strong> [Any other specific wishes regarding medical care.]</li>
+    </ul>
+
+    <h3>3. Revocation of Previous Directives</h3>
+    <p>I hereby revoke any prior Living Wills or advance directives.</p>
+
+    <h2>Signatures</h2>
+    <p>Signature:</p>
+    <p>Date: _____________________</p>
+
+    <h3>Witnesses:</h3>
+    <p>We, the undersigned witnesses, declare that [Your Full Name], signed this Living Will in our presence and appears to be of sound mind.</p>
+    <p>Witness 1 Signature: _____________________________</p>
+    <p>Name: _____________________________</p>
+    <p>Date: _____________________</p>
+
+    <p>Witness 2 Signature: _____________________________</p>
+    <p>Name: _____________________________</p>
+    <p>Date: _____________________</p>
+
+    <script>
+        // Check the theme set in documents.html and apply it
+        const theme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+    </script>
+</body>
+</html>

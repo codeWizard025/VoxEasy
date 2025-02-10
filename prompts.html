@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combined Page</title>
+    <style>
+        /* Disable dragging for all elements */
+        * {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-select: none;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500&display=swap');
+
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --item-bg: #f5f5f7;
+            --item-border: #d2d2d7;
+            --item-hover: #e8e8ed;
+            --item-selected: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--text-color);
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            transition: background-color 0s, color 0s;
+        }
+
+        .container {
+            background: var(--bg-color);
+            border-radius: 18px;
+            padding: 40px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 1800px;
+            width: 100%;
+            position: relative;
+            padding-top: 60px;
+            transition: box-shadow 0s ease;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--item-border);
+        }
+
+        .nav-item {
+            padding: 10px 20px;
+            margin: 0 5px;
+            text-decoration: none;
+            color: var(--text-color);
+            background-color: var(--item-bg);
+            border-radius: 20px;
+            transition: background-color 0s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: var(--item-hover);
+        }
+
+        .toggle-switch {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .toggle-input {
+            display: none;
+        }
+
+        .toggle-label {
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            background-color: var(--text-color);
+            border-radius: 34px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0s;
+        }
+
+        .toggle-label:before {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            top: 4px;
+            left: 4px;
+            background-color: var(--bg-color);
+            transition: 0s;
+        }
+
+        .toggle-input:checked + .toggle-label {
+            background-color: #ccc;
+        }
+
+        .toggle-input:checked + .toggle-label:before {
+            transform: translateX(26px);
+            background-color: var(--text-color);
+        }
+
+        .dark-mode {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --item-bg: #1c1c1e;
+            --item-border: #2c2c2e;
+            --item-hover: #2c2c2e;
+            --item-selected: rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .container {
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Styles from prompts.html, adjusted */
+
+        .prompts-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 10px;
+            margin: 0;
+        }
+
+        .prompts-container .section {
+            padding: 20px;
+            box-sizing: border-box;
+            border: 1px solid var(--item-border);
+            background-color: var(--item-bg);
+            border-radius: 12px;
+        }
+
+        .prompts-container .title {
+            font-size: 23px;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .prompts-container .grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .prompts-container .grid-4x4 {
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, auto);
+        }
+
+        .prompts-container .grid-2x4 {
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, auto);
+        }
+
+        .prompts-container .button {
+            padding: 10px;
+            font-size: 23px;
+            cursor: pointer;
+            text-align: center;
+            background-color: var(--bg-color);
+            border: 1px solid var(--item-border);
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: background-color 0s;
+            color: var(--text-color);
+        }
+
+        .prompts-container .button:hover {
+            background-color: var(--item-hover);
+        }
+
+        .prompts-container .button img {
+            max-width: 50px;
+            max-height: 50px;
+            margin-bottom: 5px;
+        }
+
+        .prompts-container .circle {
+            position: relative;
+            width: 100%;
+            padding-top: 100%; /* 1:1 Aspect Ratio */
+            border-radius: 50%;
+            background-color: var(--item-bg);
+            overflow: hidden;
+            margin: auto;
+        }
+
+        .prompts-container .slice {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            background-color: transparent;
+            transform-origin: 100% 50%;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24spx;
+            cursor: pointer;
+        }
+
+        .prompts-container .slice-1 { transform: rotate(0deg); background-color: #ff9999; }
+        .prompts-container .slice-2 { transform: rotate(72deg); background-color: #99ff99; }
+        .prompts-container .slice-3 { transform: rotate(144deg); background-color: #9999ff; }
+        .prompts-container .slice-4 { transform: rotate(216deg); background-color: #ffff99; }
+        .prompts-container .slice-5 { transform: rotate(288deg); background-color: #ffcc99; }
+
+        .prompts-container .emoji {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 50px;
+            pointer-events: none;
+        }
+
+        .prompts-container .emoji-1 { transform: rotate(36deg) translate(50%, 0); }
+        .prompts-container .emoji-2 { transform: rotate(108deg) translate(50%, 0); }
+        .prompts-container .emoji-3 { transform: rotate(180deg) translate(50%, 0); }
+        .prompts-container .emoji-4 { transform: rotate(252deg) translate(50%, 0); }
+        .prompts-container .emoji-5 { transform: rotate(324deg) translate(50%, 0); }
+
+        @media (max-width: 800px) {
+            .prompts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .prompts-container .placeholder {
+            color: var(--item-border);
+            text-align: center;
+            font-style: italic;
+            padding: 10px;
+        }
+
+        .yes-button {
+            background-color: #28a745; /* Green */
+            color: #ffffff;
+        }
+
+        .no-button {
+            background-color: #dc3545; /* Red */
+            color: #ffffff;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Toggle switch -->
+        <div class="toggle-switch">
+            <input type="checkbox" id="switch" class="toggle-input" />
+            <label for="switch" class="toggle-label"></label>
+        </div>
+
+        <br>
+        
+        <!-- Prompts content -->
+        <div class="prompts-container">
+            <!-- Top Left: I Am Section -->
+            <div class="section">
+                <div class="title">I AM</div>
+                <div class="grid grid-4x4">
+                    <button class="button" onclick="speakText('I am excited')">
+                        Excited
+                    </button>
+                    <button class="button" onclick="speakText('I am tired')">
+                        Tired
+                    </button>
+                    <button class="button" onclick="speakText('I am hungry')">
+                        Hungry
+                    </button>
+                    <button class="button" onclick="speakText('I am bored')">
+                        Bored
+                    </button>
+                    <button class="button" onclick="speakText('I am anxious')">
+                        Anxious
+                    </button>
+                    <button class="button" onclick="speakText('I am calm')">
+                        Calm
+                    </button>
+                    <button class="button" onclick="speakText('I am confused')">
+                        Confused
+                    </button>
+                    <button class="button" onclick="speakText('I am focused')">
+                        Focused
+                    </button>
+                    <button class="button" onclick="speakText('I am relaxed')">
+                        Relaxed
+                    </button>
+                    <button class="button" onclick="speakText('I am stressed')">
+                        Stressed
+                    </button>
+                    <button class="button" onclick="speakText('I am surprised')">
+                        Surprised
+                    </button>
+                    <button class="button" onclick="speakText('I am grateful')">
+                        Grateful
+                    </button>
+                </div>
+            </div>
+
+            <!-- Top Right: I Want Section -->
+            <div class="section">
+                <div class="title">I WANT</div>
+                <div class="grid grid-4x4">
+                    <button class="button" onclick="speakText('I want to eat')">
+                        To Eat
+                    </button>
+                    <button class="button" onclick="speakText('I want to sleep')">
+                        To Sleep
+                    </button>
+                    <button class="button" onclick="speakText('I want to read')">
+                        To Read
+                    </button>
+                    <button class="button" onclick="speakText('I want to watch TV')">
+                        To Watch TV
+                    </button>
+                    <button class="button" onclick="speakText('I want to listen to music')">
+                        To Listen to Music
+                    </button>
+                    <button class="button" onclick="speakText('I want to draw')">
+                        To Draw
+                    </button>
+                    <button class="button" onclick="speakText('I want to be comforted')">
+                        To Be Comforted
+                    </button>
+                    <button class="button" onclick="speakText('I want to drink water')">
+                        To Drink Water
+                    </button>
+                    <button class="button" onclick="speakText('I want to dance')">
+                        To Dance
+                    </button>
+                    <button class="button" onclick="speakText('I want to exercise')">
+                        To Exercise
+                    </button>
+                    <button class="button" onclick="speakText('I want to talk')">
+                        To Talk
+                    </button>
+                    <button class="button" onclick="speakText('I want to relax')">
+                        To Relax
+                    </button>
+                </div>
+            </div>
+
+            <!-- New Selected Choices Section -->
+            <div class="section">
+                <div class="title">SELECTED CHOICES</div>
+                <div id="selected-choices" class="grid">
+                    <div class="placeholder">No choices selected yet.</div>
+                </div>
+            </div>
+
+            <!-- Bottom Right: I Want to See Section -->
+            <div class="section">
+                <div class="title">I WANT TO SEE</div>
+                <div class="grid grid-2x4">
+                    <button class="button" onclick="speakText('I want to see my family')">
+                        My Family
+                    </button>
+                    <button class="button" onclick="speakText('I want to see the nurse')">
+                        The Nurse
+                    </button>
+                    <button class="button" onclick="speakText('I want to see my friends')">
+                        My Friends
+                    </button>
+                    <button class="button" onclick="speakText('I want to see the doctor')">
+                        The Doctor
+                    </button>
+                </div>
+                <div class="grid grid-2x4">
+                    <button class="button yes-button" onclick="speakText('Yes')">
+                        Yes
+                    </button>
+                    <button class="button no-button" onclick="speakText('No')">
+                        No
+                    </button>
+                    <button class="button" onclick="speakText('Stop')">
+                        Stop
+                    </button>
+                    <button class="button" onclick="speakText('Go')">
+                        Go
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Navigation bar -->
+        <nav class="navigation">
+            <a href="pic.html" class="nav-item">Picture Board</a>   
+            <a href="prompts.html" class="nav-item">Prompts</a>         
+            <a href="pain.html" class="nav-item">Pain</a>
+            <a href="keyboard.html" class="nav-item">Keyboard</a>
+            <!-- New navigation items -->
+            <a href="documents.html" class="nav-item">Documents</a>
+            <a href="mood.html" class="nav-item">Mood</a>
+        </nav>
+    </div>
+    <script>
+        // Function to speak text using the Web Speech API
+        function speak(text) {
+            console.log('Speaking:', text);
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.log('Text-to-speech is not supported in this browser.');
+                alert('Text-to-speech is not supported in this browser.');
+            }
+        }
+
+        // Alias 'speakText' to 'speak' for compatibility
+        function speakText(text) {
+            speak(text);
+            updateSelectedChoices(text);
+        }
+
+        function updateSelectedChoices(text) {
+            const selectedChoicesContainer = document.getElementById('selected-choices');
+            selectedChoicesContainer.innerHTML = ''; // Clear previous choice or placeholder
+            const choiceElement = document.createElement('div');
+            choiceElement.className = 'button';
+            choiceElement.textContent = text;
+            selectedChoicesContainer.appendChild(choiceElement);
+        }
+
+        // Dark mode toggle script
+        const toggleSwitch = document.getElementById('switch');
+        const body = document.body;
+
+        // Check the initial state from local storage
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            toggleSwitch.checked = true;
+        }
+
+        toggleSwitch.addEventListener('change', function() {
+            if (this.checked) {
+                console.log('Switch is ON - Dark Mode');
+                body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                console.log('Switch is OFF - Light Mode');
+                body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        });
+
+        const promptsButton = document.querySelector('.nav-item[href="prompts.html"]');
+
+        function updatePromptsButtonBorder() {
+            if (body.classList.contains('dark-mode')) {
+                promptsButton.style.border = '2px solid white';
+            } else {
+                promptsButton.style.border = '2px solid black';
+            }
+        }
+
+        // Call the function initially to set the correct border color
+        updatePromptsButtonBorder();
+
+        // Update the border color whenever the mode changes
+        toggleSwitch.addEventListener('change', updatePromptsButtonBorder);
+
+        function logAction(action) {
+            const currentPatient = JSON.parse(localStorage.getItem('currentPatient'));
+            if (currentPatient) {
+                const timestamp = new Date().toISOString();
+                currentPatient.log = currentPatient.log || [];
+                currentPatient.log.push(`${action} at ${timestamp}`);
+                localStorage.setItem('currentPatient', JSON.stringify(currentPatient));
+            }
+        }
+
+        // Example usage
+        document.querySelector('button').addEventListener('click', () => {
+            logAction('Button clicked');
+        });
+
+    </script>
+</body>
+</html>
