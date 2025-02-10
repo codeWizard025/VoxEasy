@@ -273,7 +273,7 @@
                 activities: []
             };
 
-            // Store the resident's name in local storage for pic.html
+            // Store the resident's name in local storage for index.html
             localStorage.setItem('currentResident', JSON.stringify({ firstName, lastName }));
 
             // Retrieve existing residents from local storage or initialize an empty array
@@ -284,7 +284,7 @@
             localStorage.setItem('residents', JSON.stringify(residents));
 
             // Redirect to resident_data.html after storing resident information
-            window.location.href = 'pic.html';
+            window.location.href = 'index.html';
         });
     </script>
 </body>
