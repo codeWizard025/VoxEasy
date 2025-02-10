@@ -272,7 +272,7 @@
                 activities: []
             };
 
-            // Store the patient's name in local storage for pic.html
+            // Store the patient's name in local storage for index.html
             localStorage.setItem('currentPatient', JSON.stringify({ firstName, lastName }));
 
             // Retrieve existing patients from local storage or initialize an empty array
@@ -283,7 +283,7 @@
             localStorage.setItem('patients', JSON.stringify(patients));
 
             // Redirect to patient_data.html after storing patient information
-            window.location.href = 'pic.html';
+            window.location.href = 'index.html';
         });
     </script>
 </body>
