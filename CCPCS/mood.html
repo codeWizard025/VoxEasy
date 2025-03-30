@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood Assessment</title>
+    <style>
+        /* Existing Styles */
+        /* Disable dragging for all elements */
+        * {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-select: none;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500&display=swap');
+
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --item-bg: #f5f5f7;
+            --item-border: #d2d2d7;
+            --item-hover: #e8e8ed;
+            --item-selected: rgba(0, 0, 0, 0.1);
+            --accent-color: #4CAF50; /* New Variable for accents */
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--text-color);
+            user-select: none;
+            transition: background-color 0s, color 0s;
+        }
+
+        .container {
+            background: var(--bg-color);
+            border-radius: 18px;
+            padding: 60px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+            max-width: 1400px;
+            width: 100%;
+            position: relative;
+            padding-top: 80px;
+            transition: box-shadow 0s ease;
+            max-height: 1200px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Toggle switch styles */
+        .toggle-switch {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .toggle-input {
+            display: none;
+        }
+
+        .toggle-label {
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            background-color: var(--text-color);
+            border-radius: 34px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0s;
+        }
+
+        .toggle-label:before {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            top: 4px;
+            left: 4px;
+            background-color: var(--bg-color);
+            transition: 0s;
+        }
+
+        .toggle-input:checked + .toggle-label {
+            background-color: #ccc;
+        }
+
+        .toggle-input:checked + .toggle-label:before {
+            transform: translateX(26px);
+            background-color: var(--text-color);
+        }
+
+        .dark-mode {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --item-bg: #1c1c1e;
+            --item-border: #2c2c2e;
+            --item-hover: #2c2c2e;
+            --item-selected: rgba(255, 255, 255, 0.1);
+            --accent-color: #4CAF50;
+        }
+
+        .dark-mode .container {
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Navigation bar styles */
+        .navigation {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--item-border);
+        }
+
+        .nav-item {
+            padding: 10px 20px;
+            margin: 0 5px;
+            text-decoration: none;
+            color: var(--text-color);
+            background-color: var(--item-bg);
+            border-radius: 20px;
+            transition: background-color 0s;
+        }
+
+        .nav-item:hover {
+            background-color: var(--item-hover);
+        }
+
+        .nav-item.active {
+            border: 2px solid var(--text-color); /* Default border color */
+        }
+
+        .dark-mode .nav-item.active {
+            border-color: #ffffff; /* White border in dark mode */
+        }
+
+        /* New Styles for Emoji Chart and Survey */
+        .main-content {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 40px;
+            gap: 40px;
+            flex-wrap: nowrap; /* Changed to nowrap */
+            position: relative; /* Added for vertical line */
+        }
+
+        /* Vertical line down the middle */
+        .main-content::before {
+            content: '';
+            position: absolute;
+            width: 1px;
+            background-color: var(--item-border);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Emotion Chart Styles */
+        .emotion-chart {
+            flex: 1 1 45%;
+            background-color: var(--item-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            font-size: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .emotion-chart h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        #emotionPieChart {
+            max-width: 100%;
+            height: auto;
+            cursor: pointer;
+        }
+
+        #emotionPieChart path:hover {
+            opacity: 0.8;
+        }
+
+        /* Daily Mood Survey Styles with Pagination */
+        .daily-survey {
+            flex: 1 1 45%;
+            background-color: var(--item-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            font-size: 18px;
+        }
+
+        .daily-survey h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        .survey-page {
+            display: none; /* Hide all pages by default */
+        }
+
+        .survey-page.active {
+            display: block; /* Show active page */
+        }
+
+        .survey-question {
+            margin-bottom: 15px;
+        }
+
+        .survey-question label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+
+        .survey-question select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--item-border);
+            border-radius: 6px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: border-color 0s;
+        }
+
+        .survey-question select:focus {
+            border-color: var(--accent-color);
+            outline: none;
+        }
+
+        /* Navigation Buttons for Survey Pagination */
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .navigation-buttons button {
+            padding: 10px 20px;
+            background-color: var(--accent-color);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0s;
+        }
+
+        /* Make next button full width */
+        .next-button {
+            width: 100%;
+        }
+
+        /* Make prev and submit buttons half width */
+        .prev-button,
+        .submit-button {
+            width: calc(50% - 5px); /* 50% width minus half of the gap */
+            margin-top: 0; /* Remove the top margin from submit button */
+            display: inline-block; /* Change display property */
+        }
+
+        /* Remove the standalone submit button styles */
+        .submit-button {
+            margin-top: 0;
+        }
+
+        .navigation-buttons button:hover {
+            background-color: #45a049; /* Darker shade for hover */
+        }
+
+        .navigation-buttons button:disabled {
+            background-color: var(--item-border); /* Use item border color for disabled state */
+            cursor: not-allowed;
+        }
+
+        #confirmationMessage {
+            display: none;
+            color: var(--accent-color);
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .main-content::before {
+                display: none; /* Hide vertical line on small screens */
+            }
+
+            .emoji-chart, .daily-survey, .emotion-chart {
+                flex: 1 1 100%;
+                max-width: 100%;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+            }
+
+            .navigation-buttons button {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .navigation-buttons button:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+        .emoji-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+        }
+
+        .emoji-item {
+            font-size: 3rem; /* Increased size for larger emojis */
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .emoji-item:hover {
+            transform: scale(1.1);
+        }
+
+        .divider {
+            width: 1px;
+            height: 40px;
+            background-color: var(--item-border);
+        }
+
+        .emoji-item.selected {
+            transform: scale(1.3);
+        }
+
+        .tooltip {
+            position: absolute;
+            background-color: var(--item-bg);
+            color: var(--text-color);
+            padding: 5px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-size: 14px;
+            display: none;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .selected-emoji {
+            font-size: 10rem; /* Larger size for the selected emoji */
+            margin-top: 20px; /* Adjusted space above the selected emoji */
+            text-align: center; /* Center the emoji */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 250px; /* Adjust height as needed */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Toggle switch -->
+        <div class="toggle-switch">
+            <input type="checkbox" id="switch" class="toggle-input" />
+            <label for="switch" class="toggle-label"></label>
+        </div>
+
+        <!-- New Sections -->
+        <div class="main-content">
+            <!-- Emotion Pie Chart Section -->
+            <div class="emotion-chart">
+                <h2>Select Your Emotion</h2>
+                <div class="emoji-container">
+                    <div class="emoji-item" data-emotion="">😊</div>
+                    <div class="divider"></div>
+                    <div class="emoji-item" data-emotion="">😢</div>
+                    <div class="divider"></div>
+                    <div class="emoji-item" data-emotion="">😡</div>
+                    <div class="divider"></div>
+                    <div class="emoji-item" data-emotion="">😲</div>
+                    <div class="divider"></div>
+                    <div class="emoji-item" data-emotion="">🤢</div>
+                    <div class="divider"></div>
+                    <div class="emoji-item" data-emotion="">😨</div>
+                    <div class="divider"></div>
+                    <div class="emoji-item" data-emotion="">😃</div>
+                    <div class="divider"></div>
+                    <div class="emoji-item" data-emotion="">😐</div>
+                    <div class="divider"></div>
+                    <div class="emoji-item" data-emotion="">😕</div>
+                    <div class="divider"></div>
+                    <div class="emoji-item" data-emotion="">😌</div>
+                </div>
+                <div class="tooltip" id="emojiTooltip"></div>
+                <div id="selectedEmojiDisplay"></div>
+            </div>
+
+            <!-- Daily Mood Survey Section with Pagination -->
+            <div class="daily-survey">
+                <h2>Daily Mood Survey</h2>
+                <form id="moodSurvey">
+                    <!-- Page 1: Questions 1-5 -->
+                    <div class="survey-page active" data-page="1">
+                        <!-- Question 1 -->
+                        <div class="survey-question">
+                            <label for="q1">1. How do you feel today?</label>
+                            <select id="q1" name="q1" required>
+                                <option value="">Select an option</option>
+                                <option value="Very Happy">Very Happy</option>
+                                <option value="Happy">Happy</option>
+                                <option value="Neutral">Neutral</option>
+                                <option value="Sad">Sad</option>
+                                <option value="Very Sad">Very Sad</option>
+                            </select>
+                        </div>
+                        <!-- Question 2 -->
+                        <div class="survey-question">
+                            <label for="q2">2. How was your sleep last night?</label>
+                            <select id="q2" name="q2" required>
+                                <option value="">Select an option</option>
+                                <option value="Excellent">Excellent</option>
+                                <option value="Good">Good</option>
+                                <option value="Fair">Fair</option>
+                                <option value="Poor">Poor</option>
+                                <option value="Very Poor">Very Poor</option>
+                            </select>
+                        </div>
+                        <!-- Question 3 -->
+                        <div class="survey-question">
+                            <label for="q3">3. How productive do you feel today?</label>
+                            <select id="q3" name="q3" required>
+                                <option value="">Select an option</option>
+                                <option value="Very Productive">Very Productive</option>
+                                <option value="Productive">Productive</option>
+                                <option value="Neutral">Neutral</option>
+                                <option value="Unproductive">Unproductive</option>
+                                <option value="Very Unproductive">Very Unproductive</option>
+                            </select>
+                        </div>
+                        <!-- Question 4 -->
+                        <div class="survey-question">
+                            <label for="q4">4. How was your appetite today?</label>
+                            <select id="q4" name="q4" required>
+                                <option value="">Select an option</option>
+                                <option value="Excellent">Excellent</option>
+                                <option value="Good">Good</option>
+                                <option value="Fair">Fair</option>
+                                <option value="Poor">Poor</option>
+                                <option value="Very Poor">Very Poor</option>
+                            </select>
+                        </div>
+                        <!-- Question 5 -->
+                        <div class="survey-question">
+                            <label for="q5">5. How engaged were you in your activities?</label>
+                            <select id="q5" name="q5" required>
+                                <option value="">Select an option</option>
+                                <option value="Very Engaged">Very Engaged</option>
+                                <option value="Engaged">Engaged</option>
+                                <option value="Neutral">Neutral</option>
+                                <option value="Disengaged">Disengaged</option>
+                                <option value="Very Disengaged">Very Disengaged</option>
+                            </select>
+                        </div>
+                        <!-- Navigation Buttons -->
+                        <div class="navigation-buttons">
+                            <button type="button" class="next-button">Next</button>
+                        </div>
+                    </div>
+
+                    <!-- Page 2: Questions 6-10 -->
+                    <div class="survey-page" data-page="2">
+                        <!-- Question 6 -->
+                        <div class="survey-question">
+                            <label for="q6">6. How was your energy level today?</label>
+                            <select id="q6" name="q6" required>
+                                <option value="">Select an option</option>
+                                <option value="Very High">Very High</option>
+                                <option value="High">High</option>
+                                <option value="Moderate">Moderate</option>
+                                <option value="Low">Low</option>
+                                <option value="Very Low">Very Low</option>
+                            </select>
+                        </div>
+                        <!-- Question 7 -->
+                        <div class="survey-question">
+                            <label for="q7">7. How often did you feel stressed today?</label>
+                            <select id="q7" name="q7" required>
+                                <option value="">Select an option</option>
+                                <option value="Never">Never</option>
+                                <option value="Rarely">Rarely</option>
+                                <option value="Sometimes">Sometimes</option>
+                                <option value="Often">Often</option>
+                                <option value="Always">Always</option>
+                            </select>
+                        </div>
+                        <!-- Question 8 -->
+                        <div class="survey-question">
+                            <label for="q8">8. How was your social interaction today?</label>
+                            <select id="q8" name="q8" required>
+                                <option value="">Select an option</option>
+                                <option value="Excellent">Excellent</option>
+                                <option value="Good">Good</option>
+                                <option value="Fair">Fair</option>
+                                <option value="Poor">Poor</option>
+                                <option value="Very Poor">Very Poor</option>
+                            </select>
+                        </div>
+                        <!-- Question 9 -->
+                        <div class="survey-question">
+                            <label for="q9">9. How motivated are you feeling?</label>
+                            <select id="q9" name="q9" required>
+                                <option value="">Select an option</option>
+                                <option value="Very Motivated">Very Motivated</option>
+                                <option value="Motivated">Motivated</option>
+                                <option value="Neutral">Neutral</option>
+                                <option value="Unmotivated">Unmotivated</option>
+                                <option value="Very Unmotivated">Very Unmotivated</option>
+                            </select>
+                        </div>
+                        <!-- Question 10 -->
+                        <div class="survey-question">
+                            <label for="q10">10. How satisfied are you with today overall?</label>
+                            <select id="q10" name="q10" required>
+                                <option value="">Select an option</option>
+                                <option value="Very Satisfied">Very Satisfied</option>
+                                <option value="Satisfied">Satisfied</option>
+                                <option value="Neutral">Neutral</option>
+                                <option value="Dissatisfied">Dissatisfied</option>
+                                <option value="Very Dissatisfied">Very Dissatisfied</option>
+                            </select>
+                        </div>
+                        <!-- Navigation Buttons -->
+                        <div class="navigation-buttons">
+                            <button type="button" class="prev-button">Previous</button>
+                            <button type="submit" class="submit-button">Submit Survey</button>
+                        </div>
+                    </div>
+
+                    <!-- Confirmation Message -->
+                    <div id="confirmationMessage">
+                        Thank you for completing the survey!
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Navigation bar -->
+        <nav class="navigation">
+            <a href="index.html" class="nav-item">Picture Board</a>
+            <a href="prompts.html" class="nav-item">Prompts</a>   
+            <a href="pain.html" class="nav-item">Pain</a>
+            <a href="keyboard.html" class="nav-item">Keyboard</a>
+            <a href="documents.html" class="nav-item">Documents</a>
+            <a href="mood.html" class="nav-item active">Mood</a>
+        </nav>
+
+        <!-- Journal Entry Section (if needed) -->
+        <!-- Add your Journal Entry elements here -->
+
+        <script>
+            // JavaScript code for toggle switch (dark mode)
+            const toggleSwitch = document.getElementById('switch');
+            const body = document.body;
+
+            // Check the initial state from local storage
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                body.classList.add('dark-mode');
+                toggleSwitch.checked = true;
+            }
+
+            toggleSwitch.addEventListener('change', function() {
+                if (this.checked) {
+                    body.classList.add('dark-mode');
+                    localStorage.setItem('darkMode', 'enabled');
+                } else {
+                    body.classList.remove('dark-mode');
+                    localStorage.setItem('darkMode', 'disabled');
+                }
+            });
+
+            // JavaScript for Daily Mood Survey with Pagination
+            const moodSurvey = document.getElementById('moodSurvey');
+            const surveyPages = document.querySelectorAll('.survey-page');
+            const nextButtons = document.querySelectorAll('.next-button');
+            const prevButtons = document.querySelectorAll('.prev-button');
+            const confirmMessage = document.getElementById('confirmationMessage');
+            let currentPage = 0;
+            const totalPages = surveyPages.length;
+
+            // Initialize the first page
+            showPage(currentPage);
+
+            // Function to show a specific page
+            function showPage(page) {
+                surveyPages.forEach((p, index) => {
+                    if(index === page){
+                        p.classList.add('active');
+                    } else {
+                        p.classList.remove('active');
+                    }
+                });
+
+                // Disable Previous button on first page
+                prevButtons.forEach(button => {
+                    if(page === 0){
+                        button.style.display = 'none'; // Hide Previous button on first page
+                    } else {
+                        button.style.display = 'inline-block'; // Show Previous button on other pages
+                        button.disabled = false;
+                    }
+                });
+
+                // Hide Next button on last page
+                nextButtons.forEach(button => {
+                    if(page === totalPages -1){
+                        button.style.display = 'none';
+                    } else {
+                        button.style.display = 'inline-block';
+                    }
+                });
+
+                // Show Submit button on last page
+                const submitButtons = document.querySelectorAll('.submit-button');
+                if(page === totalPages -1){
+                    submitButtons.forEach(button => button.style.display = 'block');
+                } else {
+                    submitButtons.forEach(button => button.style.display = 'none');
+                }
+            }
+
+            // Event listeners for Next buttons
+            nextButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Validate current page before moving forward
+                    if(validatePage(currentPage)){
+                        if(currentPage < totalPages -1){
+                            currentPage++;
+                            showPage(currentPage);
+                            window.scrollTo(0, 0); // Scroll to top on page change
+                        }
+                    }
+                });
+            });
+
+            // Event listeners for Previous buttons
+            prevButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    if(currentPage > 0){
+                        currentPage--;
+                        showPage(currentPage);
+                        window.scrollTo(0, 0); // Scroll to top on page change
+                    }
+                });
+            });
+
+            // Function to validate current page inputs
+            function validatePage(page){
+                const currentSurveyPage = surveyPages[page];
+                const selects = currentSurveyPage.querySelectorAll('select');
+                let valid = true;
+                selects.forEach(select => {
+                    if(select.value === ''){
+                        valid = false;
+                        select.style.borderColor = 'red';
+                    } else {
+                        select.style.borderColor = '';
+                    }
+                });
+                if(!valid){
+                    alert('Please answer all questions before proceeding.');
+                }
+                return valid;
+            }
+
+            // JavaScript for Survey Submission
+            moodSurvey.addEventListener('submit', function(e) {
+                e.preventDefault();
+                // Validate all pages
+                let allValid = true;
+                surveyPages.forEach((page, index) => {
+                    const selects = page.querySelectorAll('select');
+                    selects.forEach(select => {
+                        if(select.value === ''){
+                            allValid = false;
+                            select.style.borderColor = 'red';
+                        } else {
+                            select.style.borderColor = '';
+                        }
+                    });
+                });
+
+                if(!allValid){
+                    alert('Please answer all questions before submitting the survey.');
+                    return;
+                }
+
+                const formData = new FormData(moodSurvey);
+                const surveyResults = {};
+                formData.forEach((value, key) => {
+                    surveyResults[key] = value;
+                });
+                console.log('Survey Results:', surveyResults);
+
+                // Array of motivational quotes
+                const quotes = [
+                    "Believe you can and you're halfway there.",
+                    "You are stronger than you think.",
+                    "Every day is a second chance.",
+                    "Your limitation—it's only your imagination.",
+                    "Push yourself, because no one else is going to do it for you.",
+                    "Great things never come from comfort zones.",
+                    "Dream it. Wish it. Do it.",
+                    "Success doesn't just find you. You have to go out and get it.",
+                    "The harder you work for something, the greater you'll feel when you achieve it.",
+                    "Dream bigger. Do bigger.",
+                    "Don't stop when you're tired. Stop when you're done.",
+                    "Wake up with determination. Go to bed with satisfaction.",
+                    "Do something today that your future self will thank you for.",
+                    "Little things make big days.",
+                    "It's going to be hard, but hard does not mean impossible.",
+                    "Don't wait for opportunity. Create it.",
+                    "Sometimes we're tested not to show our weaknesses, but to discover our strengths.",
+                    "The key to success is to focus on goals, not obstacles.",
+                    "Dream it. Believe it. Build it.",
+                    "Act as if what you do makes a difference. It does."
+                ];
+
+                // Select a random quote
+                const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+
+                // Display confirmation message and quote
+                confirmMessage.style.display = 'block';
+                moodSurvey.style.display = 'none';
+                moodSurvey.parentElement.innerHTML = `
+                    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%;">
+                        <p style="font-size: 2rem; text-align: center;">Thank you for filling out the daily survey!</p>
+                        <p style="font-size: 1.5rem; text-align: center; margin-top: 20px;">"${randomQuote}"</p>
+                    </div>
+                `;
+                // You can further process the survey results here, such as sending to a server
+            });
+
+            // JavaScript for Emotion Pie Chart Interaction
+            document.querySelectorAll('#emotionPieChart path').forEach(function(slice) {
+                slice.addEventListener('click', function() {
+                    const selectedEmotion = this.getAttribute('data-emotion');
+                    alert('You selected: ' + selectedEmotion);
+                    // You can handle the selected emotion here
+                });
+            });
+
+            // JavaScript for Emoji Interaction
+            const emojiItems = document.querySelectorAll('.emoji-item');
+            const tooltip = document.getElementById('emojiTooltip');
+            const selectedEmojiDisplay = document.getElementById('selectedEmojiDisplay');
+
+            emojiItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    const emotion = this.getAttribute('data-emotion');
+                    tooltip.textContent = emotion;
+                    tooltip.style.display = 'block';
+                    const rect = this.getBoundingClientRect();
+                    tooltip.style.left = `${rect.left + window.scrollX + rect.width / 2 - tooltip.offsetWidth / 2}px`;
+                    tooltip.style.top = `${rect.top + window.scrollY - tooltip.offsetHeight - 5}px`;
+                });
+
+                item.addEventListener('mouseleave', function() {
+                    tooltip.style.display = 'none';
+                });
+
+                item.addEventListener('click', function() {
+                    emojiItems.forEach(e => e.classList.remove('selected'));
+                    this.classList.add('selected');
+                    const emotion = this.getAttribute('data-emotion');
+                    selectedEmojiDisplay.innerHTML = `<div class="selected-emoji">${this.innerHTML}</div><div>${emotion}</div>`;
+                });
+            });
+
+        </script>
+    </div>
+</body>
+</html>
