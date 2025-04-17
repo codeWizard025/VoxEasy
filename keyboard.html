@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoxEasy - Keyboard</title>
+    <style>
+        /* Disable dragging for all elements */
+        * {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+
+        :root {
+            /* Updated color variables for Vision Pro style */
+            --bg-color: rgba(255, 255, 255, 0.18);
+            --text-color: #333333;
+            --item-bg: rgba(255, 255, 255, 0.15);
+            --item-border: rgba(255, 255, 255, 0.2);
+            --item-hover: rgba(255, 255, 255, 0.25);
+            --item-selected: rgba(51, 51, 51, 0.15);
+            --shadow-light: rgba(255, 255, 255, 0.5);
+            --shadow-dark: rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #cfeaff 0%, #f3f3f4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--text-color);
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            background: var(--bg-color);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 18px;
+            padding: 40px;
+            box-shadow: 
+                0 8px 24px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+            max-width: 3000px;
+            width: 100%;
+            max-height: 900px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--item-border);
+            animation: containerFadeIn 0.5s ease-out;
+            overflow: visible;
+        }
+
+        @keyframes containerFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .keyboard {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 6px;
+            margin-top: 15px;
+            padding: 10px;
+        }
+
+        .key {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            border-radius: 12px;
+            padding: 25px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 30px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 4px 6px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .key:hover {
+            background: var(--item-hover);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 16px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .key:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 4px 8px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .selected-choices {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            flex-grow: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 80px;
+            max-height: 100px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 4px 12px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .selected-item {
+            width: 100%;
+            background: var(--bg-color);
+            border: 1px solid var(--item-border);
+            border-radius: 15px;
+            padding: 10px 15px;
+            font-size: 1.3em;
+            line-height: 1.2;
+            min-height: 1.2em;
+            position: relative;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .speak-button {
+            background: #333333;
+            color: #ffffff;
+            border: none;
+            padding: 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1.6em;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            text-align: center;
+            box-shadow: 
+                0 4px 6px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .speak-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 16px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .speak-button:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 4px 8px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .dark-mode .speak-button {
+            background: #ffffff;
+            color: #333333;
+        }
+
+        .prediction {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            border-radius: 12px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            margin: 0 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 0;
+            font-size: 0.9em;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 4px 6px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .prediction:hover {
+            background: var(--item-hover);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 16px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .prediction:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 4px 8px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .nav-item {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            padding: 12px 24px;
+            margin: 0 5px;
+            text-decoration: none;
+            color: var(--text-color);
+            border-radius: 24px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.15),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-item:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item[href="keyboard.html"] {
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 
+                0 16px 48px rgba(0, 0, 0, 0.2),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dark-mode {
+            --bg-color: rgba(0, 0, 0, 0.18);
+            --text-color: #ffffff;
+            --item-bg: rgba(255, 255, 255, 0.1);
+            --item-border: rgba(255, 255, 255, 0.1);
+            --item-hover: rgba(255, 255, 255, 0.15);
+            --item-selected: rgba(255, 255, 255, 0.2);
+            --shadow-light: rgba(255, 255, 255, 0.1);
+            --shadow-dark: rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2e 100%);
+        }
+
+        .dark-mode .container {
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .dark-mode .nav-item {
+            background: rgba(0, 0, 0, 0.05);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.02);
+        }
+
+        .dark-mode .nav-item:hover {
+            background: rgba(0, 0, 0, 0.08);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.25),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+        }
+
+        .dark-mode .nav-item:active {
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.15),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.02);
+        }
+
+        .dark-mode .nav-item[href="keyboard.html"] {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 16px 48px rgba(0, 0, 0, 0.3),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--item-border);
+            text-align: center;
+            width: 100%; /* Make the line span the entire width */
+        }
+
+        .nav-item {
+            padding: 10px 20px;
+            margin: 0 5px;
+            text-decoration: none;
+            color: var(--text-color);
+            background-color: var(--item-bg);
+            border-radius: 20px;
+            transition: background-color 0s;
+            text-align: center;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 500;
+            font-size: 2.5em;
+            color: var(--text-color);
+        }
+
+        .key.wide {
+            grid-column: span 2;
+            font-size: 1.5em;
+            font-weight: 500;
+        }
+
+        .selected-list {
+            flex-grow: 1;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.2em;
+            background-color: var(--text-color);
+            margin-left: 1px;
+            animation: blink 0.7s infinite;
+            vertical-align: text-bottom;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .bottom-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .back-button {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            color: var(--text-color);
+            padding: 15px 30px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-button:hover {
+            background: var(--item-hover);
+        }
+
+        .backspace-icon {
+            width: 38px;
+            height: 38px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .shift-icon {
+            width: 32px;
+            height: 32px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        #shift.active .shift-icon {
+            filter: brightness(0) invert(1);
+        }
+
+        #shift.active {
+            background-color: var(--text-color);
+        }
+
+        .prediction-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            height: 35px;
+        }
+
+        .toggle-switch {
+            margin-bottom: 20px;
+        }
+
+        .toggle-input {
+            display: none;
+        }
+
+        .toggle-label {
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            background-color: var(--text-color);
+            border-radius: 34px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0s;
+        }
+
+        .toggle-label:before {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            top: 4px;
+            left: 4px;
+            background-color: var(--bg-color);
+            transition: 0s;
+        }
+
+        .toggle-input:checked + .toggle-label {
+            background-color: #ccc;
+        }
+
+        .toggle-input:checked + .toggle-label:before {
+            transform: translateX(26px);
+            background-color: var(--text-color);
+        }
+
+        #backspace img.backspace-icon {
+            filter: brightness(0); /* Default to black in light mode */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Add the toggle switch here, before the h1 -->
+        <div class="toggle-switch" style="margin-bottom: 20px;">
+            <input type="checkbox" id="switch" class="toggle-input" />
+            <label for="switch" class="toggle-label"></label>
+        </div>
+
+        <div class="selected-choices">
+            <div class="selected-list" id="selectedList"></div>
+        </div>
+        <div class="prediction-bar" id="predictionBar">
+            <div class="prediction"></div>
+            <div class="prediction"></div>
+            <div class="prediction"></div>
+        </div>
+        
+        <div class="keyboard" id="alphabetKeyboard">
+            <div class="key">Q</div>
+            <div class="key">W</div>
+            <div class="key">E</div>
+            <div class="key">R</div>
+            <div class="key">T</div>
+            <div class="key">Y</div>
+            <div class="key">U</div>
+            <div class="key">I</div>
+            <div class="key">O</div>
+            <div class="key">P</div>
+            <div class="key">A</div>
+            <div class="key">S</div>
+            <div class="key">D</div>
+            <div class="key">F</div>
+            <div class="key">G</div>
+            <div class="key">H</div>
+            <div class="key">J</div>
+            <div class="key">K</div>
+            <div class="key">L</div>
+            <div class="key">!</div>
+            <div class="key">?</div>
+            <div class="key">Z</div>
+            <div class="key">X</div>
+            <div class="key">C</div>
+            <div class="key">V</div>
+            <div class="key">B</div>
+            <div class="key">N</div>
+            <div class="key">M</div>
+            <div class="key wide" id="backspace">
+                <img src="https://api.iconify.design/mdi:backspace-outline.svg?color=black" alt="Backspace" class="backspace-icon">
+            </div>
+            <div class="key wide" id="switchToNumbers">123</div>
+            <div class="key">,</div>
+            <div class="key wide">SPACE</div>
+            <div class="key">.</div>
+            <div class="key wide">CLEAR</div>
+            <div class="key wide" id="toggleCase">SHIFT</div>
+        </div>
+        <div class="keyboard" id="numberKeyboard" style="display: none;">
+            <div class="key">1</div>
+            <div class="key">2</div>
+            <div class="key">3</div>
+            <div class="key">4</div>
+            <div class="key">5</div>
+            <div class="key">6</div>
+            <div class="key">7</div>
+            <div class="key">8</div>
+            <div class="key">9</div>
+            <div class="key">0</div>
+            <div class="key wide" id="switchToAlphabet">ABC</div>
+            <div class="key">,</div>
+            <div class="key wide">SPACE</div>
+            <div class="key">.</div>
+            <div class="key wide">CLEAR</div>
+            <div class="key wide" id="backspace">
+                <img src="https://api.iconify.design/mdi:backspace-outline.svg?color=black" alt="Backspace" class="backspace-icon">
+            </div>
+        </div>
+        <div class="speak-button" id="speakButton">SPEAK</div>
+        <div class="bottom-buttons">
+            <nav class="navigation">
+                <a href="pic.html" class="nav-item">Picture Board</a>   
+                <a href="prompts.html" class="nav-item">Prompts</a>         
+                <a href="pain.html" class="nav-item">Pain</a>
+                <a href="keyboard.html" class="nav-item">Keyboard</a>
+                <a href="voxai.html" class="nav-item">VoxAI</a>
+                <a href="documents.html" class="nav-item">Documents</a>
+                <a href="mood.html" class="nav-item">Mood</a>
+            </nav>
+        </div>
+    </div>
+
+
+    <script>
+        const keys = document.querySelectorAll('.key');
+        const selectedList = document.getElementById('selectedList');
+        const speakButton = document.getElementById('speakButton');
+        const toggleCaseButton = document.getElementById('toggleCase');
+        let currentText = '';
+        let isUpperCase = true;
+        let isSpeaking = false;
+
+
+        const alphabetKeyboard = document.getElementById('alphabetKeyboard');
+        const numberKeyboard = document.getElementById('numberKeyboard');
+        const switchToNumbersButton = document.getElementById('switchToNumbers');
+        const switchToAlphabetButton = document.getElementById('switchToAlphabet');
+
+
+        function switchKeyboard(showNumbers) {
+            if (showNumbers) {
+                alphabetKeyboard.style.display = 'none';
+                numberKeyboard.style.display = 'grid';
+            } else {
+                alphabetKeyboard.style.display = 'grid';
+                numberKeyboard.style.display = 'none';
+            }
+        }
+
+
+        switchToNumbersButton.addEventListener('click', () => switchKeyboard(true));
+        switchToAlphabetButton.addEventListener('click', () => switchKeyboard(false));
+
+
+        function updateKeys() {
+            keys.forEach(key => {
+                if (key.textContent.length === 1 && key.textContent.match(/[a-zA-Z]/)) {
+                    key.textContent = isUpperCase ? key.textContent.toUpperCase() : key.textContent.toLowerCase();
+                }
+            });
+        }
+
+
+        function toggleCase() {
+            isUpperCase = !isUpperCase;
+            updateKeys();
+            toggleCaseButton.textContent = isUpperCase ? 'SHIFT' : 'SHIFT';
+           
+            // Update the current text to match the new case
+            currentText = isUpperCase ? currentText.toUpperCase() : currentText.toLowerCase();
+            updateSelectedList();
+        }
+
+
+        toggleCaseButton.addEventListener('click', toggleCase);
+
+
+        // Add this new object for common misspellings
+        const commonMisspellings = {
+            'teh': 'the',
+            'adn': 'and',
+            'taht': 'that',
+            'wiht': 'with',
+            'becuase': 'because',
+            'recieve': 'receive',
+            'seperate': 'separate',
+            'definately': 'definitely',
+            'occured': 'occurred',
+            'truely': 'truly',
+            'pian': 'pain',
+            'payn': 'pain',
+            'pein': 'pain',
+            'hert': 'hurt',
+            'hurrt': 'hurt',
+            'hirt': 'hurt',
+            'docter': 'doctor',
+            'doctr': 'doctor',
+            'dokter': 'doctor',
+            'nerse': 'nurse',
+            'nurce': 'nurse',
+            'nurs': 'nurse',
+            'medicin': 'medicine',
+            'medecine': 'medicine',
+            'medicene': 'medicine',
+            'feling': 'feeling',
+            'fealing': 'feeling',
+            'feelling': 'feeling',
+            'beter': 'better',
+            'bettr': 'better',
+            'bettter': 'better',
+            'wors': 'worse',
+            'worce': 'worse',
+            'werse': 'worse',
+            'tierd': 'tired',
+            'tyred': 'tired',
+            'tirred': 'tired',
+            'sleap': 'sleep',
+            'slepp': 'sleep',
+            'sleeep': 'sleep',
+            'hungrey': 'hungry',
+            'hungri': 'hungry',
+            'hunggry': 'hungry',
+            'thirsty': 'thirsty',
+            'thersty': 'thirsty',
+            'thursty': 'thirsty',
+            'bathrom': 'bathroom',
+            'bathrum': 'bathroom',
+            'bathroon': 'bathroom',
+            'halp': 'help',
+            'hellp': 'help',
+            'healp': 'help',
+            'nead': 'need',
+            'kneed': 'need',
+            'neeed': 'need',
+            'watter': 'water',
+            'watre': 'water',
+            'wotter': 'water',
+            'plese': 'please',
+            'pleese': 'please',
+            'plz': 'please',
+            'thnak': 'thank',
+            'thx': 'thanks',
+            'thnk': 'thank',
+            'yuo': 'you',
+            'yu': 'you',
+            'yoo': 'you',
+            'comfertable': 'comfortable',
+            'comftable': 'comfortable',
+            'comferble': 'comfortable',
+            'uncomfertable': 'uncomfortable',
+            'uncomftable': 'uncomfortable',
+            'uncomferble': 'uncomfortable',
+            'helli': 'hello',
+            'hllo': 'hello',
+            'heee': 'here',
+            'wjen': 'when',
+            'yoi': 'you',
+            'yiu': 'you',
+            'yuo': 'you',
+            'yur': 'your',
+            'ur': 'your',
+            'yor': 'your',
+            'tjere': 'there',
+            'wjere': 'where',
+            'wau': 'way',
+            'tjis': 'this',
+            'besr': 'best',
+            'thefe': 'there',
+            'righr': 'right',
+        };
+
+
+        function autocorrect(word) {
+            let corrected = commonMisspellings[word.toLowerCase()] || word;
+            if (isUpperCase) {
+                return corrected.toUpperCase();
+            } else {
+                return corrected.toLowerCase();
+            }
+        }
+
+
+        const predictionBar = document.getElementById('predictionBar');
+        const commonWords = [
+            'a', 'hello','abandon', 'ability', 'able', 'abortion', 'about', 'above', 'abroad', 'absence', 'absolute',
+            'absolutely', 'absorb', 'abuse', 'academic', 'accent', 'accept', 'acceptable', 'access', 'accident', 'accommodate',
+            'accompany', 'accomplish', 'accord', 'account', 'accurate', 'accuse', 'achieve', 'achievement', 'acid', 'acknowledge',
+            'acquire', 'across', 'act', 'action', 'active', 'activist', 'activity', 'actor', 'actress', 'actual',
+            'adapt', 'add', 'addition', 'additional', 'address', 'adequate', 'adjust', 'adjustment', 'administration', 'administrator',
+            'admire', 'admission', 'admit', 'adolescent', 'adopt', 'adult', 'advance', 'advanced', 'advantage', 'adventure',
+            'advertise', 'advice', 'advise', 'adviser', 'advocate', 'affair', 'affect', 'afford', 'afraid', 'african',
+            'afternoon', 'again', 'against', 'age', 'agency', 'agenda', 'agent', 'aggressive', 'ago', 'agree',
+            'agreement', 'agricultural', 'ahead', 'aid', 'aide', 'aim', 'air', 'aircraft', 'airline', 'airport',
+            'aisle', 'alarm', 'album', 'alcohol', 'alive', 'all', 'alliance', 'allow', 'ally', 'almost',
+            'alone', 'along', 'alongside', 'already', 'also', 'alter', 'alternative', 'although', 'altogether', 'aluminum',
+            'always', 'am', 'amazing', 'ambassador', 'ambition', 'ambitious', 'amendment', 'american', 'amid', 'ammunition',
+            'among', 'amount', 'analysis', 'analyst', 'analyze', 'ancestor', 'ancient', 'and', 'angel', 'anger',
+            'angle', 'angry', 'animal', 'ankle', 'anniversary', 'announce', 'annual', 'another', 'answer', 'anticipate',
+            'anxiety', 'any', 'anybody', 'anymore', 'anyone', 'anything', 'anyway', 'anywhere', 'apart', 'apartment',
+            'apparent', 'apparently', 'appeal', 'appear', 'appearance', 'apple', 'application', 'apply', 'appoint', 'appointment',
+            'appreciate', 'approach', 'appropriate', 'approval', 'approve', 'approximately', 'arab', 'architect', 'area', 'are',
+            'argue', 'argument', 'arise', 'armed', 'army', 'around', 'arrange', 'arrangement', 'arrest', 'arrival',
+            'arrive', 'article', 'artificial', 'artist', 'artistic', 'as', 'asian', 'aside', 'ask', 'asleep',
+            'aspect', 'assault', 'assert', 'assess', 'assessment', 'asset', 'assign', 'assignment', 'assist', 'assistance',
+            'assistant', 'associate', 'association', 'assume', 'assumption', 'assure', 'at', 'atmosphere', 'atom', 'attach',
+            'attack', 'attempt', 'attend', 'attention', 'attitude', 'attorney', 'attract', 'attractive', 'attribute', 'auction',
+            'audience', 'aunt', 'author', 'authority', 'automatic', 'automatically', 'automobile', 'available', 'average', 'avoid',
+            'awake', 'award', 'aware', 'awareness', 'away', 'awful', 'baby', 'back', 'background', 'backward',
+            'bacteria', 'badly', 'bag', 'bake', 'balance', 'ball', 'balloon', 'ballot', 'banana', 'band',
+            'bang', 'bank', 'banker', 'banking', 'bankruptcy', 'banner', 'bar', 'bare', 'barely', 'bargain',
+            'barrel', 'barrier', 'base', 'baseball', 'basic', 'basically', 'basis', 'basket', 'basketball', 'bathroom',
+            'battery', 'battle', 'be', 'beach', 'beam', 'bean', 'bear', 'beard', 'beast', 'beat',
+            'beautiful', 'beauty', 'became', 'because', 'become', 'bedroom', 'beef', 'been', 'beer', 'before',
+            'begin', 'beginning', 'behalf', 'behave', 'behavior', 'behind', 'being', 'belief', 'believe', 'bell',
+            'belong', 'below', 'belt', 'bench', 'bend', 'beneath', 'benefit', 'beside', 'besides', 'best',
+            'bet', 'better', 'between', 'beyond', 'bible', 'bicycle', 'bid', 'big', 'bike', 'bill',
+            'billion', 'bind', 'biography', 'biological', 'bird', 'birth', 'birthday', 'bishop', 'bite', 'bitter',
+            'black', 'blade', 'blame', 'blanket', 'blast', 'blend', 'bless', 'blessing', 'blind', 'block',
+            'blonde', 'blood', 'blue', 'board', 'boat', 'body', 'bold', 'bomb', 'bombing', 'bond',
+            'bone', 'bonus', 'book', 'boom', 'boost', 'boot', 'border', 'bore', 'born', 'borrow',
+            'boss', 'both', 'bother', 'bottle', 'bottom', 'boundary', 'bowl', 'box', 'boy', 'boyfriend',
+            'brain', 'brake', 'branch', 'brand', 'brave', 'bread', 'break', 'breakfast', 'breast', 'breath',
+            'breathe', 'breathing', 'breed', 'brick', 'bridge', 'brief', 'briefly', 'bright', 'brilliant', 'bring',
+            'british', 'broad', 'broadcast', 'broken', 'brother', 'brown', 'brush', 'bubble', 'buck', 'budget',
+            'build', 'building', 'bullet', 'bunch', 'burden', 'bureau', 'burn', 'burst', 'bury', 'bus',
+            'bush', 'business', 'businessman', 'busy', 'but', 'butter', 'button', 'buy', 'buyer', 'by',
+            'cabin', 'cabinet', 'cable', 'cage', 'cake', 'calculate', 'calendar', 'call', 'calm', 'camera',
+            'camp', 'campaign', 'campus', 'can', 'canadian', 'cancer', 'candidate', 'candy', 'cap', 'capability',
+            'capable', 'capacity', 'capital', 'captain', 'capture', 'car', 'carbon', 'card', 'care', 'career',
+            'careful', 'carefully', 'cargo', 'carpet', 'carrier', 'carry', 'cart', 'case', 'cash', 'cast',
+            'casual', 'cat', 'catch', 'category', 'catholic', 'cattle', 'cause', 'ceiling', 'celebrate', 'celebration',
+            'celebrity', 'cell', 'center', 'central', 'century', 'ceremony', 'certain', 'certainly', 'chain', 'chair',
+            'chairman', 'challenge', 'chamber', 'champion', 'championship', 'chance', 'change', 'changing', 'channel', 'chapter',
+            'character', 'characteristic', 'characterize', 'charge', 'charity', 'charm', 'chart', 'chase', 'cheap', 'check',
+            'cheek', 'cheese', 'chef', 'chemical', 'chest', 'chicken', 'chief', 'child', 'childhood', 'chinese',
+            'chip', 'chocolate', 'choice', 'cholesterol', 'choose', 'christian', 'christmas', 'church', 'cigarette', 'circle',
+            'circuit', 'circumstance', 'citizen', 'city', 'civil', 'civilian', 'claim', 'class', 'classic', 'classroom',
+            'clean', 'clear', 'clearly', 'client', 'climate', 'climb', 'clinic', 'clinical', 'clock', 'close',
+            'closely', 'closer', 'clothes', 'clothing', 'cloud', 'club', 'clue', 'cluster', 'coach', 'coal',
+            'coalition', 'coast', 'coat', 'code', 'coffee', 'cognitive', 'coin', 'cold', 'collapse', 'colleague',
+            'collect', 'collection', 'collective', 'college', 'colonial', 'color', 'column', 'combination', 'combine', 'come',
+            'comedy', 'comfort', 'comfortable', 'command', 'commander', 'comment', 'commercial', 'commission', 'commit', 'commitment',
+            'committee', 'common', 'communicate', 'communication', 'community', 'company', 'compare', 'comparison', 'compete', 'competition',
+            'competitive', 'competitor', 'complain', 'complaint', 'complete', 'completely', 'complex', 'complicated', 'component', 'compose',
+            'composition', 'compound', 'comprehensive', 'computer', 'concentrate', 'concentration', 'concept', 'concern', 'concerned', 'concert',
+            'conclude', 'conclusion', 'concrete', 'condition', 'conduct', 'conference', 'confidence', 'confident', 'confirm', 'conflict',
+            'confront', 'confusion', 'congress', 'congressional', 'connect', 'connection', 'consciousness', 'consensus', 'consequence', 'conservative',
+            'consider', 'considerable', 'consideration', 'consist', 'consistent', 'constant', 'constantly', 'constitute', 'constitutional', 'construct',
+            'construction', 'consultant', 'consume', 'consumer', 'consumption', 'contact', 'contain', 'container', 'contemporary', 'content',
+            'contest', 'context', 'continue', 'continued', 'contract', 'contrast', 'contribute', 'contribution', 'control', 'controversial',
+            'controversy', 'convention', 'conventional', 'conversation', 'convert', 'conviction', 'convince', 'cook', 'cookie', 'cooking',
+            'cool', 'cooperation', 'cop', 'cope', 'copy', 'core', 'corn', 'corner', 'corporate', 'corporation',
+            'correct', 'correspondent', 'cost', 'cotton', 'couch', 'could', 'council', 'counselor', 'count', 'counter',
+            'country', 'county', 'couple', 'courage', 'course', 'court', 'cousin', 'cover', 'coverage', 'cow',
+            'crack', 'craft', 'crash', 'crazy', 'cream', 'create', 'creation', 'creative', 'creature', 'credit',
+            'crew', 'crime', 'criminal', 'crisis', 'criteria', 'critic', 'critical', 'criticism', 'criticize', 'crop',
+            'cross', 'crowd', 'crucial', 'cry', 'cultural', 'culture', 'cup', 'curious', 'current', 'currently',
+            'curriculum', 'custom', 'customer', 'cut', 'cycle', 'daily', 'damage', 'dance', 'danger', 'dangerous',
+            'dare', 'dark', 'darkness', 'data', 'database', 'date', 'daughter', 'dawn', 'day', 'dead',
+            'deal', 'dealer', 'dear', 'death', 'debate', 'debt', 'decade', 'decide', 'decision', 'deck',
+            'declare', 'decline', 'decrease', 'deep', 'deeply', 'deer', 'defeat', 'defend', 'defendant', 'defense',
+            'defensive', 'deficit', 'define', 'definitely', 'definition', 'degree', 'delay', 'deliver', 'delivery', 'demand',
+            'democracy', 'democrat', 'democratic', 'demonstrate', 'demonstration', 'deny', 'department', 'depend', 'dependent', 'depending',
+            'depict', 'depression', 'depth', 'deputy', 'derive', 'describe', 'description', 'desert', 'deserve', 'design',
+            'designer', 'desire', 'desk', 'desperate', 'despite', 'destroy', 'destruction', 'detail', 'detailed', 'detect',
+            'determine', 'develop', 'developing', 'development', 'device', 'devote', 'dialogue', 'did', 'die', 'diet',
+            'differ', 'difference', 'different', 'differently', 'difficult', 'difficulty', 'dig', 'digital', 'dimension', 'dining',
+            'dinner', 'direct', 'direction', 'directly', 'director', 'dirt', 'dirty', 'disability', 'disagree', 'disappear',
+            'disaster', 'discipline', 'discourse', 'discover', 'discovery', 'discrimination', 'discuss', 'discussion', 'disease', 'dish',
+            'dismiss', 'disorder', 'display', 'dispute', 'distance', 'distant', 'distinct', 'distinction', 'distinguish', 'distribute',
+            'distribution', 'district', 'diverse', 'diversity', 'divide', 'division', 'divorce', 'dna', 'do', 'doctor',
+            'document', 'does', 'dog', 'domestic', 'dominant', 'dominate', 'door', 'double', 'doubt', 'down',
+            'downtown', 'dozen', 'draft', 'drag', 'drama', 'dramatic', 'dramatically', 'draw', 'drawing', 'dream',
+            'dress', 'drink', 'drive', 'driver', 'drop', 'drug', 'dry', 'due', 'during', 'dust',
+            'duty', 'each', 'eager', 'ear', 'early', 'earn', 'earnings', 'earth', 'ease', 'easily',
+            'east', 'eastern', 'easy', 'eat', 'economic', 'economics', 'economist', 'economy', 'edge', 'edition',
+            'editor', 'educate', 'education', 'educational', 'educator', 'effect', 'effective', 'effectively', 'efficiency', 'efficient',
+            'effort', 'egg', 'eight', 'either', 'elderly', 'elect', 'election', 'electric', 'electricity', 'electronic',
+            'element', 'elementary', 'eliminate', 'elite', 'else', 'elsewhere', 'email', 'embrace', 'emerge', 'emergency',
+            'emission', 'emotion', 'emotional', 'emphasis', 'emphasize', 'employ', 'employee', 'employer', 'employment', 'empty',
+            'enable', 'encounter', 'encourage', 'enemy', 'energy', 'enforcement', 'engage', 'engine', 'engineer', 'engineering',
+            'english', 'enhance', 'enjoy', 'enormous', 'enough', 'ensure', 'enter', 'enterprise', 'environment', 'environmental',
+            'equal', 'equality', 'equipment', 'era', 'error', 'escape', 'essay', 'establish', 'estate', 'estimate',
+            'ethic', 'ethics', 'evaluate', 'event', 'ever', 'every', 'everybody', 'everyone', 'everything', 'everywhere',
+            'evidence', 'evolution', 'exact', 'exactly', 'exam', 'examination', 'example', 'excellent', 'except', 'exception',
+            'exchange', 'excite', 'excitement', 'exciting', 'exclude', 'exclusive', 'exercise', 'exhibit', 'exist', 'existence',
+            'exit', 'expand', 'expansion', 'expect', 'experience', 'expert', 'feeling', 'fever', 'few', 'first',
+            'for', 'from', 'get', 'give', 'go', 'good', 'had', 'has', 'have', 'he',
+            'headache', 'hear', 'hell', 'help', 'here', 'hey', 'hi', 'him', 'his',
+            'hot', 'how', 'however', 'hungry', 'hurt', 'I', 'if', 'is','ill', 'in', 'into',
+            'it', 'its', 'just', 'know', 'later', 'like', 'little', 'look', 'lots',
+            'love', 'make', 'many', 'may', 'maybe', 'me', 'medicine', 'might', 'most', 'much',
+            'must', 'my', 'name', 'nauseous', 'need', 'new', 'no', 'not', 'now', 'nurse',
+            'of', 'off', 'ok', 'okay', 'on', 'one', 'only', 'or', 'other', 'our',
+            'out', 'over', 'pain', 'pardon', 'people', 'perhaps', 'please', 'relax', 'rest', 'run',
+            'sad', 'say', 'scared', 'see', 'shall', 'she', 'should', 'sick', 'sit', 'sleep',
+            'so', 'some', 'someone', 'something', 'somewhere', 'soon', 'sorry', 'stand', 'start', 'stomachache',
+            'stress', 'strong', 'study', 'take', 'than', 'thank', 'thanks', 'that', 'the', 'their',
+            'them', 'then', 'there', 'these', 'they', 'think', 'thirsty', 'this', 'time', 'tired',
+            'to', 'two', 'uncomfortable', 'understand', 'up', 'us', 'use', 'walk', 'wanna', 'want',
+            'warm', 'was', 'watch', 'water', 'way', 'we', 'weak', 'well', 'were', 'what',
+            'when', 'where', 'which', 'who', 'whom', 'whose', 'why', 'will', 'with', 'work',
+            'worse', 'would', 'year', 'yes', 'you', 'your'
+        ];
+
+
+        function updatePredictions() {
+            const words = currentText.split(' ');
+            const currentWord = words[words.length - 1].toLowerCase();
+           
+            let predictions = [];
+            if (currentWord.length > 0) {
+                predictions = commonWords
+                    .filter(word => word.toLowerCase().startsWith(currentWord))
+                    .slice(0, 3);
+            }
+           
+            const predictionElements = predictionBar.querySelectorAll('.prediction');
+           
+            predictionElements.forEach((elem, index) => {
+                if (index < predictions.length) {
+                    const word = isUpperCase ? predictions[index].toUpperCase() : predictions[index].toLowerCase();
+                    elem.textContent = word;
+                    elem.onclick = () => {
+                        words[words.length - 1] = word;
+                        currentText = words.join(' ') + ' ';
+                        updateSelectedList();
+                    };
+                } else {
+                    elem.textContent = '';
+                    elem.onclick = null;
+                }
+            });
+        }
+
+
+        // Initial call to set up prediction boxes
+        updatePredictions();
+
+
+        function updateSelectedList() {
+            let words = currentText.split(' ');
+            let lastWord = words[words.length - 1];
+            let correctedWord = autocorrect(lastWord);
+           
+            if (correctedWord.toLowerCase() !== lastWord.toLowerCase()) {
+                words[words.length - 1] = correctedWord;
+                currentText = words.join(' ') + ' '; // Add space after autocorrection
+            }
+
+
+            // Apply the current case to the entire text
+            currentText = isUpperCase ? currentText.toUpperCase() : currentText.toLowerCase();
+
+
+            const textWithCursor = currentText + '<span class="cursor"></span>';
+            selectedList.innerHTML = `<div class="selected-item">${textWithCursor}</div>`;
+            updatePredictions();
+        }
+
+
+        // Modify the key click event listener
+        document.querySelectorAll('.keyboard .key').forEach(key => {
+            key.addEventListener('click', () => {
+                if (key.id === 'switchToNumbers' || key.id === 'switchToAlphabet') {
+                    return; // Do nothing for these keys
+                }
+                console.log('Key clicked:', key.id || key.textContent);
+                if (key.textContent === 'SPACE' || key.textContent === 'Space') {
+                    currentText += ' ';
+                    updateSelectedList(); // Apply autocorrect when space is pressed
+                } else if (key.id === 'backspace') {
+                    currentText = currentText.slice(0, -1);
+                } else if (key.textContent === 'CLEAR' || key.textContent === 'Clear') {
+                    currentText = '';
+                } else if (key.id === 'toggleCase') {
+                    // Do nothing, handled by separate event listener
+                } else {
+                    currentText += key.textContent;
+                }
+                updateSelectedList();
+            });
+        });
+
+
+        speakButton.addEventListener('click', () => {
+            console.log('Speak button clicked');
+            if (isSpeaking) {
+                stopSpeaking();
+            } else {
+                speak(currentText);
+            }
+        });
+
+
+        // Initial update of the selected list
+        updateSelectedList();
+
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                stopSpeaking();
+               
+                const utterance = new SpeechSynthesisUtterance(text);
+               
+                utterance.onstart = () => {
+                    console.log('Speech started');
+                    isSpeaking = true;
+                    speakButton.textContent = 'SPEAK';
+                };
+
+
+                utterance.onend = () => {
+                    console.log('Speech finished');
+                    resetSpeakButton();
+                    addToLog(`Spoken: ${text}`); // Log only the spoken text here
+                };
+
+
+                utterance.onerror = () => {
+                    console.log('Speech error occurred');
+                    resetSpeakButton();
+                };
+
+
+                speechSynthesis.speak(utterance);
+            } else {
+                console.log('Text-to-speech not supported in this browser');
+            }
+        }
+
+
+        function stopSpeaking() {
+            speechSynthesis.cancel();
+            resetSpeakButton();
+        }
+
+
+        function resetSpeakButton() {
+            isSpeaking = false;
+            speakButton.textContent = 'SPEAK';
+        }
+
+
+        function addToLog(message) {
+            // Retrieve existing logs or initialize an empty array
+            let logs = JSON.parse(localStorage.getItem('ccpcsLog')) || []
+            // Add the new message to the logs
+            logs.push({ action: message, timestamp: new Date().toISOString() })
+            // Store the updated logs back in local storage
+            localStorage.setItem('ccpcsLog', JSON.stringify(logs))
+            console.log('Logged:', message)
+        }
+
+
+        const toggleSwitch = document.getElementById('switch');
+        const body = document.body;
+        const container = document.querySelector('.container');
+        
+        // Check the initial state from local storage
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            toggleSwitch.checked = true;
+            updateIconColors('white');
+        }
+
+        toggleSwitch.addEventListener('change', function() {
+            if (this.checked) {
+                console.log('Switch is ON - Dark Mode');
+                body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'enabled');
+                updateIconColors('white'); // Set icons to white
+            } else {
+                console.log('Switch is OFF - Light Mode');
+                body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'disabled');
+                updateIconColors('black'); // Set icons to black
+            }
+        });
+
+        function updateIconColors(color) {
+            const backspaceIcons = document.querySelectorAll('.backspace-icon');
+            backspaceIcons.forEach(icon => {
+                if (icon) {
+                    // Update the filter to change the icon color
+                    icon.style.filter = color === 'white' ? 'brightness(0) invert(1)' : 'brightness(0)';
+                }
+            });
+        }
+
+        const keyboardButton = document.querySelector('.nav-item[href="keyboard.html"]');
+
+        function updateKeyboardButtonBorder() {
+            if (body.classList.contains('dark-mode')) {
+                keyboardButton.style.border = '0px solid white';
+            } else {
+                keyboardButton.style.border = '0px solid black';
+            }
+        }
+
+        // Call the function initially to set the correct border color
+        updateKeyboardButtonBorder();
+
+        // Update the border color whenever the mode changes
+        toggleSwitch.addEventListener('change', updateKeyboardButtonBorder);
+
+        // Make all elements undraggable
+        document.querySelectorAll('*').forEach(element => {
+            element.setAttribute('draggable', 'false');
+        });
+
+        // Function to log actions to localStorage
+        function logAction(action) {
+            const timestamp = new Date().toISOString();
+            const logEntry = { action, timestamp };
+            
+            const log = JSON.parse(localStorage.getItem('ccpcsLog') || '[]');
+            log.push(logEntry);
+            localStorage.setItem('ccpcsLog', JSON.stringify(log));
+            
+            // Post message to log.html if it's open in another window/frame
+            try {
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({type: 'log', message: action}, '*');
+                }
+                
+                // Broadcast to other windows
+                window.dispatchEvent(new StorageEvent('storage', {
+                    key: 'ccpcsLog',
+                    newValue: JSON.stringify(log),
+                    storageArea: localStorage
+                }));
+            } catch (e) {
+                console.error("Error posting message:", e);
+            }
+        }
+
+        // Log when text is spoken
+        function speakText(text) {
+            if (!text.trim()) return; // Don't speak or log empty text
+            
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Cancel any ongoing speech
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Log before starting speech
+                logAction(`Keyboard Spoken: "${text}"`);
+                
+                // Set up event handlers for speech
+                utterance.onstart = function() {
+                    console.log('Speech started');
+                };
+                
+                utterance.onend = function() {
+                    console.log('Speech finished');
+                };
+                
+                utterance.onerror = function(event) {
+                    console.log('Speech error occurred');
+                    logAction(`Speech Error: ${event.error}`);
+                };
+                
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.log('Text-to-speech not supported');
+                logAction(`Error: Text-to-speech not supported in this browser`);
+                alert('Text-to-speech is not supported in this browser.');
+            }
+        }
+
+        // Log other button clicks (excluding navigation)
+        document.addEventListener('click', function(event) {
+            const clickedElement = event.target.closest('.key, .prediction, button');
+            
+            if (!clickedElement) return;
+            
+            // Don't log navigation items
+            if (clickedElement.classList.contains('nav-item')) {
+                return;
+            }
+
+            // Log key presses and button clicks
+            const textContent = clickedElement.textContent.trim();
+            if (textContent) {
+                // Handle special keys
+                if (clickedElement.classList.contains('key')) {
+                    // For keyboard keys
+                    logAction(`Keyboard Key Pressed: "${textContent}"`);
+                } else if (clickedElement.id === 'speakButton') {
+                    // Already handled by speakText
+                } else if (clickedElement.classList.contains('prediction')) {
+                    // For word predictions
+                    logAction(`Prediction Selected: "${textContent}"`);
+                } else if (clickedElement.tagName === 'BUTTON') {
+                    // Other buttons
+                    logAction(`Keyboard Button Clicked: "${textContent}"`);
+                }
+            }
+        });
+
+        // Add event listeners once DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get necessary elements
+            const inputField = document.querySelector('textarea, input[type="text"]'); // Adjust selector based on your input element
+            const speakButton = document.querySelector('button#speakButton'); // Adjust selector based on your speak button
+
+            // Log when speak button is clicked
+            if (speakButton) {
+                speakButton.addEventListener('click', function() {
+                    const text = inputField.value.trim();
+                    if (text) {
+                        speakText(text);
+                    }
+                });
+            }
+
+            // Log when Enter key is pressed (if you want to support this)
+            if (inputField) {
+                inputField.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter' && !event.shiftKey) {
+                        event.preventDefault();
+                        const text = this.value.trim();
+                        if (text) {
+                            speakText(text);
+                        }
+                    }
+                });
+            }
+
+            // Handle dark mode
+            const toggleSwitch = document.getElementById('switch');
+            const body = document.body;
+
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                body.classList.add('dark-mode');
+                toggleSwitch.checked = true;
+            }
+
+            toggleSwitch.addEventListener('change', function() {
+                if (this.checked) {
+                    body.classList.add('dark-mode');
+                    localStorage.setItem('darkMode', 'enabled');
+                } else {
+                    body.classList.remove('dark-mode');
+                    localStorage.setItem('darkMode', 'disabled');
+                }
+            });
+
+            // Display patient name if available
+            const currentPatient = JSON.parse(localStorage.getItem('currentPatient'));
+            if (currentPatient) {
+                const patientNameElement = document.getElementById('patient-name');
+                if (patientNameElement) {
+                    patientNameElement.textContent = `${currentPatient.firstName} ${currentPatient.lastName}`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
