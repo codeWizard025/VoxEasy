@@ -1,0 +1,1772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoxEasy - Keyboard</title>
+    <style>
+        /* Disable dragging for all elements */
+        * {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+
+        :root {
+            /* Updated color variables for Vision Pro style */
+            --bg-color: rgba(255, 255, 255, 0.18);
+            --text-color: #333333;
+            --item-bg: rgba(255, 255, 255, 0.15);
+            --item-border: rgba(255, 255, 255, 0.2);
+            --item-hover: rgba(255, 255, 255, 0.25);
+            --item-selected: rgba(51, 51, 51, 0.15);
+            --shadow-light: rgba(255, 255, 255, 0.5);
+            --shadow-dark: rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #cfeaff 0%, #f3f3f4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--text-color);
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            background: var(--bg-color);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 18px;
+            padding: 40px;
+            box-shadow: 
+                0 8px 24px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+            max-width: 3000px;
+            width: 100%;
+            max-height: 900px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--item-border);
+            animation: containerFadeIn 0.5s ease-out;
+            overflow: visible;
+        }
+
+        @keyframes containerFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .keyboard {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 6px;
+            margin-top: 15px;
+            padding: 10px;
+        }
+
+        .key {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            border-radius: 12px;
+            padding: 25px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 30px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 4px 6px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .key:hover {
+            background: var(--item-hover);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 16px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .key:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 4px 8px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .selected-choices {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            flex-grow: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 80px;
+            max-height: 100px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 4px 12px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .selected-item {
+            width: 100%;
+            background: var(--bg-color);
+            border: 1px solid var(--item-border);
+            border-radius: 15px;
+            padding: 10px 15px;
+            font-size: 1.3em;
+            line-height: 1.2;
+            min-height: 1.2em;
+            position: relative;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .speak-button {
+            background: #333333;
+            color: #ffffff;
+            border: none;
+            padding: 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1.6em;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            text-align: center;
+            box-shadow: 
+                0 4px 6px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .speak-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 16px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .speak-button:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 4px 8px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .dark-mode .speak-button {
+            background: #ffffff;
+            color: #333333;
+        }
+
+        .prediction {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            border-radius: 12px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            margin: 0 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 0;
+            font-size: 0.9em;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 4px 6px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .prediction:hover {
+            background: var(--item-hover);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 16px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .prediction:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 4px 8px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .nav-item {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            padding: 12px 24px;
+            margin: 0 5px;
+            text-decoration: none;
+            color: var(--text-color);
+            border-radius: 24px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.15),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-item:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item[href="keyboard.html"] {
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 
+                0 16px 48px rgba(0, 0, 0, 0.2),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dark-mode {
+            --bg-color: rgba(0, 0, 0, 0.18);
+            --text-color: #ffffff;
+            --item-bg: rgba(255, 255, 255, 0.1);
+            --item-border: rgba(255, 255, 255, 0.1);
+            --item-hover: rgba(255, 255, 255, 0.15);
+            --item-selected: rgba(255, 255, 255, 0.2);
+            --shadow-light: rgba(255, 255, 255, 0.1);
+            --shadow-dark: rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2e 100%);
+        }
+
+        .dark-mode .container {
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .dark-mode .nav-item {
+            background: rgba(0, 0, 0, 0.05);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.02);
+        }
+
+        .dark-mode .nav-item:hover {
+            background: rgba(0, 0, 0, 0.08);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.25),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+        }
+
+        .dark-mode .nav-item:active {
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.15),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.02);
+        }
+
+        .dark-mode .nav-item[href="keyboard.html"] {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 16px 48px rgba(0, 0, 0, 0.3),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--item-border);
+            text-align: center;
+            width: 100%; /* Make the line span the entire width */
+        }
+
+        .nav-item {
+            padding: 10px 20px;
+            margin: 0 5px;
+            text-decoration: none;
+            color: var(--text-color);
+            background-color: var(--item-bg);
+            border-radius: 20px;
+            transition: background-color 0s;
+            text-align: center;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 500;
+            font-size: 2.5em;
+            color: var(--text-color);
+        }
+
+        .key.wide {
+            grid-column: span 2;
+            font-size: 1.5em;
+            font-weight: 500;
+        }
+
+        .selected-list {
+            flex-grow: 1;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.2em;
+            background-color: var(--text-color);
+            margin-left: 1px;
+            animation: blink 0.7s infinite;
+            vertical-align: text-bottom;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .bottom-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .back-button {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            color: var(--text-color);
+            padding: 15px 30px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-button:hover {
+            background: var(--item-hover);
+        }
+
+        .backspace-icon {
+            width: 38px;
+            height: 38px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .shift-icon {
+            width: 32px;
+            height: 32px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        #shift.active .shift-icon {
+            filter: brightness(0) invert(1);
+        }
+
+        #shift.active {
+            background-color: var(--text-color);
+        }
+
+        .prediction-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            height: 35px;
+        }
+
+        .toggle-switch {
+            margin-bottom: 20px;
+        }
+
+        .toggle-input {
+            display: none;
+        }
+
+        .toggle-label {
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            background-color: var(--text-color);
+            border-radius: 34px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0s;
+        }
+
+        .toggle-label:before {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            top: 4px;
+            left: 4px;
+            background-color: var(--bg-color);
+            transition: 0s;
+        }
+
+        .toggle-input:checked + .toggle-label {
+            background-color: #ccc;
+        }
+
+        .toggle-input:checked + .toggle-label:before {
+            transform: translateX(26px);
+            background-color: var(--text-color);
+        }
+
+        #backspace img.backspace-icon {
+            filter: brightness(0); /* Default to black in light mode */
+        }
+
+        .language-dropdown {
+            padding: 8px 15px;
+            border-radius: 12px;
+            font-size: 1em;
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            color: var(--text-color);
+            box-shadow: 0 4px 6px var(--shadow-dark);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23333333%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 12px;
+            padding-right: 30px;
+            width: 140px;
+        }
+        
+        .language-dropdown:hover {
+            background: var(--item-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px var(--shadow-dark);
+        }
+        
+        .language-dropdown:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--shadow-light), 0 8px 16px var(--shadow-dark);
+        }
+        
+        .dark-mode .language-dropdown {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+        }
+
+        /* Custom styling for dropdown options - requires a custom select implementation */
+        select.language-dropdown option {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 10px;
+            font-size: 1em;
+        }
+
+        .dark-mode select.language-dropdown option {
+            background-color: rgba(50, 50, 50, 0.95);
+            color: white;
+        }
+
+        /* For Firefox */
+        select.language-dropdown {
+            scrollbar-width: thin;
+            scrollbar-color: var(--item-border) var(--bg-color);
+        }
+
+        /* For Chrome/Edge/Safari */
+        select.language-dropdown::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        select.language-dropdown::-webkit-scrollbar-track {
+            background: var(--bg-color);
+            border-radius: 10px;
+        }
+
+        select.language-dropdown::-webkit-scrollbar-thumb {
+            background-color: var(--item-border);
+            border-radius: 10px;
+            border: 2px solid var(--bg-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Add language selector dropdown next to the toggle switch -->
+        <div class="toggle-switch" style="margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center;">
+            <input type="checkbox" id="switch" class="toggle-input" />
+            <label for="switch" class="toggle-label"></label>
+            </div>
+            <div class="language-selector">
+                <select id="languageSelect" class="language-dropdown">
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                    <option value="fr">Français</option>
+                    <option value="de">Deutsch</option>
+                    <option value="it">Italiano</option>
+                    <option value="pt">Português</option>
+                    <option value="ru">Русский</option>
+                    <option value="zh">中文</option>
+                    <option value="ja">日本語</option>
+                    <option value="ko">한국어</option>
+                    <option value="hi">हिन्दी</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="selected-choices">
+            <div class="selected-list" id="selectedList"></div>
+        </div>
+        <div class="prediction-bar" id="predictionBar">
+            <div class="prediction"></div>
+            <div class="prediction"></div>
+            <div class="prediction"></div>
+        </div>
+        
+        <div class="keyboard" id="alphabetKeyboard">
+            <div class="key">Q</div>
+            <div class="key">W</div>
+            <div class="key">E</div>
+            <div class="key">R</div>
+            <div class="key">T</div>
+            <div class="key">Y</div>
+            <div class="key">U</div>
+            <div class="key">I</div>
+            <div class="key">O</div>
+            <div class="key">P</div>
+            <div class="key">A</div>
+            <div class="key">S</div>
+            <div class="key">D</div>
+            <div class="key">F</div>
+            <div class="key">G</div>
+            <div class="key">H</div>
+            <div class="key">J</div>
+            <div class="key">K</div>
+            <div class="key">L</div>
+            <div class="key">!</div>
+            <div class="key">?</div>
+            <div class="key">Z</div>
+            <div class="key">X</div>
+            <div class="key">C</div>
+            <div class="key">V</div>
+            <div class="key">B</div>
+            <div class="key">N</div>
+            <div class="key">M</div>
+            <div class="key wide" id="backspace">
+                <img src="https://api.iconify.design/mdi:backspace-outline.svg?color=black" alt="Backspace" class="backspace-icon">
+            </div>
+            <div class="key wide" id="switchToNumbers">123</div>
+            <div class="key">,</div>
+            <div class="key wide">SPACE</div>
+            <div class="key">.</div>
+            <div class="key wide">CLEAR</div>
+            <div class="key wide" id="toggleCase">SHIFT</div>
+        </div>
+        <div class="keyboard" id="numberKeyboard" style="display: none;">
+            <div class="key">1</div>
+            <div class="key">2</div>
+            <div class="key">3</div>
+            <div class="key">4</div>
+            <div class="key">5</div>
+            <div class="key">6</div>
+            <div class="key">7</div>
+            <div class="key">8</div>
+            <div class="key">9</div>
+            <div class="key">0</div>
+            <div class="key wide" id="switchToAlphabet">ABC</div>
+            <div class="key">,</div>
+            <div class="key wide">SPACE</div>
+            <div class="key">.</div>
+            <div class="key wide">CLEAR</div>
+            <div class="key wide" id="backspace">
+                <img src="https://api.iconify.design/mdi:backspace-outline.svg?color=black" alt="Backspace" class="backspace-icon">
+            </div>
+        </div>
+        <div class="speak-button" id="speakButton">SPEAK</div>
+        <div class="bottom-buttons">
+            <nav class="navigation">
+                <a href="pic.html" class="nav-item">Picture Board</a>   
+                <a href="prompts.html" class="nav-item">Prompts</a>         
+                <a href="pain.html" class="nav-item">Pain</a>
+                <a href="keyboard.html" class="nav-item">Keyboard</a>
+                <a href="voxai.html" class="nav-item">VoxAI</a>
+                <a href="entertainment.html" class="nav-item">Entertainment</a>
+                <a href="documents.html" class="nav-item">Documents</a>
+                <a href="mood.html" class="nav-item">Mood</a>
+            </nav>
+        </div>
+    </div>
+
+
+    <script>
+        const keys = document.querySelectorAll('.key');
+        const selectedList = document.getElementById('selectedList');
+        const speakButton = document.getElementById('speakButton');
+        const toggleCaseButton = document.getElementById('toggleCase');
+        const languageSelect = document.getElementById('languageSelect');
+        let currentText = '';
+        let isUpperCase = true;
+        let isSpeaking = false;
+        let currentLanguage = 'en';
+
+        // Keyboard layouts for different languages
+        const keyboardLayouts = {
+            en: {
+                main: [
+                    'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
+                    'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', '!',
+                    '?', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '', ''
+                ],
+                shiftText: 'SHIFT',
+                spaceText: 'SPACE',
+                backspaceText: '',
+                clearText: 'CLEAR',
+                numbersText: '123'
+            },
+            es: {
+                main: [
+                    'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
+                    'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ñ',
+                    '?', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '¿', '¡'
+                ],
+                shiftText: 'MAYÚS',
+                spaceText: 'ESPACIO',
+                backspaceText: '',
+                clearText: 'BORRAR',
+                numbersText: '123'
+            },
+            fr: {
+                main: [
+                    'A', 'Z', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
+                    'Q', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M',
+                    'W', 'X', 'C', 'V', 'B', 'N', 'É', 'È', 'Ç', 'À'
+                ],
+                shiftText: 'MAJ',
+                spaceText: 'ESPACE',
+                backspaceText: '',
+                clearText: 'EFFACER',
+                numbersText: '123'
+            },
+            de: {
+                main: [
+                    'Q', 'W', 'E', 'R', 'T', 'Z', 'U', 'I', 'O', 'P',
+                    'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ö',
+                    'Ü', 'Y', 'X', 'C', 'V', 'B', 'N', 'M', 'Ä', 'ß'
+                ],
+                shiftText: 'UMSCH',
+                spaceText: 'LEERTASTE',
+                backspaceText: '',
+                clearText: 'LÖSCHEN',
+                numbersText: '123'
+            },
+            it: {
+                main: [
+                    'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
+                    'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'À',
+                    'È', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Ì', 'Ò'
+                ],
+                shiftText: 'MAIUSC',
+                spaceText: 'SPAZIO',
+                backspaceText: '',
+                clearText: 'CANCELLA',
+                numbersText: '123'
+            },
+            pt: {
+                main: [
+                    'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
+                    'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ç',
+                    '?', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Ã', 'Õ'
+                ],
+                shiftText: 'SHIFT',
+                spaceText: 'ESPAÇO',
+                backspaceText: '',
+                clearText: 'LIMPAR',
+                numbersText: '123'
+            },
+            ru: {
+                main: [
+                    'Й', 'Ц', 'У', 'К', 'Е', 'Н', 'Г', 'Ш', 'Щ', 'З',
+                    'Ф', 'Ы', 'В', 'А', 'П', 'Р', 'О', 'Л', 'Д', 'Ж',
+                    'Э', 'Я', 'Ч', 'С', 'М', 'И', 'Т', 'Ь', 'Б', 'Ю'
+                ],
+                shiftText: 'ВЕРХ',
+                spaceText: 'ПРОБЕЛ',
+                backspaceText: '',
+                clearText: 'ОЧИСТИТЬ',
+                numbersText: '123'
+            },
+            zh: {
+                main: [
+                    '你', '我', '他', '的', '是', '了', '在', '有', '和', '人',
+                    '这', '中', '大', '为', '上', '个', '国', '生', '时', '会',
+                    '出', '要', '就', '那', '可', '到', '自', '年', '家', '能'
+                ],
+                shiftText: '转换',
+                spaceText: '空格',
+                backspaceText: '',
+                clearText: '清除',
+                numbersText: '123'
+            },
+            ja: {
+                main: [
+                    'あ', 'い', 'う', 'え', 'お', 'か', 'き', 'く', 'け', 'こ',
+                    'さ', 'し', 'す', 'せ', 'そ', 'た', 'ち', 'つ', 'て', 'と',
+                    'な', 'に', 'ぬ', 'ね', 'の', 'は', 'ひ', 'ふ', 'へ', 'ほ'
+                ],
+                shiftText: '変換',
+                spaceText: 'スペース',
+                backspaceText: '',
+                clearText: 'クリア',
+                numbersText: '123'
+            },
+            ko: {
+                main: [
+                    'ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅊ',
+                    'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ', 'ㅏ', 'ㅑ', 'ㅓ', 'ㅕ', 'ㅗ', 'ㅛ',
+                    'ㅜ', 'ㅠ', 'ㅡ', 'ㅣ', '가', '나', '다', '라', '마', '바'
+                ],
+                shiftText: '전환',
+                spaceText: '스페이스',
+                backspaceText: '',
+                clearText: '지우기',
+                numbersText: '123'
+            },
+            ar: {
+                main: [
+                    'ض', 'ص', 'ث', 'ق', 'ف', 'غ', 'ع', 'ه', 'خ', 'ح',
+                    'ش', 'س', 'ي', 'ب', 'ل', 'ا', 'ت', 'ن', 'م', 'ك',
+                    'ط', 'ئ', 'ء', 'ؤ', 'ر', 'لا', 'ى', 'ة', 'و', 'ز'
+                ],
+                shiftText: 'تبديل',
+                spaceText: 'مسافة',
+                backspaceText: '',
+                clearText: 'مسح',
+                numbersText: '123'
+            },
+            hi: {
+                main: [
+                    'ौ', 'ै', 'ा', 'ी', 'ू', 'ब', 'ह', 'ग', 'द', 'ज',
+                    'ो', 'े', 'ि', 'ु', 'प', 'र', 'क', 'त', 'च', 'ट',
+                    'ं', 'म', 'न', 'व', 'ल', 'स', 'य', 'थ', 'श', 'ष'
+                ],
+                shiftText: 'शिफ्ट',
+                spaceText: 'स्पेस',
+                backspaceText: '',
+                clearText: 'साफ़',
+                numbersText: '123'
+            }
+        };
+
+        // Initialize the appropriate keyboard layout
+        function updateKeyboardLayout() {
+            const layout = keyboardLayouts[currentLanguage];
+            const keyElements = document.querySelectorAll('#alphabetKeyboard .key:not(.wide)');
+            
+            // Update regular keys
+            keyElements.forEach((key, index) => {
+                if (index < layout.main.length) {
+                    key.textContent = isUpperCase ? layout.main[index].toUpperCase() : layout.main[index].toLowerCase();
+                }
+            });
+            
+            // FORCE UPDATE all special keys regardless of current text
+            document.getElementById('toggleCase').textContent = layout.shiftText;
+            
+            // Find space key and update it
+            document.querySelectorAll('.key').forEach(key => {
+                // Reset any previous special actions
+                key.removeAttribute('data-action');
+                
+                // Check if this is the space key (it's the wide one in the middle of the bottom row)
+                if (key.className.includes('wide') && key.textContent.toLowerCase().includes('space') || 
+                    key.textContent.includes('スペース') || key.textContent.includes('ESPACE') || 
+                    key.textContent.includes('ESPACIO') || key.textContent.includes('LEERTASTE') ||
+                    key.textContent.includes('SPAZIO') || key.textContent.includes('ESPAÇO') ||
+                    key.textContent.includes('ПРОБЕЛ') || key.textContent.includes('空格') ||
+                    key.textContent.includes('스페이스') || key.textContent.includes('مسافة') ||
+                    key.textContent.includes('स्पेस')) {
+                    key.textContent = layout.spaceText;
+                    key.dataset.action = 'space';
+                }
+                
+                // Check if this is the clear key
+                else if (key.className.includes('wide') && (key.textContent.toLowerCase().includes('clear') || 
+                    key.textContent.includes('クリア') || key.textContent.includes('EFFACER') || 
+                    key.textContent.includes('BORRAR') || key.textContent.includes('LÖSCHEN') ||
+                    key.textContent.includes('CANCELLA') || key.textContent.includes('LIMPAR') ||
+                    key.textContent.includes('ОЧИСТИТЬ') || key.textContent.includes('清除') ||
+                    key.textContent.includes('지우기') || key.textContent.includes('مسح') ||
+                    key.textContent.includes('साफ़'))) {
+                    key.textContent = layout.clearText;
+                    key.dataset.action = 'clear';
+                }
+                
+                // Check if this is the numbers key
+                else if (key.id === 'switchToNumbers') {
+                    key.textContent = layout.numbersText;
+                }
+            });
+            
+            // Set speak button to current language
+            speakButton.textContent = 'SPEAK';
+            
+            // Update speech synthesis language
+            if (window.speechSynthesis) {
+                speechSynthesis.cancel();
+            }
+        }
+        
+        // Unified async language change handler
+        languageSelect.addEventListener('change', async function() {
+            const oldLanguage = currentLanguage;
+            const oldLanguageName = languageSelect.options[languageSelect.selectedIndex].text;
+            const textToTranslate = currentText;
+            const newLanguage = this.value;
+            currentLanguage = newLanguage;
+            localStorage.setItem('keyboardLanguage', newLanguage);
+
+            // Translate the text buffer
+            if (textToTranslate.trim() !== '') {
+                try {
+                    selectedList.innerHTML = `<div class=\"selected-item\"> </div>`;
+                    const translatedText = await translateWithAPI(textToTranslate, newLanguage);
+                    currentText = translatedText;
+                } catch (error) {
+                    console.error('Translation failed:', error);
+                    selectedList.innerHTML = `<div class=\"selected-item\">Translation failed. Keeping original text.</div>`;
+                    setTimeout(() => updateSelectedList(), 2000);
+                }
+            }
+            // Update the keyboard layout and selected list
+            updateKeyboardLayout();
+            updateSelectedList();
+            // Translate the navigation bar
+            await translateNavBar(newLanguage);
+            // Language change completed
+        });
+
+        const alphabetKeyboard = document.getElementById('alphabetKeyboard');
+        const numberKeyboard = document.getElementById('numberKeyboard');
+        const switchToNumbersButton = document.getElementById('switchToNumbers');
+        const switchToAlphabetButton = document.getElementById('switchToAlphabet');
+
+
+        function switchKeyboard(showNumbers) {
+            if (showNumbers) {
+                alphabetKeyboard.style.display = 'none';
+                numberKeyboard.style.display = 'grid';
+            } else {
+                alphabetKeyboard.style.display = 'grid';
+                numberKeyboard.style.display = 'none';
+            }
+        }
+
+
+        switchToNumbersButton.addEventListener('click', () => switchKeyboard(true));
+        switchToAlphabetButton.addEventListener('click', () => switchKeyboard(false));
+
+
+        function updateKeys() {
+            keys.forEach(key => {
+                if (key.textContent.length === 1 && key.textContent.match(/[a-zA-Z]/)) {
+                    key.textContent = isUpperCase ? key.textContent.toUpperCase() : key.textContent.toLowerCase();
+                }
+            });
+            
+            // Also update language-specific keyboard layout
+            updateKeyboardLayout();
+        }
+
+
+        function toggleCase() {
+            isUpperCase = !isUpperCase;
+            updateKeys();
+            toggleCaseButton.textContent = isUpperCase ? keyboardLayouts[currentLanguage].shiftText : keyboardLayouts[currentLanguage].shiftText;
+           
+            // Update the current text to match the new case
+            currentText = isUpperCase ? currentText.toUpperCase() : currentText.toLowerCase();
+            updateSelectedList();
+        }
+
+
+        toggleCaseButton.addEventListener('click', toggleCase);
+
+
+        // Add this new object for common misspellings
+        const commonMisspellings = {
+            'teh': 'the',
+            'adn': 'and',
+            'taht': 'that',
+            'wiht': 'with',
+            'becuase': 'because',
+            'recieve': 'receive',
+            'seperate': 'separate',
+            'definately': 'definitely',
+            'occured': 'occurred',
+            'truely': 'truly',
+            'pian': 'pain',
+            'payn': 'pain',
+            'pein': 'pain',
+            'hert': 'hurt',
+            'hurrt': 'hurt',
+            'hirt': 'hurt',
+            'docter': 'doctor',
+            'doctr': 'doctor',
+            'dokter': 'doctor',
+            'nerse': 'nurse',
+            'nurce': 'nurse',
+            'nurs': 'nurse',
+            'medicin': 'medicine',
+            'medecine': 'medicine',
+            'medicene': 'medicine',
+            'feling': 'feeling',
+            'fealing': 'feeling',
+            'feelling': 'feeling',
+            'beter': 'better',
+            'bettr': 'better',
+            'bettter': 'better',
+            'wors': 'worse',
+            'worce': 'worse',
+            'werse': 'worse',
+            'tierd': 'tired',
+            'tyred': 'tired',
+            'tirred': 'tired',
+            'sleap': 'sleep',
+            'slepp': 'sleep',
+            'sleeep': 'sleep',
+            'hungrey': 'hungry',
+            'hungri': 'hungry',
+            'hunggry': 'hungry',
+            'thirsty': 'thirsty',
+            'thersty': 'thirsty',
+            'thursty': 'thirsty',
+            'bathrom': 'bathroom',
+            'bathrum': 'bathroom',
+            'bathroon': 'bathroom',
+            'halp': 'help',
+            'hellp': 'help',
+            'healp': 'help',
+            'nead': 'need',
+            'kneed': 'need',
+            'neeed': 'need',
+            'watter': 'water',
+            'watre': 'water',
+            'wotter': 'water',
+            'plese': 'please',
+            'pleese': 'please',
+            'plz': 'please',
+            'thnak': 'thank',
+            'thx': 'thanks',
+            'thnk': 'thank',
+            'yuo': 'you',
+            'yu': 'you',
+            'yoo': 'you',
+            'comfertable': 'comfortable',
+            'comftable': 'comfortable',
+            'comferble': 'comfortable',
+            'uncomfertable': 'uncomfortable',
+            'uncomftable': 'uncomfortable',
+            'uncomferble': 'uncomfortable',
+            'helli': 'hello',
+            'hllo': 'hello',
+            'heee': 'here',
+            'wjen': 'when',
+            'yoi': 'you',
+            'yiu': 'you',
+            'yuo': 'you',
+            'yur': 'your',
+            'ur': 'your',
+            'yor': 'your',
+            'tjere': 'there',
+            'wjere': 'where',
+            'wau': 'way',
+            'tjis': 'this',
+            'besr': 'best',
+            'thefe': 'there',
+            'righr': 'right',
+        };
+
+
+        function autocorrect(word) {
+            let corrected = commonMisspellings[word.toLowerCase()] || word;
+            if (isUpperCase) {
+                return corrected.toUpperCase();
+            } else {
+                return corrected.toLowerCase();
+            }
+        }
+
+
+        const predictionBar = document.getElementById('predictionBar');
+        const commonWords = [
+            'a', 'hello','abandon', 'ability', 'able', 'abortion', 'about', 'above', 'abroad', 'absence', 'absolute',
+            'absolutely', 'absorb', 'abuse', 'academic', 'accent', 'accept', 'acceptable', 'access', 'accident', 'accommodate',
+            'accompany', 'accomplish', 'accord', 'account', 'accurate', 'accuse', 'achieve', 'achievement', 'acid', 'acknowledge',
+            'acquire', 'across', 'act', 'action', 'active', 'activist', 'activity', 'actor', 'actress', 'actual',
+            'adapt', 'add', 'addition', 'additional', 'address', 'adequate', 'adjust', 'adjustment', 'administration', 'administrator',
+            'admire', 'admission', 'admit', 'adolescent', 'adopt', 'adult', 'advance', 'advanced', 'advantage', 'adventure',
+            'advertise', 'advice', 'advise', 'adviser', 'advocate', 'affair', 'affect', 'afford', 'afraid', 'african',
+            'afternoon', 'again', 'against', 'age', 'agency', 'agenda', 'agent', 'aggressive', 'ago', 'agree',
+            'agreement', 'agricultural', 'ahead', 'aid', 'aide', 'aim', 'air', 'aircraft', 'airline', 'airport',
+            'aisle', 'alarm', 'album', 'alcohol', 'alive', 'all', 'alliance', 'allow', 'ally', 'almost',
+            'alone', 'along', 'alongside', 'already', 'also', 'alter', 'alternative', 'although', 'altogether', 'aluminum',
+            'always', 'am', 'amazing', 'ambassador', 'ambition', 'ambitious', 'amendment', 'american', 'amid', 'ammunition',
+            'among', 'amount', 'analysis', 'analyst', 'analyze', 'ancestor', 'ancient', 'and', 'angel', 'anger',
+            'angle', 'angry', 'animal', 'ankle', 'anniversary', 'announce', 'annual', 'another', 'answer', 'anticipate',
+            'anxiety', 'any', 'anybody', 'anymore', 'anyone', 'anything', 'anyway', 'anywhere', 'apart', 'apartment',
+            'apparent', 'apparently', 'appeal', 'appear', 'appearance', 'apple', 'application', 'apply', 'appoint', 'appointment',
+            'appreciate', 'approach', 'appropriate', 'approval', 'approve', 'approximately', 'are', 'arab', 'architect', 'area',
+            'argue', 'argument', 'arise', 'armed', 'army', 'around', 'arrange', 'arrangement', 'arrest', 'arrival',
+            'arrive', 'article', 'artificial', 'artist', 'artistic', 'as', 'asian', 'aside', 'ask', 'asleep',
+            'aspect', 'assault', 'assert', 'assess', 'assessment', 'asset', 'assign', 'assignment', 'assist', 'assistance',
+            'assistant', 'associate', 'association', 'assume', 'assumption', 'assure', 'at', 'atmosphere', 'atom', 'attach',
+            'attack', 'attempt', 'attend', 'attention', 'attitude', 'attorney', 'attract', 'attractive', 'attribute', 'auction',
+            'audience', 'aunt', 'author', 'authority', 'automatic', 'automatically', 'automobile', 'available', 'average', 'avoid',
+            'awake', 'award', 'aware', 'awareness', 'away', 'awful', 'baby', 'back', 'background', 'backward',
+            'bacteria', 'badly', 'bag', 'bake', 'balance', 'ball', 'balloon', 'ballot', 'banana', 'band',
+            'bang', 'bank', 'banker', 'banking', 'bankruptcy', 'banner', 'bar', 'bare', 'barely', 'bargain',
+            'barrel', 'barrier', 'base', 'baseball', 'basic', 'basically', 'basis', 'basket', 'basketball', 'bathroom',
+            'battery', 'battle', 'be', 'beach', 'beam', 'bean', 'bear', 'beard', 'beast', 'beat',
+            'beautiful', 'beauty', 'became', 'because', 'become', 'bedroom', 'beef', 'been', 'beer', 'before',
+            'begin', 'beginning', 'behalf', 'behave', 'behavior', 'behind', 'being', 'belief', 'believe', 'bell',
+            'belong', 'below', 'belt', 'bench', 'bend', 'beneath', 'benefit', 'beside', 'besides', 'best',
+            'bet', 'better', 'between', 'beyond', 'bible', 'bicycle', 'bid', 'big', 'bike', 'bill',
+            'billion', 'bind', 'biography', 'biological', 'bird', 'birth', 'birthday', 'bishop', 'bite', 'bitter',
+            'black', 'blade', 'blame', 'blanket', 'blast', 'blend', 'bless', 'blessing', 'blind', 'block',
+            'blonde', 'blood', 'blue', 'board', 'boat', 'body', 'bold', 'bomb', 'bombing', 'bond',
+            'bone', 'bonus', 'book', 'boom', 'boost', 'boot', 'border', 'bore', 'born', 'borrow',
+            'boss', 'both', 'bother', 'bottle', 'bottom', 'boundary', 'bowl', 'box', 'boy', 'boyfriend',
+            'brain', 'brake', 'branch', 'brand', 'brave', 'bread', 'break', 'breakfast', 'breast', 'breath',
+            'breathe', 'breathing', 'breed', 'brick', 'bridge', 'brief', 'briefly', 'bright', 'brilliant', 'bring',
+            'british', 'broad', 'broadcast', 'broken', 'brother', 'brown', 'brush', 'bubble', 'buck', 'budget',
+            'build', 'building', 'bullet', 'bunch', 'burden', 'bureau', 'burn', 'burst', 'bury', 'bus',
+            'bush', 'business', 'businessman', 'busy', 'but', 'butter', 'button', 'buy', 'buyer', 'by',
+            'cabin', 'cabinet', 'cable', 'cage', 'cake', 'calculate', 'calendar', 'call', 'calm', 'camera',
+            'camp', 'campaign', 'campus', 'can', 'canadian', 'cancer', 'candidate', 'candy', 'cap', 'capability',
+            'capable', 'capacity', 'capital', 'captain', 'capture', 'car', 'carbon', 'card', 'care', 'career',
+            'careful', 'carefully', 'cargo', 'carpet', 'carrier', 'carry', 'cart', 'case', 'cash', 'cast',
+            'casual', 'cat', 'catch', 'category', 'catholic', 'cattle', 'cause', 'ceiling', 'celebrate', 'celebration',
+            'celebrity', 'cell', 'center', 'central', 'century', 'ceremony', 'certain', 'certainly', 'chain', 'chair',
+            'chairman', 'challenge', 'chamber', 'champion', 'championship', 'chance', 'change', 'changing', 'channel', 'chapter',
+            'character', 'characteristic', 'characterize', 'charge', 'charity', 'charm', 'chart', 'chase', 'cheap', 'check',
+            'cheek', 'cheese', 'chef', 'chemical', 'chest', 'chicken', 'chief', 'child', 'childhood', 'chinese',
+            'chip', 'chocolate', 'choice', 'cholesterol', 'choose', 'christian', 'christmas', 'church', 'cigarette', 'circle',
+            'circuit', 'circumstance', 'citizen', 'city', 'civil', 'civilian', 'claim', 'class', 'classic', 'classroom',
+            'clean', 'clear', 'clearly', 'client', 'climate', 'climb', 'clinic', 'clinical', 'clock', 'close',
+            'closely', 'closer', 'clothes', 'clothing', 'cloud', 'club', 'clue', 'cluster', 'coach', 'coal',
+            'coalition', 'coast', 'coat', 'code', 'coffee', 'cognitive', 'coin', 'cold', 'collapse', 'colleague',
+            'collect', 'collection', 'collective', 'college', 'colonial', 'color', 'column', 'combination', 'combine', 'come',
+            'comedy', 'comfort', 'comfortable', 'command', 'commander', 'comment', 'commercial', 'commission', 'commit', 'commitment',
+            'committee', 'common', 'communicate', 'communication', 'community', 'company', 'compare', 'comparison', 'compete', 'competition',
+            'competitive', 'competitor', 'complain', 'complaint', 'complete', 'completely', 'complex', 'complicated', 'component', 'compose',
+            'composition', 'compound', 'comprehensive', 'computer', 'concentrate', 'concentration', 'concept', 'concern', 'concerned', 'concert',
+            'conclude', 'conclusion', 'concrete', 'condition', 'conduct', 'conference', 'confidence', 'confident', 'confirm', 'conflict',
+            'confront', 'confusion', 'congress', 'congressional', 'connect', 'connection', 'consciousness', 'consensus', 'consequence', 'conservative',
+            'consider', 'considerable', 'consideration', 'consist', 'consistent', 'constant', 'constantly', 'constitute', 'constitutional', 'construct',
+            'construction', 'consultant', 'consume', 'consumer', 'consumption', 'contact', 'contain', 'container', 'contemporary', 'content',
+            'contest', 'context', 'continue', 'continued', 'contract', 'contrast', 'contribute', 'contribution', 'control', 'controversial',
+            'controversy', 'convention', 'conventional', 'conversation', 'convert', 'conviction', 'convince', 'cook', 'cookie', 'cooking',
+            'cool', 'cooperation', 'cop', 'cope', 'copy', 'core', 'corn', 'corner', 'corporate', 'corporation',
+            'correct', 'correspondent', 'cost', 'cotton', 'couch', 'could', 'council', 'counselor', 'count', 'counter',
+            'country', 'county', 'couple', 'courage', 'course', 'court', 'cousin', 'cover', 'coverage', 'cow',
+            'crack', 'craft', 'crash', 'crazy', 'cream', 'create', 'creation', 'creative', 'creature', 'credit',
+            'crew', 'crime', 'criminal', 'crisis', 'criteria', 'critic', 'critical', 'criticism', 'criticize', 'crop',
+            'cross', 'crowd', 'crucial', 'cry', 'cultural', 'culture', 'cup', 'curious', 'current', 'currently',
+            'curriculum', 'custom', 'customer', 'cut', 'cycle', 'daily', 'damage', 'dance', 'danger', 'dangerous',
+            'dare', 'dark', 'darkness', 'data', 'database', 'date', 'daughter', 'dawn', 'day', 'dead',
+            'deal', 'dealer', 'dear', 'death', 'debate', 'debt', 'decade', 'decide', 'decision', 'deck',
+            'declare', 'decline', 'decrease', 'deep', 'deeply', 'deer', 'defeat', 'defend', 'defendant', 'defense',
+            'defensive', 'deficit', 'define', 'definitely', 'definition', 'degree', 'delay', 'deliver', 'delivery', 'demand',
+            'democracy', 'democrat', 'democratic', 'demonstrate', 'demonstration', 'deny', 'department', 'depend', 'dependent', 'depending',
+            'depict', 'depression', 'depth', 'deputy', 'derive', 'describe', 'description', 'desert', 'deserve', 'design',
+            'designer', 'desire', 'desk', 'desperate', 'despite', 'destroy', 'destruction', 'detail', 'detailed', 'detect',
+            'determine', 'develop', 'developing', 'development', 'device', 'devote', 'dialogue', 'did', 'die', 'diet',
+            'differ', 'difference', 'different', 'differently', 'difficult', 'difficulty', 'dig', 'digital', 'dimension', 'dining',
+            'dinner', 'direct', 'direction', 'directly', 'director', 'dirt', 'dirty', 'disability', 'disagree', 'disappear',
+            'disaster', 'discipline', 'discourse', 'discover', 'discovery', 'discrimination', 'discuss', 'discussion', 'disease', 'dish',
+            'dismiss', 'disorder', 'display', 'dispute', 'distance', 'distant', 'distinct', 'distinction', 'distinguish', 'distribute',
+            'distribution', 'district', 'diverse', 'diversity', 'divide', 'division', 'divorce', 'dna', 'do', 'doing', 'doctor',
+            'document', 'does', 'dog', 'domestic', 'dominant', 'dominate', 'door', 'double', 'doubt', 'down',
+            'downtown', 'dozen', 'draft', 'drag', 'drama', 'dramatic', 'dramatically', 'draw', 'drawing', 'dream',
+            'dress', 'drink', 'drive', 'driver', 'drop', 'drug', 'dry', 'due', 'during', 'dust',
+            'duty', 'each', 'eager', 'ear', 'early', 'earn', 'earnings', 'earth', 'ease', 'easily',
+            'east', 'eastern', 'easy', 'eat', 'economic', 'economics', 'economist', 'economy', 'edge', 'edition',
+            'editor', 'educate', 'education', 'educational', 'educator', 'effect', 'effective', 'effectively', 'efficiency', 'efficient',
+            'effort', 'egg', 'eight', 'either', 'elderly', 'elect', 'election', 'electric', 'electricity', 'electronic',
+            'element', 'elementary', 'eliminate', 'elite', 'else', 'elsewhere', 'email', 'embrace', 'emerge', 'emergency',
+            'emission', 'emotion', 'emotional', 'emphasis', 'emphasize', 'employ', 'employee', 'employer', 'employment', 'empty',
+            'enable', 'encounter', 'encourage', 'enemy', 'energy', 'enforcement', 'engage', 'engine', 'engineer', 'engineering',
+            'english', 'enhance', 'enjoy', 'enormous', 'enough', 'ensure', 'enter', 'enterprise', 'environment', 'environmental',
+            'equal', 'equality', 'equipment', 'era', 'error', 'escape', 'essay', 'establish', 'estate', 'estimate',
+            'ethic', 'ethics', 'evaluate', 'event', 'ever', 'every', 'everybody', 'everyone', 'everything', 'everywhere',
+            'evidence', 'evolution', 'exact', 'exactly', 'exam', 'examination', 'example', 'excellent', 'except', 'exception',
+            'exchange', 'excite', 'excitement', 'exciting', 'exclude', 'exclusive', 'exercise', 'exhibit', 'exist', 'existence',
+            'exit', 'expand', 'expansion', 'expect', 'experience', 'expert', 'feeling', 'fever', 'few', 'first',
+            'for', 'from', 'get', 'give', 'go', 'good', 'had', 'has', 'have', 'he',
+            'headache', 'hear', 'hell', 'help', 'here', 'hey', 'hi', 'him', 'his',
+            'hot', 'how', 'however', 'hungry', 'hurt', 'I', 'if', 'is','ill', 'in', 'into',
+            'it', 'its', 'just', 'know', 'later', 'like', 'little', 'look', 'lots',
+            'love', 'make', 'many', 'may', 'maybe', 'me', 'medicine', 'might', 'most', 'much',
+            'must', 'my', 'name', 'nauseous', 'need', 'new', 'no', 'not', 'now', 'nurse',
+            'of', 'off', 'ok', 'okay', 'on', 'one', 'only', 'or', 'other', 'our',
+            'out', 'over', 'pain', 'pardon', 'people', 'perhaps', 'please', 'relax', 'rest', 'run',
+            'sad', 'say', 'scared', 'see', 'shall', 'she', 'should', 'sick', 'sit', 'sleep',
+            'so', 'some', 'someone', 'something', 'somewhere', 'soon', 'sorry', 'stand', 'start', 'stomachache',
+            'stress', 'strong', 'study', 'take', 'than', 'thank', 'thanks', 'that', 'the', 'their',
+            'them', 'then', 'there', 'these', 'they', 'think', 'thirsty', 'this', 'time', 'tired',
+            'to', 'two', 'uncomfortable', 'understand', 'up', 'us', 'use', 'what', 'walk', 'wanna', 'want',
+            'warm', 'was', 'watch', 'water', 'way', 'we', 'weak', 'well', 'were',
+            'when', 'where', 'which', 'who', 'whom', 'whose', 'why', 'will', 'with', 'work',
+            'worse', 'would', 'you', 'yes','your'
+        ];
+
+
+        function updatePredictions() {
+            const words = currentText.split(' ');
+            const currentWord = words[words.length - 1].toLowerCase();
+           
+            let predictions = [];
+            if (currentWord.length > 0) {
+                predictions = commonWords
+                    .filter(word => word.toLowerCase().startsWith(currentWord))
+                    .slice(0, 3);
+            }
+           
+            const predictionElements = predictionBar.querySelectorAll('.prediction');
+           
+            predictionElements.forEach((elem, index) => {
+                if (index < predictions.length) {
+                    const word = isUpperCase ? predictions[index].toUpperCase() : predictions[index].toLowerCase();
+                    elem.textContent = word;
+                    elem.onclick = () => {
+                        words[words.length - 1] = word;
+                        currentText = words.join(' ') + ' ';
+                        updateSelectedList();
+                    };
+                } else {
+                    elem.textContent = '';
+                    elem.onclick = null;
+                }
+            });
+        }
+
+
+        // Initial call to set up prediction boxes
+        updatePredictions();
+
+
+        function updateSelectedList() {
+            let words = currentText.split(' ');
+            let lastWord = words[words.length - 1];
+            let correctedWord = autocorrect(lastWord);
+           
+            if (correctedWord.toLowerCase() !== lastWord.toLowerCase()) {
+                words[words.length - 1] = correctedWord;
+                currentText = words.join(' ') + ' '; // Add space after autocorrection
+            }
+
+
+            // Apply the current case to the entire text
+            currentText = isUpperCase ? currentText.toUpperCase() : currentText.toLowerCase();
+
+
+            const textWithCursor = currentText + '<span class="cursor"></span>';
+            selectedList.innerHTML = `<div class="selected-item">${textWithCursor}</div>`;
+            updatePredictions();
+        }
+
+
+        // Modify the key click event listener
+        document.querySelectorAll('.keyboard .key').forEach(key => {
+            key.addEventListener('click', () => {
+                if (key.id === 'switchToNumbers' || key.id === 'switchToAlphabet') {
+                    return; // Do nothing for these keys
+                }
+                
+                console.log('Key clicked:', key.id || key.textContent, 'Action:', key.dataset.action);
+                
+                // Use data-action attribute to determine behavior
+                if (key.dataset.action === 'clear') {
+                    currentText = '';
+                } else if (key.dataset.action === 'space' || key.textContent === keyboardLayouts[currentLanguage].spaceText) {
+                    currentText += ' ';
+                    updateSelectedList(); // Apply autocorrect when space is pressed
+                } else if (key.id === 'backspace') {
+                    currentText = currentText.slice(0, -1);
+                } else if (key.id === 'toggleCase') {
+                    // Do nothing, handled by separate event listener
+                } else {
+                    currentText += key.textContent;
+                }
+                updateSelectedList();
+            });
+        });
+
+
+        speakButton.addEventListener('click', () => {
+            console.log('Speak button clicked');
+            if (isSpeaking) {
+                stopSpeaking();
+            } else {
+                speak(currentText);
+            }
+        });
+
+
+        // Initial update of the selected list
+        updateSelectedList();
+
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                stopSpeaking();
+               
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Set language for speech synthesis based on current keyboard language
+                const langMap = {
+                    'en': 'en-US',
+                    'es': 'es-ES',
+                    'fr': 'fr-FR',
+                    'de': 'de-DE',
+                    'it': 'it-IT',
+                    'pt': 'pt-PT',
+                    'ru': 'ru-RU',
+                    'zh': 'zh-CN',
+                    'ja': 'ja-JP',
+                    'ko': 'ko-KR',
+                    'ar': 'ar-SA',
+                    'hi': 'hi-IN'
+                };
+                
+                utterance.lang = langMap[currentLanguage] || 'en-US';
+               
+                utterance.onstart = () => {
+                    console.log('Speech started');
+                    isSpeaking = true;
+                    speakButton.textContent = 'SPEAK';
+                };
+
+
+                utterance.onend = () => {
+                    console.log('Speech finished');
+                    resetSpeakButton();
+                    addToLog(`Spoken (${langMap[currentLanguage]}): ${text}`);
+                };
+
+
+                utterance.onerror = () => {
+                    console.log('Speech error occurred');
+                    resetSpeakButton();
+                };
+
+
+                speechSynthesis.speak(utterance);
+            } else {
+                console.log('Text-to-speech not supported in this browser');
+            }
+        }
+
+
+        function stopSpeaking() {
+            speechSynthesis.cancel();
+            resetSpeakButton();
+        }
+
+
+        function resetSpeakButton() {
+            isSpeaking = false;
+            speakButton.textContent = 'SPEAK';
+        }
+
+
+        function addToLog(message) {
+            // Retrieve existing logs or initialize an empty array
+            let logs = JSON.parse(localStorage.getItem('ccpcsLog')) || []
+            // Add the new message to the logs
+            logs.push({ action: message, timestamp: new Date().toISOString() })
+            // Store the updated logs back in local storage
+            localStorage.setItem('ccpcsLog', JSON.stringify(logs))
+            console.log('Logged:', message)
+        }
+
+
+        const toggleSwitch = document.getElementById('switch');
+        const body = document.body;
+        const container = document.querySelector('.container');
+        
+        // Check the initial state from local storage
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            toggleSwitch.checked = true;
+            updateIconColors('white');
+        }
+
+        toggleSwitch.addEventListener('change', function() {
+            if (this.checked) {
+                console.log('Switch is ON - Dark Mode');
+                body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'enabled');
+                updateIconColors('white'); // Set icons to white
+            } else {
+                console.log('Switch is OFF - Light Mode');
+                body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'disabled');
+                updateIconColors('black'); // Set icons to black
+            }
+        });
+
+        function updateIconColors(color) {
+            const backspaceIcons = document.querySelectorAll('.backspace-icon');
+            backspaceIcons.forEach(icon => {
+                if (icon) {
+                    // Update the filter to change the icon color
+                    icon.style.filter = color === 'white' ? 'brightness(0) invert(1)' : 'brightness(0)';
+                }
+            });
+        }
+
+        const keyboardButton = document.querySelector('.nav-item[href="keyboard.html"]');
+
+        function updateKeyboardButtonBorder() {
+            if (body.classList.contains('dark-mode')) {
+                keyboardButton.style.border = '0px solid white';
+            } else {
+                keyboardButton.style.border = '0px solid black';
+            }
+        }
+
+        // Call the function initially to set the correct border color
+        updateKeyboardButtonBorder();
+
+        // Update the border color whenever the mode changes
+        toggleSwitch.addEventListener('change', updateKeyboardButtonBorder);
+
+        // Make all elements undraggable
+        document.querySelectorAll('*').forEach(element => {
+            element.setAttribute('draggable', 'false');
+        });
+
+        // Function to log actions to localStorage
+        function logAction(action) {
+            const timestamp = new Date().toISOString();
+            const logEntry = { action, timestamp };
+            
+            const log = JSON.parse(localStorage.getItem('ccpcsLog') || '[]');
+            log.push(logEntry);
+            localStorage.setItem('ccpcsLog', JSON.stringify(log));
+            
+            // Post message to log.html if it's open in another window/frame
+            try {
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({type: 'log', message: action}, '*');
+                }
+                
+                // Broadcast to other windows
+                window.dispatchEvent(new StorageEvent('storage', {
+                    key: 'ccpcsLog',
+                    newValue: JSON.stringify(log),
+                    storageArea: localStorage
+                }));
+            } catch (e) {
+                console.error("Error posting message:", e);
+            }
+        }
+
+        // Log when text is spoken
+        function speakText(text) {
+            if (!text.trim()) return; // Don't speak or log empty text
+            
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Cancel any ongoing speech
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Log before starting speech
+                logAction(`Keyboard Spoken: "${text}"`);
+                
+                // Set up event handlers for speech
+                utterance.onstart = function() {
+                    console.log('Speech started');
+                };
+                
+                utterance.onend = function() {
+                    console.log('Speech finished');
+                };
+                
+                utterance.onerror = function(event) {
+                    console.log('Speech error occurred');
+                };
+                
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.log('Text-to-speech not supported');
+                alert('Text-to-speech is not supported in this browser.');
+            }
+        }
+
+        // No additional click logging needed - only log when text is spoken
+
+        // Add event listeners once DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize with English if no saved preference
+            currentLanguage = localStorage.getItem('keyboardLanguage') || 'en';
+            languageSelect.value = currentLanguage;
+            
+            // Force complete keyboard update
+            updateKeyboardLayout();
+        });
+        
+        // Save language preference when changed
+        languageSelect.addEventListener('change', function() {
+            localStorage.setItem('keyboardLanguage', this.value);
+        });
+
+        // Add a comprehensive translation dictionary for many more words across all languages
+        const translations = {
+            // English to all other languages
+            en: {
+                // Greetings and common phrases
+                hello: { es: 'hola', fr: 'bonjour', de: 'hallo', it: 'ciao', pt: 'olá', ru: 'привет', zh: '你好', ja: 'こんにちは', ko: '안녕하세요', ar: 'مرحبا', hi: 'नमस्ते' },
+                hi: { es: 'hola', fr: 'salut', de: 'hi', it: 'ciao', pt: 'oi', ru: 'привет', zh: '嗨', ja: 'やあ', ko: '안녕', ar: 'أهلا', hi: 'नमस्कार' },
+                goodbye: { es: 'adiós', fr: 'au revoir', de: 'auf wiedersehen', it: 'arrivederci', pt: 'adeus', ru: 'до свидания', zh: '再见', ja: 'さようなら', ko: '안녕히 가세요', ar: 'وداعا', hi: 'अलविदा' },
+                bye: { es: 'adiós', fr: 'salut', de: 'tschüss', it: 'ciao', pt: 'tchau', ru: 'пока', zh: '拜拜', ja: 'バイバイ', ko: '잘 가', ar: 'باي', hi: 'बाय' },
+                yes: { es: 'sí', fr: 'oui', de: 'ja', it: 'sì', pt: 'sim', ru: 'да', zh: '是', ja: 'はい', ko: '예', ar: 'نعم', hi: 'हां' },
+                no: { es: 'no', fr: 'non', de: 'nein', it: 'no', pt: 'não', ru: 'нет', zh: '不', ja: 'いいえ', ko: '아니요', ar: 'لا', hi: 'नहीं' },
+                please: { es: 'por favor', fr: 's\'il vous plaît', de: 'bitte', it: 'per favore', pt: 'por favor', ru: 'пожалуйста', zh: '请', ja: 'お願いします', ko: '부탁합니다', ar: 'من فضلك', hi: 'कृपया' },
+                thanks: { es: 'gracias', fr: 'merci', de: 'danke', it: 'grazie', pt: 'obrigado', ru: 'спасибо', zh: '谢谢', ja: 'ありがとう', ko: '감사합니다', ar: 'شكرا', hi: 'धन्यवाद' },
+                thankyou: { es: 'gracias', fr: 'merci', de: 'danke', it: 'grazie', pt: 'obrigado', ru: 'спасибо', zh: '谢谢', ja: 'ありがとう', ko: '감사합니다', ar: 'شكرا', hi: 'धन्यवाद' },
+                sorry: { es: 'lo siento', fr: 'désolé', de: 'entschuldigung', it: 'scusa', pt: 'desculpe', ru: 'извините', zh: '对不起', ja: 'ごめんなさい', ko: '죄송합니다', ar: 'آسف', hi: 'माफ़ करें' },
+                excuse: { es: 'disculpe', fr: 'excusez-moi', de: 'entschuldigung', it: 'scusi', pt: 'com licença', ru: 'извините', zh: '打扰了', ja: 'すみません', ko: '실례합니다', ar: 'عذراً', hi: 'क्षमा करें' },
+                
+                // Question words
+                what: { es: 'qué', fr: 'quoi', de: 'was', it: 'cosa', pt: 'o que', ru: 'что', zh: '什么', ja: '何', ko: '무엇', ar: 'ماذا', hi: 'क्या' },
+                when: { es: 'cuándo', fr: 'quand', de: 'wann', it: 'quando', pt: 'quando', ru: 'когда', zh: '什么时候', ja: 'いつ', ko: '언제', ar: 'متى', hi: 'कब' },
+                where: { es: 'dónde', fr: 'où', de: 'wo', it: 'dove', pt: 'onde', ru: 'где', zh: '哪里', ja: 'どこ', ko: '어디', ar: 'أين', hi: 'कहां' },
+                who: { es: 'quién', fr: 'qui', de: 'wer', it: 'chi', pt: 'quem', ru: 'кто', zh: '谁', ja: '誰', ko: '누구', ar: 'من', hi: 'कौन' },
+                why: { es: 'por qué', fr: 'pourquoi', de: 'warum', it: 'perché', pt: 'por que', ru: 'почему', zh: '为什么', ja: 'なぜ', ko: '왜', ar: 'لماذا', hi: 'क्यों' },
+                how: { es: 'cómo', fr: 'comment', de: 'wie', it: 'come', pt: 'como', ru: 'как', zh: '怎么', ja: 'どうやって', ko: '어떻게', ar: 'كيف', hi: 'कैसे' },
+                
+                // Common words: health and medical
+                pain: { es: 'dolor', fr: 'douleur', de: 'schmerz', it: 'dolore', pt: 'dor', ru: 'боль', zh: '疼痛', ja: '痛み', ko: '통증', ar: 'ألم', hi: 'दर्द' },
+                hurt: { es: 'duele', fr: 'fait mal', de: 'schmerzt', it: 'fa male', pt: 'dói', ru: 'болит', zh: '疼', ja: '痛い', ko: '아프다', ar: 'يؤلم', hi: 'दर्द होना' },
+                sick: { es: 'enfermo', fr: 'malade', de: 'krank', it: 'malato', pt: 'doente', ru: 'больной', zh: '生病', ja: '病気', ko: '아픈', ar: 'مريض', hi: 'बीमार' },
+                doctor: { es: 'médico', fr: 'médecin', de: 'arzt', it: 'dottore', pt: 'médico', ru: 'врач', zh: '医生', ja: '医者', ko: '의사', ar: 'طبيب', hi: 'डॉक्टर' },
+                nurse: { es: 'enfermera', fr: 'infirmière', de: 'krankenschwester', it: 'infermiera', pt: 'enfermeira', ru: 'медсестра', zh: '护士', ja: '看護師', ko: '간호사', ar: 'ممرضة', hi: 'नर्स' },
+                hospital: { es: 'hospital', fr: 'hôpital', de: 'krankenhaus', it: 'ospedale', pt: 'hospital', ru: 'больница', zh: '医院', ja: '病院', ko: '병원', ar: 'مستشفى', hi: 'अस्पताल' },
+                medicine: { es: 'medicina', fr: 'médicament', de: 'medizin', it: 'medicina', pt: 'remédio', ru: 'лекарство', zh: '药', ja: '薬', ko: '약', ar: 'دواء', hi: 'दवा' },
+                headache: { es: 'dolor de cabeza', fr: 'mal de tête', de: 'kopfschmerzen', it: 'mal di testa', pt: 'dor de cabeça', ru: 'головная боль', zh: '头痛', ja: '頭痛', ko: '두통', ar: 'صداع', hi: 'सिरदर्द' },
+                stomachache: { es: 'dolor de estómago', fr: 'mal d\'estomac', de: 'bauchschmerzen', it: 'mal di stomaco', pt: 'dor de estômago', ru: 'боль в животе', zh: '胃痛', ja: '腹痛', ko: '복통', ar: 'وجع معدة', hi: 'पेट दर्द' },
+                fever: { es: 'fiebre', fr: 'fièvre', de: 'fieber', it: 'febbre', pt: 'febre', ru: 'жар', zh: '发烧', ja: '熱', ko: '열', ar: 'حمى', hi: 'बुखार' },
+                cold: { es: 'resfriado', fr: 'rhume', de: 'erkältung', it: 'raffreddore', pt: 'resfriado', ru: 'простуда', zh: '感冒', ja: '風邪', ko: '감기', ar: 'زكام', hi: 'जुकाम' },
+                allergy: { es: 'alergia', fr: 'allergie', de: 'allergie', it: 'allergia', pt: 'alergia', ru: 'аллергия', zh: '过敏', ja: 'アレルギー', ko: '알레르기', ar: 'حساسية', hi: 'एलर्जी' },
+                
+                // Basic needs and feelings
+                water: { es: 'agua', fr: 'eau', de: 'wasser', it: 'acqua', pt: 'água', ru: 'вода', zh: '水', ja: '水', ko: '물', ar: 'ماء', hi: 'पानी' },
+                food: { es: 'comida', fr: 'nourriture', de: 'essen', it: 'cibo', pt: 'comida', ru: 'еда', zh: '食物', ja: '食べ物', ko: '음식', ar: 'طعام', hi: 'खाना' },
+                hungry: { es: 'hambriento', fr: 'faim', de: 'hungrig', it: 'affamato', pt: 'com fome', ru: 'голодный', zh: '饿', ja: 'お腹がすいた', ko: '배고픈', ar: 'جائع', hi: 'भूखा' },
+                thirsty: { es: 'sediento', fr: 'soif', de: 'durstig', it: 'assetato', pt: 'com sede', ru: 'жаждущий', zh: '渴', ja: '喉が渇いた', ko: '목마른', ar: 'عطشان', hi: 'प्यासा' },
+                toilet: { es: 'baño', fr: 'toilettes', de: 'toilette', it: 'bagno', pt: 'banheiro', ru: 'туалет', zh: '厕所', ja: 'トイレ', ko: '화장실', ar: 'مرحاض', hi: 'शौचालय' },
+                bathroom: { es: 'baño', fr: 'salle de bain', de: 'badezimmer', it: 'bagno', pt: 'banheiro', ru: 'ванная', zh: '浴室', ja: '浴室', ko: '욕실', ar: 'حمام', hi: 'स्नानघर' },
+                tired: { es: 'cansado', fr: 'fatigué', de: 'müde', it: 'stanco', pt: 'cansado', ru: 'уставший', zh: '累', ja: '疲れた', ko: '피곤한', ar: 'متعب', hi: 'थका हुआ' },
+                sleep: { es: 'dormir', fr: 'dormir', de: 'schlafen', it: 'dormire', pt: 'dormir', ru: 'спать', zh: '睡觉', ja: '眠る', ko: '잠', ar: 'نوم', hi: 'नींद' },
+                hot: { es: 'caliente', fr: 'chaud', de: 'heiß', it: 'caldo', pt: 'quente', ru: 'горячий', zh: '热', ja: '暑い', ko: '뜨거운', ar: 'حار', hi: 'गरम' },
+                cold: { es: 'frío', fr: 'froid', de: 'kalt', it: 'freddo', pt: 'frio', ru: 'холодный', zh: '冷', ja: '寒い', ko: '추운', ar: 'بارد', hi: 'ठंडा' },
+                happy: { es: 'feliz', fr: 'heureux', de: 'glücklich', it: 'felice', pt: 'feliz', ru: 'счастливый', zh: '开心', ja: '幸せ', ko: '행복한', ar: 'سعيد', hi: 'खुश' },
+                sad: { es: 'triste', fr: 'triste', de: 'traurig', it: 'triste', pt: 'triste', ru: 'грустный', zh: '伤心', ja: '悲しい', ko: '슬픈', ar: 'حزين', hi: 'दुखी' },
+                scared: { es: 'asustado', fr: 'effrayé', de: 'verängstigt', it: 'spaventato', pt: 'assustado', ru: 'испуганный', zh: '害怕', ja: '怖い', ko: '무서운', ar: 'خائف', hi: 'डरा हुआ' },
+                angry: { es: 'enojado', fr: 'en colère', de: 'wütend', it: 'arrabbiato', pt: 'bravo', ru: 'сердитый', zh: '生气', ja: '怒った', ko: '화난', ar: 'غاضب', hi: 'नाराज' },
+                
+                // Time expressions
+                today: { es: 'hoy', fr: 'aujourd\'hui', de: 'heute', it: 'oggi', pt: 'hoje', ru: 'сегодня', zh: '今天', ja: '今日', ko: '오늘', ar: 'اليوم', hi: 'आज' },
+                yesterday: { es: 'ayer', fr: 'hier', de: 'gestern', it: 'ieri', pt: 'ontem', ru: 'вчера', zh: '昨天', ja: '昨日', ko: '어제', ar: 'أمس', hi: 'कल' },
+                tomorrow: { es: 'mañana', fr: 'demain', de: 'morgen', it: 'domani', pt: 'amanhã', ru: 'завтра', zh: '明天', ja: '明日', ko: '내일', ar: 'غدا', hi: 'कल' },
+                now: { es: 'ahora', fr: 'maintenant', de: 'jetzt', it: 'ora', pt: 'agora', ru: 'сейчас', zh: '现在', ja: '今', ko: '지금', ar: 'الآن', hi: 'अब' },
+                later: { es: 'después', fr: 'plus tard', de: 'später', it: 'dopo', pt: 'depois', ru: 'позже', zh: '稍后', ja: '後で', ko: '나중에', ar: 'لاحقا', hi: 'बाद में' },
+                
+                // Numbers
+                one: { es: 'uno', fr: 'un', de: 'eins', it: 'uno', pt: 'um', ru: 'один', zh: '一', ja: '一', ko: '하나', ar: 'واحد', hi: 'एक' },
+                two: { es: 'dos', fr: 'deux', de: 'zwei', it: 'due', pt: 'dois', ru: 'два', zh: '二', ja: '二', ko: '둘', ar: 'اثنان', hi: 'दो' },
+                three: { es: 'tres', fr: 'trois', de: 'drei', it: 'tre', pt: 'três', ru: 'три', zh: '三', ja: '三', ko: '셋', ar: 'ثلاثة', hi: 'तीन' },
+                four: { es: 'cuatro', fr: 'quatre', de: 'vier', it: 'quattro', pt: 'quatro', ru: 'четыре', zh: '四', ja: '四', ko: '넷', ar: 'أربعة', hi: 'चार' },
+                five: { es: 'cinco', fr: 'cinq', de: 'fünf', it: 'cinque', pt: 'cinco', ru: 'пять', zh: '五', ja: '五', ko: '다섯', ar: 'خمسة', hi: 'पांच' },
+                
+                // Common verbs
+                want: { es: 'querer', fr: 'vouloir', de: 'wollen', it: 'volere', pt: 'querer', ru: 'хотеть', zh: '想要', ja: '欲しい', ko: '원하다', ar: 'يريد', hi: 'चाहना' },
+                need: { es: 'necesitar', fr: 'avoir besoin', de: 'brauchen', it: 'avere bisogno', pt: 'precisar', ru: 'нуждаться', zh: '需要', ja: '必要', ko: '필요하다', ar: 'يحتاج', hi: 'जरूरत' },
+                help: { es: 'ayuda', fr: 'aide', de: 'hilfe', it: 'aiuto', pt: 'ajuda', ru: 'помощь', zh: '帮助', ja: '助け', ko: '도움', ar: 'مساعدة', hi: 'मदद' },
+                go: { es: 'ir', fr: 'aller', de: 'gehen', it: 'andare', pt: 'ir', ru: 'идти', zh: '去', ja: '行く', ko: '가다', ar: 'يذهب', hi: 'जाना' },
+                come: { es: 'venir', fr: 'venir', de: 'kommen', it: 'venire', pt: 'vir', ru: 'приходить', zh: '来', ja: '来る', ko: '오다', ar: 'يأتي', hi: 'आना' },
+                see: { es: 'ver', fr: 'voir', de: 'sehen', it: 'vedere', pt: 'ver', ru: 'видеть', zh: '看', ja: '見る', ko: '보다', ar: 'يرى', hi: 'देखना' },
+                understand: { es: 'entender', fr: 'comprendre', de: 'verstehen', it: 'capire', pt: 'entender', ru: 'понимать', zh: '理解', ja: '理解する', ko: '이해하다', ar: 'يفهم', hi: 'समझना' },
+                speak: { es: 'hablar', fr: 'parler', de: 'sprechen', it: 'parlare', pt: 'falar', ru: 'говорить', zh: '说话', ja: '話す', ko: '말하다', ar: 'يتكلم', hi: 'बोलना' },
+                
+                // Other common phrases
+                good: { es: 'bueno', fr: 'bon', de: 'gut', it: 'buono', pt: 'bom', ru: 'хороший', zh: '好', ja: '良い', ko: '좋은', ar: 'جيد', hi: 'अच्छा' },
+                bad: { es: 'malo', fr: 'mauvais', de: 'schlecht', it: 'cattivo', pt: 'ruim', ru: 'плохой', zh: '坏', ja: '悪い', ko: '나쁜', ar: 'سيء', hi: 'बुरा' },
+                more: { es: 'más', fr: 'plus', de: 'mehr', it: 'più', pt: 'mais', ru: 'больше', zh: '更多', ja: 'もっと', ko: '더', ar: 'أكثر', hi: 'अधिक' },
+                less: { es: 'menos', fr: 'moins', de: 'weniger', it: 'meno', pt: 'menos', ru: 'меньше', zh: '更少', ja: 'より少ない', ko: '덜', ar: 'أقل', hi: 'कम' }
+            },
+            // Add more languages as needed...
+        };
+
+        // Improved function to attempt basic translation between languages
+        function translateText(text, fromLang, toLang) {
+            if (fromLang === toLang) return text;
+            
+            // If we don't have translation support for the source language, return original
+            if (!translations[fromLang]) {
+                console.log(`No translation dictionary for ${fromLang}`);
+                return text;
+            }
+            
+            // Split text into words, keeping spaces and punctuation
+            const words = text.split(/(\s+|\b)/);
+            const translatedWords = words.map(word => {
+                // Skip empty strings, spaces, and punctuation
+                if (!word.trim() || /^[\s.,!?;:'"()[\]{}]+$/.test(word)) {
+                    return word;
+                }
+                
+                // Try to find translation for this word (case insensitive)
+                const cleanWord = word.toLowerCase().trim().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
+                
+                // Look for exact match first
+                if (translations[fromLang][cleanWord] && translations[fromLang][cleanWord][toLang]) {
+                    // Preserve capitalization if possible
+                    if (word[0] === word[0].toUpperCase()) {
+                        const translated = translations[fromLang][cleanWord][toLang];
+                        return translated.charAt(0).toUpperCase() + translated.slice(1);
+                    }
+                    return translations[fromLang][cleanWord][toLang];
+                }
+                
+                // Try additional lookups for common variants
+                // Check for plurals (very simple approach - just remove trailing 's')
+                if (cleanWord.endsWith('s') && translations[fromLang][cleanWord.slice(0, -1)]) {
+                    const singularForm = cleanWord.slice(0, -1);
+                    if (translations[fromLang][singularForm] && translations[fromLang][singularForm][toLang]) {
+                        return translations[fromLang][singularForm][toLang];
+                    }
+                }
+                
+                // Keep original if no translation found
+                return word;
+            });
+            
+            return translatedWords.join('');
+        }
+
+        // Fix the language change handler to translate the current text when switching languages
+        languageSelect.addEventListener('change', function() {
+            // Get the old language for logging
+            const oldLanguage = currentLanguage;
+            const oldLanguageName = languageSelect.options[languageSelect.selectedIndex].text;
+            
+            // Store the current text for translation
+            const textToTranslate = currentText;
+            
+            // Update current language
+            currentLanguage = this.value;
+            
+            // Attempt to translate the text to the new language
+            if (textToTranslate.trim() !== '') {
+                currentText = translateText(textToTranslate, oldLanguage, currentLanguage);
+            }
+            
+            // Update the keyboard layout
+            updateKeyboardLayout();
+            
+            // Update the displayed text with translation
+            updateSelectedList();
+            
+            // Language change completed
+        });
+
+        // Google Cloud Translation API integration
+        async function translateWithAPI(text, targetLang) {
+          if (!text.trim()) return text;
+          const codeMap = {
+            en:'en', es:'es', fr:'fr', de:'de', it:'it',
+            pt:'pt', ru:'ru', zh:'zh', ja:'ja', ko:'ko',
+            ar:'ar', hi:'hi'
+          };
+          const apiKey = 'AIzaSyAYKhxYf1Hr-SCooahHeHXZIPmiEZJc3AM';
+          const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+          const payload = {
+            q: text,
+            target: codeMap[targetLang] || 'en',
+            format: 'text'
+          };
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error(res.status);
+          const data = await res.json();
+          return data.data.translations[0].translatedText;
+        }
+
+        // Update the dropdown handler to remove 'Translating…' feedback
+        languageSelect.addEventListener('change', async function() {
+          const target = this.value;          // e.g. "fr", "de", "ja"…
+          const original = currentText;       // whatever's in the text buffer
+
+          // translate in the background, no feedback
+          currentText = await translateWithAPI(original, target)
+                           .catch(_=> original);  // on error, keep original
+
+          // refresh UI
+          updateKeyboardLayout();
+          updateSelectedList();
+        });
+
+        // Add translation cache
+        const translationCache = new Map();
+        const MAX_CACHE_SIZE = 1000;
+
+        // Function to manage cache size
+        function manageCache() {
+            if (translationCache.size > MAX_CACHE_SIZE) {
+                const keysToDelete = Array.from(translationCache.keys()).slice(0, 100);
+                keysToDelete.forEach(key => translationCache.delete(key));
+            }
+        }
+
+        // Modify the language change handler to use the improved translation
+        languageSelect.addEventListener('change', async function() {
+            const oldLanguage = currentLanguage;
+            const oldLanguageName = languageSelect.options[languageSelect.selectedIndex].text;
+            const textToTranslate = currentText;
+            
+            // Update current language
+            currentLanguage = this.value;
+            
+            // Attempt to translate the text using the API
+            if (textToTranslate.trim() !== '') {
+                try {
+                    // Show loading state
+                    selectedList.innerHTML = `<div class=\"selected-item\"> </div>`;
+                    
+                    // Get the translation
+                    const translatedText = await translateWithAPI(textToTranslate, oldLanguage);
+                    currentText = translatedText;
+                    
+                    // Manage cache size
+                    manageCache();
+                    
+                    // Update the keyboard layout
+                    updateKeyboardLayout();
+                    
+                    // Update the displayed text with translation
+                    updateSelectedList();
+                    
+                    // Language change completed
+                } catch (error) {
+                    console.error('Translation failed:', error);
+                    // Show error state
+                    selectedList.innerHTML = `<div class=\"selected-item\">Translation failed. Keeping original text.</div>`;
+                    setTimeout(() => updateSelectedList(), 2000);
+                }
+            } else {
+                // If no text to translate, just update the keyboard layout
+                updateKeyboardLayout();
+            }
+        });
+
+        // Add debug logging for language changes
+        languageSelect.addEventListener('change', function() {
+            console.log('Language changed to:', this.value);
+            console.log('Current text:', currentText);
+        });
+
+        // Helper function to translate navigation bar items
+        async function translateNavBar(targetLang) {
+            const navItems = document.querySelectorAll('.navigation .nav-item');
+            for (const item of navItems) {
+                const original = item.getAttribute('data-original') || item.textContent;
+                item.setAttribute('data-original', original);
+                // Use the same API as translateWithAPI
+                try {
+                    const translated = await translateWithAPI(original, targetLang);
+                    item.textContent = translated;
+                } catch (e) {
+                    item.textContent = original;
+                }
+            }
+        }
+
+        // Update navigation bar translation on language change
+        languageSelect.addEventListener('change', async function() {
+            await translateNavBar(this.value);
+        });
+
+        // On page load, translate nav bar if language is not English
+        window.addEventListener('DOMContentLoaded', async function() {
+            const lang = localStorage.getItem('keyboardLanguage') || 'en';
+            if (lang !== 'en') {
+                await translateNavBar(lang);
+            }
+        });
+    </script>
+</body>
+</html>

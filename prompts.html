@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoxEasy - Prompts</title>
+    <style>
+        /* Disable dragging for all elements */
+        * {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+
+        :root {
+            /* Updated color variables for Vision Pro style */
+            --bg-color: rgba(255, 255, 255, 0.18);
+            --text-color: #333333;
+            --item-bg: rgba(255, 255, 255, 0.15);
+            --item-border: rgba(255, 255, 255, 0.2);
+            --item-hover: rgba(255, 255, 255, 0.25);
+            --item-selected: rgba(51, 51, 51, 0.15);
+            --shadow-light: rgba(255, 255, 255, 0.5);
+            --shadow-dark: rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #cfeaff 0%, #f3f3f4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--text-color);
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            background: var(--bg-color);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 
+                0 8px 24px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+            max-width: 1500px;
+            width: 100%;
+            position: relative;
+            padding-top: 70px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--item-border);
+            animation: containerFadeIn 0.5s ease-out;
+        }
+
+        @keyframes containerFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--item-border);
+        }
+
+        .nav-item {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            padding: 12px 24px;
+            margin: 0 5px;
+            text-decoration: none;
+            color: var(--text-color);
+            border-radius: 24px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.1),
+                rgba(255, 255, 255, 0.05)
+            );
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.15),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-item:hover::before {
+            opacity: 1;
+        }
+
+        .nav-item:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .toggle-switch {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .toggle-input {
+            display: none;
+        }
+
+        .toggle-label {
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            background-color: var(--text-color);
+            border-radius: 34px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-label:before {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            top: 4px;
+            left: 4px;
+            background-color: var(--bg-color);
+            transition: 0.3s ease;
+        }
+
+        .toggle-input:checked + .toggle-label {
+            background-color: #ccc;
+        }
+
+        .toggle-input:checked + .toggle-label:before {
+            transform: translateX(26px);
+            background-color: var(--text-color);
+        }
+
+        .dark-mode {
+            --bg-color: rgba(0, 0, 0, 0.18);
+            --text-color: #ffffff;
+            --item-bg: rgba(255, 255, 255, 0.1);
+            --item-border: rgba(255, 255, 255, 0.1);
+            --item-hover: rgba(255, 255, 255, 0.15);
+            --item-selected: rgba(255, 255, 255, 0.2);
+            --shadow-light: rgba(255, 255, 255, 0.1);
+            --shadow-dark: rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2e 100%);
+        }
+
+        .dark-mode .container {
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .dark-mode .nav-item {
+            background: rgba(0, 0, 0, 0.05);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.02);
+        }
+
+        .dark-mode .nav-item:hover {
+            background: rgba(0, 0, 0, 0.08);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.25),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+        }
+
+        .dark-mode .nav-item:active {
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.15),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.02);
+        }
+
+        /* Styles for prompts.html, adjusted to match index.html */
+
+        .prompts-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 15px;
+            margin: 0;
+        }
+
+        .prompts-container .section {
+            padding: 15px;
+            box-sizing: border-box;
+            border: 1px solid var(--item-border);
+            background: var(--item-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 
+                0 4px 12px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+            transition: all 0.3s ease;
+        }
+
+        .prompts-container .title {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .prompts-container .grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .prompts-container .grid-4x4 {
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, auto);
+        }
+
+        .prompts-container .grid-2x4 {
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, auto);
+        }
+
+        .prompts-container .button {
+            padding: 12px;
+            font-size: 20px;
+            cursor: pointer;
+            text-align: center;
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            color: var(--text-color);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            box-shadow: 
+                0 4px 6px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .prompts-container .button:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 2px 4px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .prompts-container .button img {
+            max-width: 50px;
+            max-height: 50px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .yes-button {
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.7), rgba(40, 167, 69, 0.5)) !important;
+            color: white !important;
+            font-weight: 500;
+        }
+
+        .no-button {
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.7), rgba(220, 53, 69, 0.5)) !important; 
+            color: white !important;
+            font-weight: 500;
+        }
+
+        .prompts-container .placeholder {
+            color: var(--item-border);
+            text-align: center;
+            font-style: italic;
+            padding: 15px;
+        }
+
+        @media (max-width: 800px) {
+            .prompts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .nav-item[href="prompts.html"] {
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 
+                0 16px 48px rgba(0, 0, 0, 0.2),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-item[href="prompts.html"]::before {
+            opacity: 1;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.15),
+                rgba(255, 255, 255, 0.08)
+            );
+        }
+
+        .dark-mode .nav-item[href="prompts.html"] {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 16px 48px rgba(0, 0, 0, 0.3),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+        }
+
+        .top-right-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.2em;
+            color: var(--text-color);
+        }
+
+        .logout-container {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .logout-button {
+            background-color: rgba(255, 59, 48, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 4px 6px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .prompts-container .section:nth-child(3) {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .prompts-container .section:nth-child(3) #selected-choices {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #selected-choices .button {
+            font-size: 28px;
+            padding: 15px;
+            min-height: 70px;
+            margin-top: 0;
+            width: 80%;
+        }
+
+        #selected-choices .placeholder {
+            margin: auto;
+        }
+
+        /* Make "SELECTED CHOICES" title bigger */
+        .prompts-container .section:nth-child(3) .title {
+            font-size: 22px;
+        }
+
+        .undo-label {
+            display: inline-block;
+            width: 44px;
+            height: 34px;
+            background: var(--bg-color);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 34px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s, box-shadow 0.3s, color 0.3s;
+            color: var(--text-color);
+            font-size: 1.6em;
+            border: 1px solid var(--item-border);
+            outline: none;
+            box-shadow: 0 2px 8px var(--shadow-dark), inset 0 1px 1px var(--shadow-light);
+            text-align: center;
+            line-height: 34px;
+            padding: 0;
+        }
+        .undo-label:active {
+            background: var(--item-hover);
+            color: var(--text-color);
+        }
+        .dark-mode .undo-label {
+            background: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--item-border);
+            box-shadow: 0 2px 8px var(--shadow-dark), inset 0 1px 1px var(--shadow-light);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Toggle switch -->
+        <div class="toggle-switch">
+            <input type="checkbox" id="switch" class="toggle-input" />
+            <label for="switch" class="toggle-label"></label>
+        </div>
+
+        <!-- Add logout button -->
+   
+
+ 
+
+        <br>
+        
+        <!-- Prompts content -->
+        <div class="prompts-container">
+            <!-- Top Left: I Am Section -->
+            <div class="section">
+                <div class="title" data-translate>I AM</div>
+                <div class="grid grid-4x4">
+                    <button class="button" onclick="speakText('I am excited')" data-translate>
+                        Excited
+                    </button>
+                    <button class="button" onclick="speakText('I am tired')" data-translate>
+                        Tired
+                    </button>
+                    <button class="button" onclick="speakText('I am hungry')" data-translate>
+                        Hungry
+                    </button>
+                    <button class="button" onclick="speakText('I am bored')" data-translate>
+                        Bored
+                    </button>
+                    <button class="button" onclick="speakText('I am anxious')" data-translate>
+                        Anxious
+                    </button>
+                    <button class="button" onclick="speakText('I am calm')" data-translate>
+                        Calm
+                    </button>
+                    <button class="button" onclick="speakText('I am confused')" data-translate>
+                        Confused
+                    </button>
+                    <button class="button" onclick="speakText('I am focused')" data-translate>
+                        Focused
+                    </button>
+                    <button class="button" onclick="speakText('I am relaxed')" data-translate>
+                        Relaxed
+                    </button>
+                    <button class="button" onclick="speakText('I am stressed')" data-translate>
+                        Stressed
+                    </button>
+                    <button class="button" onclick="speakText('I am surprised')" data-translate>
+                        Surprised
+                    </button>
+                    <button class="button" onclick="speakText('I am grateful')" data-translate>
+                        Grateful
+                    </button>
+                </div>
+            </div>
+
+            <!-- Top Right: I Want Section -->
+            <div class="section">
+                <div class="title" data-translate>I WANT</div>
+                <div class="grid grid-4x4">
+                    <button class="button" onclick="speakText('I want to eat')" data-translate>
+                        To Eat
+                    </button>
+                    <button class="button" onclick="speakText('I want to sleep')" data-translate>
+                        To Sleep
+                    </button>
+                    <button class="button" onclick="speakText('I want to read')" data-translate>
+                        To Read
+                    </button>
+                    <button class="button" onclick="speakText('I want to watch TV')" data-translate>
+                        To Watch TV
+                    </button>
+                    <button class="button" onclick="speakText('I want to listen to music')" data-translate>
+                        Music
+                    </button>
+                    <button class="button" onclick="speakText('I want to draw')" data-translate>
+                        To Draw
+                    </button>
+                    <button class="button" onclick="speakText('I want to be comforted')" data-translate>
+                        Comfort
+                    </button>
+                    <button class="button" onclick="speakText('I want to drink water')" data-translate>
+                        To Drink Water
+                    </button>
+                    <button class="button" onclick="speakText('I want to dance')" data-translate>
+                        To Dance
+                    </button>
+                    <button class="button" onclick="speakText('I want to exercise')" data-translate>
+                        To Exercise
+                    </button>
+                    <button class="button" onclick="speakText('I want to talk')" data-translate>
+                        To Talk
+                    </button>
+                    <button class="button" onclick="speakText('I want to relax')" data-translate>
+                        To Relax
+                    </button>
+                </div>
+            </div>
+
+            <!-- New Selected Choices Section -->
+            <div class="section" style="position: relative;">
+                <div class="title" data-translate>SELECTED CHOICES</div>
+                <!-- Undo button -->
+                <div class="undo-switch" style="position: absolute; top: 15px; right: 15px; z-index: 2;">
+                    <button id="undo-btn" class="undo-label" title="Undo" aria-label="Undo" onclick="undoSelectedChoice()">
+                        &#8630;
+                    </button>
+                </div>
+                <div id="selected-choices" class="grid">
+                    <div class="placeholder" data-translate>No choices selected yet.</div>
+                </div>
+            </div>
+
+            <!-- Bottom Right: I Want to See Section -->
+            <div class="section">
+                <div class="title" data-translate>I WANT TO SEE</div>
+                <div class="grid grid-2x4">
+                    <button class="button" onclick="speakText('I want to see my family')" data-translate>
+                        My Family
+                    </button>
+                    <button class="button" onclick="speakText('I want to see the nurse')" data-translate>
+                        The Nurse
+                    </button>
+                    <button class="button" onclick="speakText('I want to see my friends')" data-translate>
+                        My Friends
+                    </button>
+                    <button class="button" onclick="speakText('I want to see the doctor')" data-translate>
+                        The Doctor
+                    </button>
+                </div>
+                <div class="grid grid-2x4">
+                    <button class="button yes-button" onclick="speakText('Yes')" data-translate>
+                        Yes
+                    </button>
+                    <button class="button no-button" onclick="speakText('No')" data-translate>
+                        No
+                    </button>
+                    <button class="button" onclick="speakText('Stop')" data-translate>
+                        Stop
+                    </button>
+                    <button class="button" onclick="speakText('Go')" data-translate>
+                        Go
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Navigation bar -->
+        <nav class="navigation">
+            <a href="pic.html" class="nav-item" data-translate>Picture Board</a>   
+            <a href="prompts.html" class="nav-item" data-translate>Prompts</a>         
+            <a href="pain.html" class="nav-item" data-translate>Pain</a>
+            <a href="keyboard.html" class="nav-item" data-translate>Keyboard</a>
+            <a href="voxai.html" class="nav-item" data-translate>VoxAI</a>
+            <a href="entertainment.html" class="nav-item" data-translate>Entertainment</a>
+            <a href="documents.html" class="nav-item" data-translate>Documents</a>
+            <a href="mood.html" class="nav-item" data-translate>Mood</a>
+        </nav>
+    </div>
+    <script>
+        // Function to speak text using the Web Speech API
+        function speak(text) {
+            console.log('Speaking:', text);
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                // Get the selected language from localStorage
+                const selectedLang = localStorage.getItem('selectedLanguage') || 'en';
+                // Map language codes to speech synthesis voices
+                const langMap = {
+                    'en': 'en-US',
+                    'es': 'es-ES',
+                    'fr': 'fr-FR',
+                    'de': 'de-DE',
+                    'it': 'it-IT',
+                    'pt': 'pt-BR',
+                    'ru': 'ru-RU',
+                    'zh': 'zh-CN',
+                    'ja': 'ja-JP',
+                    'ko': 'ko-KR',
+                    'ar': 'ar-SA',
+                    'hi': 'hi-IN'
+                };
+                utterance.lang = langMap[selectedLang] || 'en-US';
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.log('Text-to-speech is not supported in this browser.');
+                alert('Text-to-speech is not supported in this browser.');
+            }
+        }
+
+        // Function to translate a single text
+        async function translateText(text, targetLang) {
+            if (targetLang === 'en') return text;
+            const apiKey = 'AIzaSyAYKhxYf1Hr-SCooahHeHXZIPmiEZJc3AM';
+            const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify({ q: [text], target: targetLang }),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                if (data && data.data && data.data.translations && data.data.translations[0]) {
+                    return data.data.translations[0].translatedText;
+                }
+                return text;
+            } catch (err) {
+                console.error('Translation failed:', err);
+                return text;
+            }
+        }
+
+        // Modified speakText function to handle translations
+        async function speakText(text) {
+            const selectedLang = localStorage.getItem('selectedLanguage') || 'en';
+            const translatedText = await translateText(text, selectedLang);
+            speak(translatedText);
+            updateSelectedChoices(translatedText);
+            
+            // Log the spoken text
+            logAction(`Prompt Spoken: "${translatedText}"`);
+        }
+
+        // Modified updateSelectedChoices to handle translations
+        async function updateSelectedChoices(text) {
+            const selectedChoicesContainer = document.getElementById('selected-choices');
+            selectedChoicesContainer.innerHTML = ''; // Clear previous choice or placeholder
+            const choiceElement = document.createElement('div');
+            choiceElement.className = 'button';
+            if (text.trim().toLowerCase() === 'yes' || text.trim().toLowerCase() === 'sí' || text.trim().toLowerCase() === 'oui' || text.trim().toLowerCase() === 'ja' || text.trim().toLowerCase() === 'はい' || text.trim().toLowerCase() === '네' || text.trim().toLowerCase() === 'نعم' || text.trim().toLowerCase() === 'हाँ') {
+                choiceElement.classList.add('yes-button');
+            } else if (text.trim().toLowerCase() === 'no' || text.trim().toLowerCase() === 'no' || text.trim().toLowerCase() === 'non' || text.trim().toLowerCase() === 'nein' || text.trim().toLowerCase() === 'いいえ' || text.trim().toLowerCase() === '아니요' || text.trim().toLowerCase() === 'لا' || text.trim().toLowerCase() === 'नहीं') {
+                choiceElement.classList.add('no-button');
+            }
+            choiceElement.textContent = text;
+            selectedChoicesContainer.appendChild(choiceElement);
+        }
+
+        // Update all button click handlers to use async/await
+        document.querySelectorAll('.button').forEach(button => {
+            const originalOnClick = button.getAttribute('onclick');
+            if (originalOnClick) {
+                const text = originalOnClick.match(/speakText\('([^']+)'\)/)[1];
+                button.removeAttribute('onclick');
+                button.addEventListener('click', () => speakText(text));
+            }
+        });
+
+        // Update undo function to handle translations
+        async function undoSelectedChoice() {
+            const selectedChoicesContainer = document.getElementById('selected-choices');
+            const selectedLang = localStorage.getItem('selectedLanguage') || 'en';
+            const placeholderText = await translateText('No choices selected yet.', selectedLang);
+            selectedChoicesContainer.innerHTML = `<div class="placeholder" data-translate>${placeholderText}</div>`;
+        }
+
+        // Core logging functionality
+        function logAction(action) {
+            const timestamp = new Date().toISOString();
+            const logEntry = { action, timestamp };
+            
+            const log = JSON.parse(localStorage.getItem('ccpcsLog') || '[]');
+            log.push(logEntry);
+            localStorage.setItem('ccpcsLog', JSON.stringify(log));
+        }
+
+        // Prompt buttons are handled by the speakText function which includes logging
+
+        // Dark mode functionality
+        const toggleSwitch = document.getElementById('switch');
+        const body = document.body;
+
+        // Check the initial state from local storage
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            toggleSwitch.checked = true;
+            updateIconColors('white');
+        }
+
+        toggleSwitch.addEventListener('change', function() {
+            if (this.checked) {
+                body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'enabled');
+                updateIconColors('white');
+            } else {
+                body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'disabled');
+                updateIconColors('black');
+            }
+        });
+
+        function updateIconColors(color) {
+            const icons = document.querySelectorAll('.prompt-item img');
+            icons.forEach(icon => {
+                const currentSrc = icon.src;
+                const newSrc = currentSrc.replace(/color=[^&]+/, `color=${color}`);
+                icon.src = newSrc;
+            });
+        }
+
+        // Display patient name
+        const currentPatient = JSON.parse(localStorage.getItem('currentPatient'));
+        if (currentPatient) {
+            const patientNameElement = document.getElementById('patient-name');
+            if (patientNameElement) {
+                patientNameElement.textContent = `${currentPatient.firstName} ${currentPatient.lastName}`;
+            }
+        }
+
+        // No additional click logging needed - only log when text is spoken
+
+        // Batch translation logic for all visible text, placeholders, alt, button values, and aria-labels
+        const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+        if (savedLang !== 'en') batchTranslateAllText(savedLang);
+        async function batchTranslateAllText(targetLang) {
+          // Gather all text nodes
+          const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+          let node;
+          const textNodes = [];
+          while ((node = walker.nextNode())) {
+            if (node.parentNode && node.textContent.trim() && node.parentNode.offsetParent !== null) {
+              textNodes.push(node);
+            }
+          }
+          // Gather all translatable attributes
+          const attrNodes = [];
+          const all = document.querySelectorAll('[placeholder], [alt], [value], [aria-label]');
+          for (const el of all) {
+            if (el.placeholder) attrNodes.push({el, attr: 'placeholder', value: el.placeholder});
+            if (el.alt) attrNodes.push({el, attr: 'alt', value: el.alt});
+            if (el.value && (el.tagName === 'BUTTON' || el.tagName === 'INPUT')) attrNodes.push({el, attr: 'value', value: el.value});
+            if (el.getAttribute('aria-label')) attrNodes.push({el, attr: 'aria-label', value: el.getAttribute('aria-label')});
+          }
+          // Prepare all strings for translation
+          const allStrings = [...textNodes.map(n => n.textContent), ...attrNodes.map(a => a.value)];
+          if (allStrings.length === 0) return;
+          const apiKey = 'AIzaSyAYKhxYf1Hr-SCooahHeHXZIPmiEZJc3AM';
+          const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+          const response = await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify({ q: allStrings, target: targetLang }),
+            headers: { 'Content-Type': 'application/json' }
+          });
+          const data = await response.json();
+          const translations = data.data.translations.map(t => t.translatedText);
+          // Update text nodes
+          textNodes.forEach((n, i) => { n.textContent = translations[i]; });
+          // Update attributes
+          attrNodes.forEach((a, i) => { a.el[a.attr] = translations[textNodes.length + i]; });
+        }
+
+    </script>
+</body>
+</html>

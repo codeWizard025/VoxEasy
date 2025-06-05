@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>General Consent</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background-color: white;
+            --text-color: black;
+        }
+
+        [data-theme="dark"] {
+            --background-color: black;
+            --text-color: white;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.25rem;
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+
+        p, ul {
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .signature-container {
+            margin: 20px 0;
+        }
+
+        .signature-canvas {
+            border: 1px solid var(--text-color);
+            background: var(--background-color);
+            cursor: crosshair;
+        }
+
+        .clear-signature {
+            display: block;
+            margin: 10px 0;
+            padding: 8px 16px;
+            background: var(--background-color);
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .clear-signature:hover {
+            background: var(--text-color);
+            color: var(--background-color);
+        }
+
+        .clear-signature:active {
+            transform: scale(0.98);
+        }
+
+        .form-input {
+            background: var(--background-color);
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            padding: 5px;
+            margin: 5px 0;
+            width: 300px;
+        }
+
+        .save-button {
+            display: block;
+            margin: 30px auto;
+            padding: 12px 24px;
+            background: var(--background-color);
+            color: var(--text-color);
+            border: 2px solid var(--text-color);
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .save-button:hover {
+            background: var(--text-color);
+            color: var(--background-color);
+        }
+
+        .save-button:active {
+            transform: scale(0.98);
+        }
+
+        #pdf-content {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            
+            #pdf-content {
+                width: 100%;
+                padding: 0;
+            }
+
+            .signature-container {
+                page-break-inside: avoid;
+            }
+
+            h1, h2, h3 {
+                page-break-after: avoid;
+            }
+
+            p {
+                orphans: 3;
+                widows: 3;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="pdf-content">
+        <h1>General Consent Form</h1>
+
+        <h2>Purpose</h2>
+        <p>This General Consent Form outlines my voluntary agreement to receive medical treatment, care, and services, and acknowledges my understanding of the procedures, potential risks, and my rights as a patient.</p>
+
+        <h2>Declaration of Consent</h2>
+        <p>I, <input type="text" class="form-input" placeholder="Your Full Name">, being of sound mind, voluntarily provide this consent to receive medical evaluation, treatment, and procedures as deemed necessary by healthcare professionals involved in my care. I understand that this consent is given freely and without coercion.</p>
+
+        <h3>Consent to Medical Treatment</h3>
+        <p>I authorize healthcare providers to perform examinations, diagnostic procedures, medical treatments, and any other services considered necessary for my health and well-being. This may include, but is not limited to:</p>
+        <ul>
+            <li>Administration of medications</li>
+            <li>Laboratory tests</li>
+            <li>Diagnostic imaging (X-rays, MRI, CT scans, etc.)</li>
+            <li>Medical or surgical procedures</li>
+        </ul>
+
+        <h3>Acknowledgment of Risks and Benefits</h3>
+        <p>I understand that all medical procedures and treatments carry certain risks and possible side effects. I acknowledge that I have the right to ask questions about any procedure or treatment and to receive clear, understandable answers before giving consent.</p>
+
+        <h3>Right to Refuse Treatment</h3>
+        <p>I acknowledge that I have the right to refuse any specific treatment or procedure at any time, even after signing this form, and that my decision will be respected.</p>
+
+        <h3>Consent for Use and Disclosure of Information</h3>
+        <p>I authorize the healthcare facility and its staff to use and disclose my medical information as necessary for the purposes of treatment, payment, and healthcare operations, in compliance with applicable privacy laws.</p>
+
+        <h3>Revocation of Consent</h3>
+        <p>I understand that I may revoke this consent at any time by notifying the healthcare provider in writing. Revocation will not affect any treatment or disclosures that occurred prior to the revocation.</p>
+
+        <h2>Signatures</h2>
+        <p>Your Signature:</p>
+        <div class="signature-container" id="signature1">
+            <div class="signature-field"></div>
+        </div>
+        <p>Date: <input type="text" class="form-input" placeholder="MM/DD/YYYY"></p>
+
+        <h3>Witnesses:</h3>
+        <p>Witness 1 Signature:</p>
+        <div class="signature-container" id="signature2">
+            <div class="signature-field"></div>
+        </div>
+        <p>Name: <input type="text" class="form-input" placeholder="Enter witness name"></p>
+        <p>Date: <input type="text" class="form-input" placeholder="MM/DD/YYYY"></p>
+
+        <p>Witness 2 Signature:</p>
+        <div class="signature-container" id="signature3">
+            <div class="signature-field"></div>
+        </div>
+        <p>Name: <input type="text" class="form-input" placeholder="Enter witness name"></p>
+        <p>Date: <input type="text" class="form-input" placeholder="MM/DD/YYYY"></p>
+
+        <button id="savePDF" class="save-button">Save as PDF</button>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="documentFunctions.js"></script>
+</body>
+</html>
+
