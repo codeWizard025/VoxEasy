@@ -1254,7 +1254,7 @@
 
         // Common word completions for partial words
         const commonWords = [
-            'a', 'about', 'after', 'again', 'all', 'also', 'and', 'any', 'are', 'as', 'at', 'back',
+            'a', 'about', 'after', 'again', 'there', 'all', 'also', 'and', 'any', 'are', 'as', 'at', 'back',
             'be', 'because', 'been', 'before', 'being', 'but', 'by', 'call', 'came', 'can', 'come',
             'could', 'day', 'did', 'do', 'down', 'each', 'even', 'every', 'feel', 'feeling', 'find',
             'first', 'for', 'from', 'get', 'give', 'go', 'going', 'good', 'great', 'had', 'has',
@@ -1269,7 +1269,7 @@
             'water', 'way', 'we', 'well', 'went', 'were', 'what', 'when', 'where', 'which', 'who',
             'will', 'with', 'work', 'would', 'yes', 'you', 'your',
             // Medical/AAC specific words
-            'bathroom', 'bed', 'better', 'cold', 'comfortable', 'doctor', 'eat', 'food', 'hello',
+            'bathroom', 'bed', 'better', 'cold', 'comfortable', 'doctor', 'eat', 'food', 'hello', 'hey', 'hi',
             'home', 'hot', 'medicine', 'nurse', 'okay', 'rest', 'sleep', 'sorry', 'thank', 'thanks',
             'thirsty', 'toilet', 'uncomfortable', 'understand', 'walk', 'warm', 'worse',
             // Expanded word list
@@ -1288,7 +1288,7 @@
             'seem', 'sense', 'service', 'set', 'several', 'show', 'side', 'since', 'small', 'social', 
             'something', 'sometimes', 'sound', 'speak', 'spend', 'stand', 'start', 'state', 'still', 
             'stop', 'story', 'street', 'student', 'study', 'system', 'talk', 'tell', 'thing', 
-            'though', 'three', 'together', 'toward', 'try', 'turn', 'under', 'until', 'wait', 'watch', 
+            'though', 'there', 'together', 'toward', 'try', 'turn', 'under', 'until', 'wait', 'watch', 
             'while', 'white', 'whole', 'why', 'without', 'woman', 'word', 'world', 'write', 'year', 'young'
         ];
 
@@ -2449,7 +2449,10 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             if (swipePoints.length < 2) return;
 
-            ctx.strokeStyle = `rgba(80, 160, 255, ${opacity})`;
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const trailColor = isDarkMode ? `rgba(255, 255, 255, ${opacity})` : `rgba(51, 51, 51, ${opacity})`;
+
+            ctx.strokeStyle = trailColor;
             ctx.lineWidth = 6;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
