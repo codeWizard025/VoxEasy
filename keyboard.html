@@ -1307,7 +1307,7 @@
             // This function is now fully cursor-aware.
             const cursor_pos = textElement ? getCaretPosition(textElement) : currentText.length;
             const text_before_cursor = currentText.substring(0, cursor_pos);
-
+            
             const endsWithSpace = /\s$/.test(text_before_cursor);
             let predictions = [];
             let isCompletion = false;
@@ -1333,19 +1333,19 @@
                     if (contextualPhrases[lastWord]) predictions = contextualPhrases[lastWord];
                 }
 
-            } else {
+                } else {
                 // Offer COMPLETIONS for the current partial word.
                 isCompletion = true;
                 const wordStartIndex = text_before_cursor.lastIndexOf(' ') + 1;
                 const currentWord = text_before_cursor.substring(wordStartIndex).toLowerCase();
 
-                if (currentWord.length > 0) {
-                    const completions = commonWords.filter(word => 
-                        word.toLowerCase().startsWith(currentWord) && 
-                        word.toLowerCase() !== currentWord
-                    );
-                    if (completions.length > 0) {
-                        predictions = completions;
+                    if (currentWord.length > 0) {
+                        const completions = commonWords.filter(word => 
+                            word.toLowerCase().startsWith(currentWord) && 
+                            word.toLowerCase() !== currentWord
+                        );
+                        if (completions.length > 0) {
+                            predictions = completions;
                     }
                 }
             }
@@ -1387,7 +1387,7 @@
                             const suffix = currentText.substring(currentPos);
                             currentText = prefix + wordToInsert + suffix;
                             cursorPosition = currentPos + wordToInsert.length;
-                        }
+                            }
 
                         updateSelectedList();
                         setTimeout(() => setCaretPosition(textElement, cursorPosition), 10);
@@ -1421,129 +1421,78 @@
 
             // Create or update the editable text element
             if (!textElement) {
-                selectedList.innerHTML = `<div class="selected-item" contenteditable="true" id="editableText"></div>`;
+                selectedList.innerHTML = `<div class="selected-item" id="editableText"></div>`;
                 textElement = document.getElementById('editableText');
                 
-                // Add event listeners for the editable element
-                textElement.addEventListener('input', handleTextInput);
-                textElement.addEventListener('click', handleTextClick);
-                textElement.addEventListener('keydown', handleKeyDown);
-                textElement.addEventListener('paste', handlePaste);
+                // Remove interactivity to prevent native keyboard on mobile devices
+                textElement.removeAttribute('contenteditable');
+                textElement.style.cursor = 'default';
             }
             
-            // Update the text content and preserve cursor position
-            const savedSelection = saveSelection(textElement);
+            // Update the text content directly without cursor management
             textElement.textContent = displayText;
-            restoreSelection(textElement, savedSelection);
             
-            updatePredictions();
-        }
-
-        // Handle direct text input in the editable field
-        function handleTextInput(e) {
-            currentText = e.target.textContent || '';
-            cursorPosition = getCaretPosition(e.target);
-            updatePredictions();
-        }
-
-        // Handle clicks in the text to position cursor
-        function handleTextClick(e) {
-            cursorPosition = getCaretPosition(e.target);
-        }
-
-        // Handle keyboard input in the editable field
-        function handleKeyDown(e) {
-            // Allow normal typing and editing
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                currentText += '\n';
-                updateSelectedList();
-            }
-        }
-
-        // Handle paste events
-        function handlePaste(e) {
-            e.preventDefault();
-            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
-            insertTextAtCursor(pastedText);
-        }
-
-        // Get current cursor position
-        function getCaretPosition(element) {
-            let caretPos = 0;
-            const selection = window.getSelection();
-            if (selection.rangeCount > 0) {
-                const range = selection.getRangeAt(0);
-                const preCaretRange = range.cloneRange();
-                preCaretRange.selectNodeContents(element);
-                preCaretRange.setEnd(range.endContainer, range.endOffset);
-                caretPos = preCaretRange.toString().length;
-            }
-            return caretPos;
-        }
-
-        // Set cursor position
-        function setCaretPosition(element, pos) {
-            const range = document.createRange();
-            const selection = window.getSelection();
-            
-            if (element.firstChild) {
-                const textNode = element.firstChild;
-                const maxPos = textNode.textContent.length;
-                pos = Math.min(pos, maxPos);
-                range.setStart(textNode, pos);
-                range.setEnd(textNode, pos);
+            // Add visual cursor at the end for user feedback
+            if (displayText.length === 0 || !displayText.endsWith(' ')) {
+                textElement.innerHTML = displayText + '<span class="cursor"></span>';
             } else {
-                range.selectNodeContents(element);
+                textElement.innerHTML = displayText + '<span class="cursor"></span>';
             }
             
-            selection.removeAllRanges();
-            selection.addRange(range);
+            updatePredictions();
         }
 
-        // Save selection state
+        // Remove all text input handlers since we don't want direct text input
+        function handleTextInput(e) {
+            // Disabled to prevent native keyboard
+        }
+
+        function handleTextClick(e) {
+            // Disabled to prevent native keyboard
+        }
+
+        function handleKeyDown(e) {
+            // Disabled to prevent native keyboard
+        }
+
+        function handlePaste(e) {
+            // Disabled to prevent native keyboard
+        }
+
+        // Get current cursor position - now just returns end of text
+        function getCaretPosition(element) {
+            return currentText.length;
+        }
+
+        // Set cursor position - disabled for mobile compatibility
+        function setCaretPosition(element, pos) {
+            // Disabled to prevent native keyboard focus
+        }
+
+        // Save selection state - disabled
         function saveSelection(element) {
-            const selection = window.getSelection();
-            if (selection.rangeCount > 0) {
-                const range = selection.getRangeAt(0);
-                const preCaretRange = range.cloneRange();
-                preCaretRange.selectNodeContents(element);
-                preCaretRange.setEnd(range.endContainer, range.endOffset);
-                return preCaretRange.toString().length;
-            }
-            return 0;
+            return currentText.length;
         }
 
-        // Restore selection state
+        // Restore selection state - disabled
         function restoreSelection(element, savedPos) {
-            if (element.firstChild) {
-                setCaretPosition(element, savedPos);
-            }
+            // Disabled to prevent native keyboard focus
         }
 
         // Insert text at current cursor position
         function insertTextAtCursor(text) {
-            if (!textElement) return;
-            
-            const pos = getCaretPosition(textElement);
-            currentText = currentText.slice(0, pos) + text + currentText.slice(pos);
-            cursorPosition = pos + text.length;
-            
+            // Always insert at the end since we don't have cursor management
+            currentText += text;
+            cursorPosition = currentText.length;
             updateSelectedList();
-            setTimeout(() => setCaretPosition(textElement, cursorPosition), 10);
         }
 
         // Perform a single backspace operation
         function performBackspace() {
-            if (textElement) {
-                cursorPosition = getCaretPosition(textElement);
-            }
-            
-            if (cursorPosition > 0) {
-                currentText = currentText.slice(0, cursorPosition - 1) + currentText.slice(cursorPosition);
-                cursorPosition--;
+            if (currentText.length > 0) {
+                currentText = currentText.slice(0, -1);
+                cursorPosition = currentText.length;
                 updateSelectedList();
-                setTimeout(() => setCaretPosition(textElement, cursorPosition), 10);
             }
         }
 
