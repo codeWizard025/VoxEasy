@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoxEasy - Light Humor</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+
+        * {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --bg-color: rgba(255, 255, 255, 0.18);
+            --text-color: #333333;
+            --item-bg: rgba(255, 255, 255, 0.15);
+            --item-border: rgba(255, 255, 255, 0.2);
+            --item-hover: rgba(255, 255, 255, 0.25);
+            --item-selected: rgba(51, 51, 51, 0.15);
+            --shadow-light: rgba(255, 255, 255, 0.5);
+            --shadow-dark: rgba(0, 0, 0, 0.15);
+            --accent-color: #FF6B6B;
+            --bubble-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #FFE5E5 0%, #FFF5F5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            background: var(--bg-color);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 20px;
+            padding: 45px;
+            box-shadow: 
+                0 8px 24px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+            max-width: 1200px;
+            width: 100%;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            max-height: 80vh;
+            height: auto;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--item-border);
+            animation: containerFadeIn 0.5s ease-out;
+        }
+
+        @keyframes containerFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 500;
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin: 10px 0 0;
+        }
+
+        .back-to-feel {
+            position: absolute;
+            top: 24px;
+            left: 32px;
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            color: var(--text-color);
+            padding: 10px 22px;
+            border-radius: 20px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 2px 6px var(--shadow-dark), inset 0 1px 1px var(--shadow-light);
+        }
+
+        .back-to-feel:hover {
+            background: var(--item-hover);
+            transform: translateY(-2px);
+        }
+
+        .back-to-feel:active {
+            transform: translateY(0);
+        }
+
+        .joke-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            padding: 20px;
+        }
+
+        .avatar-container {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 100%;
+            height: 100%;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .speech-bubble {
+            background: var(--bubble-bg);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+            box-shadow: 0 4px 12px var(--shadow-dark);
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 20px 20px 0;
+            border-style: solid;
+            border-color: var(--bubble-bg) transparent transparent;
+        }
+
+        .joke-text {
+            font-size: 1.4em;
+            line-height: 1.6;
+            color: var(--text-color);
+            text-align: center;
+            margin: 0;
+            min-height: 2.4em;
+        }
+
+        .category-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .category-button {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .category-button:hover {
+            background: var(--item-hover);
+            transform: translateY(-2px);
+        }
+
+        .category-button.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .interaction-buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .interaction-button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .interaction-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .interaction-button:active {
+            transform: translateY(0);
+        }
+
+        /* Dark mode styles */
+        .dark-mode {
+            --bg-color: rgba(0, 0, 0, 0.18);
+            --text-color: #ffffff;
+            --item-bg: rgba(255, 255, 255, 0.1);
+            --item-border: rgba(255, 255, 255, 0.1);
+            --item-hover: rgba(255, 255, 255, 0.15);
+            --item-selected: rgba(255, 255, 255, 0.2);
+            --shadow-light: rgba(255, 255, 255, 0.1);
+            --shadow-dark: rgba(0, 0, 0, 0.3);
+            --bubble-bg: rgba(30, 30, 30, 0.95);
+            background: linear-gradient(135deg, #2C1810 0%, #1A1A1A 100%);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .avatar-container {
+                width: 150px;
+                height: 150px;
+            }
+
+            .speech-bubble {
+                padding: 20px;
+            }
+
+            .joke-text {
+                font-size: 1.2em;
+            }
+
+            .category-buttons {
+                gap: 10px;
+            }
+
+            .category-button {
+                padding: 10px 20px;
+                font-size: 1em;
+            }
+
+            .interaction-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .interaction-button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Typewriter animation */
+        .typewriter {
+            overflow: hidden;
+            border-right: 2px solid var(--accent-color);
+            white-space: nowrap;
+            margin: 0 auto;
+            animation: typing 3.5s steps(40, end),
+                       blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--accent-color) }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="back-to-feel" onclick="window.location.href='feel.html'" data-translate>← Back</button>
+        <div class="header">
+            <h1 data-translate>Light Humor</h1>
+            <p data-translate>Let humor brighten your day</p>
+        </div>
+
+        <div class="joke-container">
+            <div class="avatar-container">
+                <!-- SVG Avatar -->
+                <svg class="avatar" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Face -->
+                    <circle cx="100" cy="100" r="90" fill="#FFD93D" stroke="#333" stroke-width="2"/>
+                    
+                    <!-- Eyes -->
+                    <g class="eyes">
+                        <circle cx="65" cy="85" r="12" fill="#333"/>
+                        <circle cx="135" cy="85" r="12" fill="#333"/>
+                        <!-- Blinking animation -->
+                        <line x1="55" y1="85" x2="75" y2="85" stroke="#333" stroke-width="3" class="blink" style="display: none;"/>
+                        <line x1="125" y1="85" x2="145" y2="85" stroke="#333" stroke-width="3" class="blink" style="display: none;"/>
+                    </g>
+                    
+                    <!-- Smile -->
+                    <path d="M70 120 Q100 150 130 120" stroke="#333" stroke-width="3" fill="none"/>
+                    
+                    <!-- Blush -->
+                    <circle cx="50" cy="100" r="15" fill="#FF9999" opacity="0.5"/>
+                    <circle cx="150" cy="100" r="15" fill="#FF9999" opacity="0.5"/>
+                </svg>
+            </div>
+
+            <div class="speech-bubble">
+                <p class="joke-text" id="jokeText"></p>
+            </div>
+
+            <div class="category-buttons">
+                <button class="category-button active" data-category="random" onclick="selectCategory('random')">
+                    😂 <span data-translate>Random</span>
+                </button>
+                <button class="category-button" data-category="dad" onclick="selectCategory('dad')">
+                    👨‍🥧 <span data-translate>Dad Jokes</span>
+                </button>
+                <button class="category-button" data-category="animal" onclick="selectCategory('animal')">
+                    🐾 <span data-translate>Animal Jokes</span>
+                </button>
+                <button class="category-button" data-category="pun" onclick="selectCategory('pun')">
+                    🔊 <span data-translate>Puns</span>
+                </button>
+                <button class="category-button" data-category="tech" onclick="selectCategory('tech')">
+                    💻 <span data-translate>Tech Jokes</span>
+                </button>
+                <button class="category-button" data-category="food" onclick="selectCategory('food')">
+                    🍔 <span data-translate>Food Jokes</span>
+                </button>
+                <button class="category-button" data-category="school" onclick="selectCategory('school')">
+                    📚 <span data-translate>School Jokes</span>
+                </button>
+                <button class="category-button" data-category="sports" onclick="selectCategory('sports')">
+                    ⚽ <span data-translate>Sports Jokes</span>
+                </button>
+                <button class="category-button" data-category="music" onclick="selectCategory('music')">
+                    🎵 <span data-translate>Music Jokes</span>
+                </button>
+                <button class="category-button" data-category="science" onclick="selectCategory('science')">
+                    🔬 <span data-translate>Science Jokes</span>
+                </button>
+                <button class="category-button" data-category="holiday" onclick="selectCategory('holiday')">
+                    🎄 <span data-translate>Holiday Jokes</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check for dark mode
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+        }
+
+        // Joke database
+        const jokes = {
+            random: [
+                "Why did the bicycle fall over? Because it was two-tired!",
+                "What did the ocean say to the beach? Nothing, it just waved!",
+                "Why did the computer go to the doctor? Because it had a virus!",
+                "What do you call a bear that's always cold? A brrr-bear!",
+                "Why did the cookie go to the doctor? Because it was feeling a bit sweet!",
+                "Why did the tomato turn red? Because it saw the salad dressing!",
+                "Why did the picture go to jail? Because it was framed!",
+                "What do you call a fish with no eyes? Fsh!",
+                "Why did the banana go to the doctor? Because it wasn't peeling well!",
+                "What do you call a pencil that's been sharpened too much? Pointless!",
+                "Why don't cats play poker in the jungle? Too many cheetahs!",
+                "What do you call a dog that can do magic? A labracadabrador!",
+                "Why did the cow go to space? To see the moooon!",
+                "What do you call cheese that isn't yours? Nacho cheese!",
+                "What did the computer do at lunchtime? Had a byte!",
+                "Why was the computer cold? It left its Windows open!",
+                "Why did the football coach go to the bank? To get his quarter back!",
+                "Why did the golfer bring two pairs of pants? In case he got a hole in one!",
+                "Why did the student eat their homework? Because the teacher said it was a piece of cake!",
+                "Why did Santa's helper see the doctor? Because he had low elf-esteem!",
+                "What do you call Santa when he stops moving? Santa Pause!",
+                "Why did the musician go to jail? Because he got caught in a treble!",
+                "Why did the science book look sad? Because it had too many experiments!",
+                "Why did the scarecrow become a successful motivational speaker? Because he was outstanding in his field!",
+                "What do you call a dinosaur with an extensive vocabulary? A thesaurus!",
+                "Why did the cookie cry? Because his mom was a wafer too long!",
+                "Why did the bee get married? Because he found his honey!",
+                "What did one wall say to the other? I'll meet you at the corner!",
+                "Why don't skeletons fight each other? They don't have the guts!",
+                "Why can't your nose be 12 inches long? Because then it would be a foot!"
+            ],
+            dad: [
+                "Why don't scientists trust atoms? Because they make up everything!",
+                "How do you organize a space party? You planet!",
+                "I'm reading a book about anti-gravity. It's impossible to put down!",
+                "I would tell you a joke about construction, but I'm still working on it.",
+                "Why can't you hear a pterodactyl go to the bathroom? Because the 'P' is silent!",
+                "Why do chicken coops only have two doors? Because if they had four, they'd be chicken sedans!",
+                "Why did the man get hit by a bike every day? Because he was stuck in a vicious cycle!",
+                "Why did the dad bring a ladder to the bar? Because he heard the drinks were on the house!",
+                "What do you call a factory that makes okay products? A satisfactory!",
+                "How do you make holy water? You boil the hell out of it!",
+                "I used to hate facial hair… but then it grew on me.",
+                "Why don't eggs tell jokes? They'd crack each other up!",
+                "I asked my dog what's two minus two. He said nothing.",
+                "Want to hear a joke about paper? Never mind—it's tearable!",
+                "Why do melons have weddings? Because they cantaloupe!",
+                "I'm afraid for the calendar. Its days are numbered.",
+                "Why did the dad sit on the clock? He wanted to be on time.",
+                "I used to play piano by ear, but now I use my hands.",
+                "What do you call a belt made out of watches? A waist of time!",
+                "Why don't skeletons ever go trick or treating? Because they have no body to go with!",
+                "How do cows stay up to date? They read the moos-paper!",
+                "Why did the broom get promoted? Because it swept the competition!",
+                "What do you call a man with a rubber toe? Roberto!",
+                "Did you hear the rumor about butter? Well, I'm not going to spread it!",
+                "What does a lemon say when it answers the phone? Yellow!",
+                "I ordered a chicken and an egg from Amazon. I'll let you know.",
+                "How do you make a tissue dance? Put a little boogie in it!",
+                "Why are elevator jokes so classic and good? They work on many levels.",
+                "I told my wife she should embrace her mistakes. She hugged me.",
+                "My wife said I should do lunges to stay in shape. That would be a big step forward."
+            ],
+            animal: [
+                "Why do cows wear bells? Because their horns don't work!",
+                "What do you get from a pampered cow? Spoiled milk!",
+                "Why are frogs so happy? They eat whatever bugs them!",
+                "What do you call an alligator in a vest? An investigator!",
+                "What do you call a sleeping bull? A bulldozer!",
+                "Why don't elephants use computers? They're afraid of the mouse!",
+                "What do you call a pig that does karate? A pork chop!",
+                "Why are fish so smart? Because they live in schools!",
+                "Why was the cat sitting on the computer? It wanted to keep an eye on the mouse!",
+                "How do you catch a squirrel? Climb a tree and act like a nut!",
+                "Why did the chicken join a band? Because it had the drumsticks!",
+                "What do you call a deer with no eyes? No eye-deer!",
+                "What do you get when you cross a snowman and a dog? Frostbite!",
+                "Why did the duck get a red card? For fowl play!",
+                "Why do bees have sticky hair? Because they use honeycombs!",
+                "What do you call an owl that does magic? Hoo-dini!",
+                "Why don't seagulls fly over the bay? Because then they'd be bagels!",
+                "What do you call a snake that works for the government? A civil serpent!",
+                "Why did the turtle cross the road? To get to the shell station!",
+                "What kind of dog loves indulging in movies? A popcorn retriever!",
+                "What do you get when you cross a sheep and a kangaroo? A woolly jumper!",
+                "Why did the cow sit down at the table? It wanted to chew the cud!",
+                "What do you call a bear that got stuck in the rain? A drizzly bear!",
+                "Why did the horse go behind the tree? To change his jockeys!",
+                "Why was the crab never invited to parties? Because he was a little shellfish!",
+                "What do you get if you cross a parrot and a shark? A bird that talks your ear off before eating you!",
+                "Why did the lion eat the tightrope walker? He wanted a well-balanced meal!",
+                "What do you call a crocodile that likes to bowl? An alley-gator!",
+                "Why did the ants dance on the jam jar? Because the lid said \"twist to open!\"",
+                "What happened when the cat swallowed a ball of yarn? She had mittens!"
+            ],
+            pun: [
+                "I used to be a banker but I lost interest.",
+                "I'm reading a book on anti-gravity. It's impossible to put down!",
+                "I wondered why the baseball was getting bigger. Then it hit me.",
+                "Did you hear about the guy whose left side was cut off? He's all right now.",
+                "I'm on a seafood diet. I see food and I eat it.",
+                "I would tell you a joke about an elevator, but it's an uplifting experience.",
+                "I used to play piano by ear, but now I use my hands.",
+                "I was struggling to figure out how lightning works, but then it struck me.",
+                "I used to be a baker, but I couldn't make enough dough.",
+                "I got a job at a bakery because I kneaded dough.",
+                "I'm friends with all electricians. We have good current connections.",
+                "I used to be a watchmaker. It was a timely profession.",
+                "I once got into a fight with a broken elevator. I took it to another level.",
+                "I was going to make myself a belt made out of watches, but then I realized it would be a waist of time.",
+                "I used to be a Velcro salesman, but I couldn't stick with it.",
+                "I got a job at a calendar factory but got fired for taking a couple of days off.",
+                "I used to be a train driver but I got sidetracked.",
+                "I once heard a joke about amnesia, but I forgot how it goes.",
+                "I used to be a tap dancer until I fell into the sink.",
+                "I got a job as a human cannonball, but it was shot-lived.",
+                "I once knew a guy who was addicted to brake fluid. He said he could stop anytime."
+            ],
+            tech: [
+                "Why did the computer show up at work late? It had a hard drive.",
+                "Why was the cell phone wearing glasses? Because it lost its contacts.",
+                "Why did the computer go to therapy? It had too many bytes of issues.",
+                "Why did the smartphone need a nap? It had too many tabs open.",
+                "Why did the computer break up with the internet? There was no connection.",
+                "Why did the programmer go broke? Because he used up all his cache.",
+                "Why did the computer get cold? It left its Windows open.",
+                "Why did the computer go to the doctor? It had a virus.",
+                "Why did the computer go to art school? To learn how to draw its graphics.",
+                "Why did the computer get glasses? To improve its web sight.",
+                "Why did the computer get a promotion? It had a lot of drive.",
+                "Why did the computer go to the beach? To surf the net.",
+                "Why did the computer go to the gym? To get more RAM.",
+                "Why did the computer go to the bar? To get a byte.",
+                "Why did the computer get a job? It wanted to improve its processing power.",
+                "Why did the computer go to the dance? To find its motherboard.",
+                "Why did the computer go to the bank? To check its balance.",
+                "Why did the computer go to the library? To improve its memory.",
+                "Why did the computer go to the party? To have a byte.",
+                "Why did the computer go to the store? To buy a new mouse.",
+                "Why did the computer go to school? To improve its processing.",
+                "Why did the computer go to the restaurant? To get a byte.",
+                "Why did the computer go to the park? To get some fresh air.",
+                "Why did the computer go to the zoo? To see the RAM.",
+                "Why did the computer go to the movies? To see the latest ROM-com.",
+                "Why did the computer go to the concert? To hear the sound card.",
+                "Why did the computer go to the museum? To see the artifacts.",
+                "Why did the computer go to the gym? To get more RAM.",
+                "Why did the computer go to the bar? To get a byte.",
+                "Why did the computer go to the doctor? It had a hard drive."
+            ],
+            food: [
+                "Why did the tomato turn red? Because it saw the salad dressing!",
+                "Why did the banana go to the doctor? Because it wasn't peeling well!",
+                "Why did the cookie go to the doctor? Because it was feeling crumbly!",
+                "What do you call cheese that isn't yours? Nacho cheese!",
+                "Why did the grape stop in the middle of the road? Because it ran out of juice!",
+                "What do you call a fake noodle? An impasta!",
+                "Why did the melon jump into the lake? It wanted to be a water-melon!",
+                "What do you call a bear that loves honey? Winnie the Pooh!",
+                "Why did the orange stop in the middle of the road? Because it ran out of juice!",
+                "What do you call a bear that's always hungry? A bear-y hungry bear!",
+                "Why did the apple stop in the middle of the road? Because it ran out of juice!",
+                "What do you call a bear that's always cold? A brrr-bear!",
+                "Why did the pear stop in the middle of the road? Because it ran out of juice!",
+                "What do you call a bear that's always happy? A bear-y cheerful bear!",
+                "Why did the peach stop in the middle of the road? Because it ran out of juice!",
+                "What do you call a bear that's always late? A tardy bear!",
+                "Why did the plum stop in the middle of the road? Because it ran out of juice!",
+                "What do you call a bear that's always dancing? A bear-y good dancer!",
+                "Why did the cherry stop in the middle of the road? Because it ran out of juice!",
+                "What do you call a bear that's always singing? A bear-y good singer!",
+                "Why did the strawberry stop in the middle of the road? Because it ran out of juice!",
+                "What do you call a bear that's always running? A bear-y fast bear!",
+                "Why did the blueberry stop in the middle of the road? Because it ran out of juice!",
+                "What do you call a bear that's always reading? A bookish bear!",
+                "Why did the raspberry stop in the middle of the road? Because it ran out of juice!",
+                "What do you call a bear that's always tired? A sleepy bear!",
+                "Why did the blackberry stop in the middle of the road? Because it ran out of juice!",
+                "What do you call a bear that's always hungry? A bear-y hungry bear!",
+                "Why did the cranberry stop in the middle of the road? Because it ran out of juice!",
+                "What do you call a bear that's always cold? A brrr-bear!"
+            ],
+            school: [
+                "Why did the student eat his homework? Because the teacher told him it was a piece of cake!",
+                "Why did the math book look sad? Because it had too many problems.",
+                "Why did the teacher wear sunglasses? Because her students were so bright!",
+                "Why did the student bring a ladder to school? Because he wanted to go to high school.",
+                "Why did the teacher go to the beach? Because she wanted to test the waters.",
+                "Why did the student bring a pencil to the party? Because he wanted to draw attention.",
+                "Why did the teacher go to the bank? Because she wanted to check her balance.",
+                "Why did the student bring a flashlight to school? Because he wanted to be a bright student.",
+                "Why did the teacher go to the zoo? Because she wanted to see the class clown.",
+                "Why did the student bring a map to school? Because he wanted to find his way to success.",
+                "Why did the teacher go to the doctor? Because she had too many pupils.",
+                "Why did the student bring a calculator to school? Because he wanted to add to his knowledge.",
+                "Why did the teacher go to the gym? Because she wanted to work on her class.",
+                "Why did the student bring a backpack to school? Because he wanted to carry his knowledge.",
+                "Why did the teacher go to the library? Because she wanted to check out a good book.",
+                "Why did the student bring a ruler to school? Because he wanted to measure his success.",
+                "Why did the teacher go to the museum? Because she wanted to see the history of education.",
+                "Why did the student bring a globe to school? Because he wanted to explore the world.",
+                "Why did the teacher go to the concert? Because she wanted to hear the class notes.",
+                "Why did the student bring a notebook to school? Because he wanted to write his future.",
+                "Why did the teacher go to the park? Because she wanted to grade the papers.",
+                "Why did the student bring a pen to school? Because he wanted to ink his ideas.",
+                "Why did the teacher go to the restaurant? Because she wanted to grade the menu.",
+                "Why did the student bring a book to school? Because he wanted to read his way to success.",
+                "Why did the teacher go to the movie theater? Because she wanted to see the class act.",
+                "Why did the student bring a camera to school? Because he wanted to capture the moment.",
+                "Why did the teacher go to the art gallery? Because she wanted to see the class masterpiece.",
+                "Why did the student bring a dictionary to school? Because he wanted to look up to success.",
+                "Why did the teacher go to the garden? Because she wanted to see her students grow.",
+                "Why did the student bring a compass to school? Because he wanted to find his direction in life."
+            ],
+            sports: [
+                "Why did the golfer bring two pairs of pants? In case he got a hole in one!",
+                "Why can't Cinderella play soccer? Because she's always running away from the ball!",
+                "Why did the baseball player get arrested? Because he stole second base!",
+                "Why did the football coach go to the bank? To get his quarterback!",
+                "Why are basketball players messy eaters? Because they're always dribbling!",
+                "What do you call a pig who plays basketball? A ball hog!",
+                "Why did the tennis player bring a ladder? To reach the high serves!",
+                "Why did the soccer player bring string to the game? To tie the score!",
+                "Why did the referee go to art school? To learn how to draw the line!",
+                "Why did the gymnast bring a broom? To sweep the competition!",
+                "Why did the swimmer bring a suitcase? Because he was going on a freestyle trip!",
+                "Why did the runner bring a pencil? To draw a finish line!",
+                "Why did the boxer go to the bakery? To get a punch roll!",
+                "Why did the cyclist bring a map? To find his way back to the peloton!",
+                "Why did the baseball team hire a detective? To find their missing bats!",
+                "Why did the golfer wear two hats? In case he got a hole in one!",
+                "Why did the basketball player sit on the bench? Because he was out of bounds!",
+                "Why did the soccer team go to the bank? To get their goalie back!",
+                "Why did the football player go to the library? To get his playbook!",
+                "Why did the tennis player bring a spoon? To serve!",
+                "Why did the baseball player bring a ladder? To reach the high balls!",
+                "Why did the runner bring a flashlight? To see the finish line!",
+                "Why did the swimmer bring a towel? To dry off after the splash!",
+                "Why did the gymnast bring a mirror? To reflect on her performance!",
+                "Why did the cyclist bring a bell? To ring in the victory!",
+                "Why did the boxer bring a pillow? To soften the blow!",
+                "Why did the football player bring a notebook? To draw up new plays!",
+                "Why did the basketball player bring a mop? To clean up the court!",
+                "Why did the soccer player bring a whistle? To call his own fouls!",
+                "Why did the golfer bring a camera? To capture his swing!"
+            ],
+            music: [
+                "Why did the musician get kicked out of the band? He was always flat!",
+                "What do you get when you drop a piano down a mine shaft? A flat minor!",
+                "Why did the singer climb a ladder? To reach the high notes!",
+                "What do you call a cow that can play a musical instrument? A moo-sician!",
+                "Why did the drum take a nap? It was beat!",
+                "Why did the pianist keep banging his head against the keys? He was playing by ear!",
+                "Why did the guitar teacher get arrested? For fingering a minor!",
+                "Why did the music teacher go to jail? Because she got caught with too many sharp objects!",
+                "Why did the trumpet player bring a ladder? To reach the high notes!",
+                "Why did the violinist get in trouble? He was always stringing people along!",
+                "Why did the singer go to jail? Because she got caught in a treble!",
+                "Why did the conductor get arrested? For orchestrating a crime!",
+                "Why did the band break up? Because they couldn't find their rhythm!",
+                "Why did the saxophone player get lost? Because he couldn't find his keys!",
+                "Why did the drummer get a promotion? Because he always kept the beat!",
+                "Why did the singer get a job at the bakery? Because she was a great roll model!",
+                "Why did the guitarist get in trouble? He was caught stringing people along!",
+                "Why did the pianist get locked out? Because he lost his keys!",
+                "Why did the singer go to school? To improve her pitch!",
+                "Why did the musician get a ticket? For not following the notes!",
+                "Why did the conductor get a raise? Because he was instrumental to the team!",
+                "Why did the band go to the bank? To get their notes in order!",
+                "Why did the singer bring a ladder? To reach the high notes!",
+                "Why did the drummer bring a suitcase? Because he was going on tour!",
+                "Why did the guitarist bring a map? To find his way to the next gig!",
+                "Why did the pianist bring a mirror? To reflect on his performance!",
+                "Why did the singer bring a flashlight? To find her pitch in the dark!",
+                "Why did the conductor bring a whistle? To keep the band in line!",
+                "Why did the musician bring a pencil? To draw up new notes!",
+                "Why did the band bring a camera? To capture their performance!"
+            ],
+            science: [
+                "Why can't you trust atoms? Because they make up everything!",
+                "What do you call an educated tube? A graduated cylinder.",
+                "Why did the physicist go to the beach? Because of wave functions!",
+                "What did the biologist wear to impress their date? Designer genes.",
+                "Why did the chemist drop a periodic table? Because it had too many elements!",
+                "Why did the microscope break up with the telescope? They just weren't on the same wavelength.",
+                "Why can't you take a nap around a neutron? Because it has no charge!",
+                "What do you call a dinosaur with a PhD? A thesaurus.",
+                "What did one ion say to the other? I've got my ion you!",
+                "Why was the biology book so full of drama? It had all the cell-fies.",
+                "Why don't scientists trust stairs? Because they're always up to something.",
+                "What do you call a science teacher who's always calm? A stable isotope.",
+                "Why did the bacteria cross the microscope? To get to the other slide!",
+                "Why do biologists look forward to casual Fridays? Because they're allowed to wear genes!",
+                "How do you know the moon is going broke? It's down to its last quarter.",
+                "Why are chemists excellent at solving problems? Because they have all the solutions.",
+                "Why did the nucleus break up with the electron? It was acting negative.",
+                "What did the physicist say when he found out he passed? 'Mass-terpiece!'",
+                "Why are electrons never invited to parties? They're always negative.",
+                "What do you call a cloud with a doctorate? Drizzle.",
+                "Why did the scientist put a knocker on his lab door? Because he wanted to win the No-bell Prize!",
+                "What did the thermometer say to the graduated cylinder? You're so measured!",
+                "Why did the chemist sole the murder mystery? He had the right formula.",
+                "What do you call it when a biologist takes a selfie? A cell-fie!",
+                "Why don't scientists ever trust atoms anymore? Because they make up fake news.",
+                "What did the physicist say to the engineer? 'You lack the gravity of the situation!'",
+                "Why did the astronaut break up with her partner? There was no space for love.",
+                "Why was the chemistry teacher always so positive? Because he had a noble gas.",
+                "What did the neuron say after a great idea? That's a synapse!",
+                "Why did the particle go to therapy? It had too much mass baggage."
+            ],
+            holiday: [
+                "What do elves use to take notes in school? Their elf-abet!",
+                "Why don't skeletons like Halloween parties? They have no body to dance with.",
+                "Why did the turkey join a band? Because it had the drumsticks!",
+                "What do snowmen call their kids? Chill-dren!",
+                "Why was the Easter Bunny so upset? He was having a bad hare day!",
+                "Why didn't the skeleton go trick-or-treating? Because he had no guts.",
+                "What's Santa's favorite type of music? Wrap!",
+                "Why did the Christmas tree go to the barber? It needed a trim.",
+                "Why are ghosts such bad liars? Because they are too transparent.",
+                "What's a vampire's favorite holiday? Fangsgiving.",
+                "Why did the witch break up with the ghoul? He ghosted her!",
+                "What did one Christmas light say to the other? You light up my life!",
+                "What did the turkey say to the computer? Google, Google!",
+                "Why don't mummies take vacations? They're afraid to unwind.",
+                "What do you get when you cross a snowman and a dog? Frostbite!",
+                "Why didn't Rudolph get a good report card? Because he went down in history.",
+                "What do you call a frog hanging from the ceiling? Mistle-toad.",
+                "Why did the leprechaun go outside? To sit on his patio-gold.",
+                "Why are ghosts such bad cheaters? Because they're easy to spot!",
+                "What does a gingerbread man use to fix his house? Icing and gumdrops.",
+                "Why was the Valentine candy so good at school? It always made sweet grades.",
+                "Why didn't the skeleton attend the New Year's party? He had no body to go with.",
+                "How do you scare a snowman? Point a hairdryer at him.",
+                "What do you get when Santa becomes a detective? Santa Clues!",
+                "Why did the ornament go to school? To get a little more tree-ducation.",
+                "Why are holidays like math problems? Because you need to solve your family issues.",
+                "What do pumpkins do after Halloween? They let themselves go.",
+                "Why do turkeys hate Thanksgiving? Because they always get roasted!",
+                "What did Santa name his dog? Santa Paws.",
+                "Why don't ghosts like rain? It dampens their spirits!"
+            ]
+        };
+
+        let currentCategory = 'random';
+        let currentJoke = '';
+        let isTyping = false;
+        let typewriterInterval;
+        let categoryIndex = 0;
+        const categories = Object.keys(jokes);
+
+        // Avatar blinking animation
+        function blinkEyes() {
+            const eyes = document.querySelectorAll('.eyes circle');
+            const blinks = document.querySelectorAll('.blink');
+            
+            eyes.forEach(eye => eye.style.display = 'none');
+            blinks.forEach(blink => blink.style.display = 'block');
+            
+            setTimeout(() => {
+                eyes.forEach(eye => eye.style.display = 'block');
+                blinks.forEach(blink => blink.style.display = 'none');
+            }, 200);
+        }
+
+        // Random blink interval
+        setInterval(() => {
+            if (Math.random() < 0.3) { // 30% chance to blink
+                blinkEyes();
+            }
+        }, 3000);
+
+        function typeWriter(text, element) {
+            if (isTyping) {
+                clearInterval(typewriterInterval);
+            }
+            
+            isTyping = true;
+            let i = 0;
+            element.textContent = '';
+            
+            typewriterInterval = setInterval(() => {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(typewriterInterval);
+                    isTyping = false;
+                }
+            }, 50);
+        }
+
+        // Function to translate a joke if needed
+        async function translateJokeIfNeeded(joke, targetLang) {
+            if (targetLang === 'en') return joke;
+            const apiKey = 'AIzaSyC1RWlflkLkg10IB6zv4HNzzq1y5qJgoh0';
+            const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify({ q: [joke], target: targetLang }),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                return data.data.translations[0].translatedText;
+            } catch (e) {
+                return joke; // fallback to original if error
+            }
+        }
+
+        function getRandomJoke(category) {
+            const categoryJokes = jokes[category];
+            const randomIndex = Math.floor(Math.random() * categoryJokes.length);
+            return categoryJokes[randomIndex];
+        }
+
+        // Updated getNewJoke to translate joke if needed
+        async function getNewJoke() {
+            const jokeText = document.getElementById('jokeText');
+            currentJoke = getRandomJoke(currentCategory);
+            const lang = localStorage.getItem('selectedLanguage') || 'en';
+            const jokeToShow = await translateJokeIfNeeded(currentJoke, lang);
+            typeWriter(jokeToShow, jokeText);
+        }
+
+        // Update selectCategory to use async getNewJoke
+        async function selectCategory(category) {
+            currentCategory = category;
+            document.querySelectorAll('.category-button').forEach(button => {
+                button.classList.toggle('active', button.dataset.category === category);
+            });
+            await getNewJoke();
+        }
+
+        function shuffleCategory() {
+            categoryIndex = (categoryIndex + 1) % categories.length;
+            selectCategory(categories[categoryIndex]);
+        }
+
+        // Add batch translation logic
+        const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+        if (savedLang !== 'en') batchTranslateAllText(savedLang);
+
+        async function batchTranslateAllText(targetLang) {
+            const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            let node;
+            const textNodes = [];
+            while ((node = walker.nextNode())) {
+                if (node.parentNode && node.textContent.trim() && node.parentNode.offsetParent !== null) {
+                    textNodes.push(node);
+                }
+            }
+            const attrNodes = [];
+            const all = document.querySelectorAll('[placeholder], [alt], [value], [aria-label]');
+            for (const el of all) {
+                if (el.placeholder) attrNodes.push({el, attr: 'placeholder', value: el.placeholder});
+                if (el.alt) attrNodes.push({el, attr: 'alt', value: el.alt});
+                if (el.value && (el.tagName === 'BUTTON' || el.tagName === 'INPUT')) attrNodes.push({el, attr: 'value', value: el.value});
+                if (el.getAttribute('aria-label')) attrNodes.push({el, attr: 'aria-label', value: el.getAttribute('aria-label')});
+            }
+            const allStrings = [...textNodes.map(n => n.textContent), ...attrNodes.map(a => a.value)];
+            if (allStrings.length === 0) return;
+            const apiKey = 'AIzaSyC1RWlflkLkg10IB6zv4HNzzq1y5qJgoh0';
+            const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+            const response = await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify({ q: allStrings, target: targetLang }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+            const translations = data.data.translations.map(t => t.translatedText);
+            textNodes.forEach((n, i) => { n.textContent = translations[i]; });
+            attrNodes.forEach((a, i) => { a.el[a.attr] = translations[textNodes.length + i]; });
+        }
+
+        // Listen for language changes
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'selectedLanguage' && e.newValue !== e.oldValue) {
+                batchTranslateAllText(e.newValue);
+            }
+        });
+
+        // Load initial joke
+        getNewJoke();
+    </script>
+</body>
+</html> 

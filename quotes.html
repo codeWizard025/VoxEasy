@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoxEasy - Inspirational Quotes</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+
+        * {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --bg-color: rgba(240, 248, 240, 0.18);
+            --text-color: #2c4a3e;
+            --item-bg: rgba(255, 255, 255, 0.15);
+            --item-border: rgba(255, 255, 255, 0.2);
+            --item-hover: rgba(255, 255, 255, 0.25);
+            --item-selected: rgba(44, 74, 62, 0.15);
+            --shadow-light: rgba(255, 255, 255, 0.5);
+            --shadow-dark: rgba(0, 0, 0, 0.1);
+            --accent-color: #4a7c59;
+            --quote-bg: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            background: var(--bg-color);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 20px;
+            padding: 45px;
+            box-shadow: 
+                0 8px 24px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+            max-width: 1400px;
+            width: 100%;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: auto;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--item-border);
+            animation: containerFadeIn 0.5s ease-out;
+        }
+
+        @keyframes containerFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 500;
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin: 10px 0 0;
+        }
+
+        .back-to-feel {
+            position: absolute;
+            top: 24px;
+            left: 32px;
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            color: var(--text-color);
+            padding: 10px 22px;
+            border-radius: 20px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 2px 6px var(--shadow-dark), inset 0 1px 1px var(--shadow-light);
+        }
+
+        .back-to-feel:hover {
+            background: var(--item-hover);
+            transform: translateY(-2px);
+        }
+
+        .back-to-feel:active {
+            transform: translateY(0);
+        }
+
+        .content-section {
+            position: relative;
+            width: 100%;
+            max-width: 95%;
+            box-sizing: border-box;
+            margin: 20px auto;
+            padding: 30px;
+            border-radius: 16px;
+            background: var(--item-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .content-section h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        .content-section p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: var(--text-color);
+            opacity: 0.9;
+            margin-bottom: 30px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .slide-button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .slide-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .quote-container {
+            background: var(--quote-bg);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 20px 0;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 12px var(--shadow-dark);
+            border: 1px solid var(--item-border);
+            transition: transform 0.3s ease;
+        }
+
+        .quote-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .quote-text {
+            font-size: 1.8em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            font-style: italic;
+        }
+
+        .quote-author {
+            font-size: 1.2em;
+            color: var(--accent-color);
+            font-weight: 500;
+            margin-bottom: 30px;
+        }
+
+        .quote-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .quote-button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+
+        .quote-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .quote-category {
+            display: inline-block;
+            background: var(--item-bg);
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            color: var(--text-color);
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+        }
+
+            .header h1 {
+                font-size: 2em;
+        }
+
+            .quote-text {
+                font-size: 1.4em;
+            }
+            
+            .quote-container {
+                padding: 25px;
+            }
+        }
+
+        /* Dark mode styles */
+        .dark-mode {
+            --bg-color: rgba(44, 74, 62, 0.18);
+            --text-color: #e8f5e9;
+            --item-bg: rgba(255, 255, 255, 0.1);
+            --item-border: rgba(255, 255, 255, 0.1);
+            --item-hover: rgba(255, 255, 255, 0.15);
+            --item-selected: rgba(255, 255, 255, 0.2);
+            --shadow-light: rgba(255, 255, 255, 0.1);
+            --shadow-dark: rgba(0, 0, 0, 0.3);
+            --accent-color: #81c784;
+            background: linear-gradient(135deg, #1b3c2e 0%, #2c4a3e 100%);
+        }
+
+        .dark-mode .quote-container {
+            background: rgba(44, 74, 62, 0.25);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .dark-mode .quote-category {
+            background: rgba(44, 74, 62, 0.4);
+            color: #e8f5e9;
+        }
+
+        .dark-mode .quote-author {
+            color: #81c784;
+        }
+
+        .dark-mode .slide-button,
+        .dark-mode .quote-button {
+            background: #81c784;
+            color: #1b3c2e;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .dark-mode .slide-button:hover,
+        .dark-mode .quote-button:hover {
+            background: #93d494;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+        }
+
+        .dark-mode .back-to-feel {
+            background: rgba(44, 74, 62, 0.4);
+            border-color: rgba(255, 255, 255, 0.15);
+            color: #e8f5e9;
+            }
+
+        .dark-mode .back-to-feel:hover {
+            background: rgba(44, 74, 62, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="back-to-feel" onclick="window.location.href='feel.html'" data-translate>← Back</button>
+        <div class="header">
+            <h1 data-translate>Inspirational Quotes</h1>
+            <p data-translate>Find motivation and wisdom in every word</p>
+        </div>
+        
+        <div class="content-section">
+            <h2 data-translate>Daily Inspiration</h2>
+            <p data-translate>Discover uplifting quotes to start your day with positivity and purpose. Each quote is carefully selected to inspire and motivate.</p>
+            <button class="slide-button" onclick="showQuotes()" data-translate>View Quotes</button>
+    </div>
+
+        <div id="quotesContent" style="display: none;">
+            <div class="quote-container">
+                <span class="quote-category" data-translate>Motivation</span>
+                <div class="quote-text" data-translate>"The only way to do great work is to love what you do."</div>
+                <div class="quote-author">- Steve Jobs</div>
+                <div class="quote-actions">
+                    <button class="quote-button" onclick="nextQuote()" data-translate>Next Quote</button>
+            </div>
+            </div>
+            </div>
+    </div>
+
+    <script>
+        // Check for dark mode
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+        }
+
+        // Add batch translation logic
+        const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+        if (savedLang !== 'en') batchTranslateAllText(savedLang);
+
+        async function batchTranslateAllText(targetLang) {
+            const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            let node;
+            const textNodes = [];
+            while ((node = walker.nextNode())) {
+                if (node.parentNode && node.textContent.trim() && node.parentNode.offsetParent !== null && node.parentNode.tagName !== 'IFRAME') {
+                    textNodes.push(node);
+                }
+            }
+            const attrNodes = [];
+            const all = document.querySelectorAll(':not(iframe) [placeholder], :not(iframe) [alt], :not(iframe) [value], :not(iframe) [aria-label]');
+            for (const el of all) {
+                if (el.placeholder) attrNodes.push({el, attr: 'placeholder', value: el.placeholder});
+                if (el.alt) attrNodes.push({el, attr: 'alt', value: el.alt});
+                if (el.value && (el.tagName === 'BUTTON' || el.tagName === 'INPUT')) attrNodes.push({el, attr: 'value', value: el.value});
+                if (el.getAttribute('aria-label')) attrNodes.push({el, attr: 'aria-label', value: el.getAttribute('aria-label')});
+            }
+            const allStrings = [...textNodes.map(n => n.textContent), ...attrNodes.map(a => a.value)];
+            if (allStrings.length === 0) return;
+            const apiKey = 'AIzaSyC1RWlflkLkg10IB6zv4HNzzq1y5qJgoh0';
+            const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+            const response = await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify({ q: allStrings, target: targetLang }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+            const translations = data.data.translations.map(t => t.translatedText);
+            textNodes.forEach((n, i) => { n.textContent = translations[i]; });
+            attrNodes.forEach((a, i) => { a.el[a.attr] = translations[textNodes.length + i]; });
+        }
+
+        // Listen for language changes
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'selectedLanguage' && e.newValue !== e.oldValue) {
+                batchTranslateAllText(e.newValue);
+            }
+        });
+
+        const quotesContent = document.getElementById('quotesContent');
+
+        const quotes = [
+            { text: "The only way to do great work is to love what you do.", author: "Steve Jobs", category: "Motivation" },
+            { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill", category: "Perseverance" },
+            { text: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt", category: "Dreams" },
+            { text: "Everything you've ever wanted is on the other side of fear.", author: "George Addair", category: "Courage" },
+            { text: "The best way to predict the future is to create it.", author: "Peter Drucker", category: "Leadership" },
+            // Hope & Healing
+            { text: "Once you choose hope, anything's possible.", author: "Christopher Reeve", category: "Hope" },
+            { text: "Healing takes courage, and we all have courage, even if we have to dig a little to find it.", author: "Tori Amos", category: "Healing" },
+            { text: "It's not whether you get knocked down, it's whether you get up.", author: "Vince Lombardi", category: "Hope" },
+            { text: "Our wounds are often the openings into the best and most beautiful part of us.", author: "David Richo", category: "Healing" },
+            { text: "Hope is the thing with feathers that perches in the soul.", author: "Emily Dickinson", category: "Hope" },
+            // Strength & Resilience
+            { text: "You never know how strong you are until being strong is your only choice.", author: "Bob Marley", category: "Strength" },
+            { text: "Out of difficulties grow miracles.", author: "Jean de La Bruyère", category: "Resilience" },
+            { text: "Fall seven times, stand up eight.", author: "Japanese Proverb", category: "Resilience" },
+            { text: "Hard times may have held you down, but they will not last forever.", author: "Joel Osteen", category: "Strength" },
+            { text: "The human spirit is stronger than anything that can happen to it.", author: "C.C. Scott", category: "Resilience" },
+            // Calm & Peace
+            { text: "Peace begins with a smile.", author: "Mother Teresa", category: "Peace" },
+            { text: "You cannot always control what goes on outside. But you can always control what goes on inside.", author: "Wayne Dyer", category: "Calm" },
+            { text: "Within you, there is a stillness and a sanctuary to which you can retreat at any time.", author: "Hermann Hesse", category: "Calm" },
+            { text: "Be like a tree and let the dead leaves drop.", author: "Rumi", category: "Peace" },
+            { text: "Nothing can bring you peace but yourself.", author: "Ralph Waldo Emerson", category: "Peace" },
+            // Love & Support
+            { text: "To love and be loved is to feel the sun from both sides.", author: "David Viscott", category: "Love" },
+            { text: "Where there is love, there is life.", author: "Mahatma Gandhi", category: "Love" },
+            { text: "A kind word is like a spring day.", author: "Russian Proverb", category: "Support" },
+            { text: "Love cures people—both the ones who give it and the ones who receive it.", author: "Karl Menninger", category: "Love" },
+            // Gratitude
+            { text: "Gratitude turns what we have into enough.", author: "Aesop", category: "Gratitude" },
+            { text: "Appreciation is a wonderful thing. It makes what is excellent in others belong to us as well.", author: "Voltaire", category: "Gratitude" },
+            { text: "Enjoy the little things, for one day you may look back and realize they were the big things.", author: "Robert Brault", category: "Gratitude" },
+            { text: "Let us be grateful to people who make us happy.", author: "Marcel Proust", category: "Gratitude" },
+            { text: "Gratitude is the fairest blossom which springs from the soul.", author: "Henry Ward Beecher", category: "Gratitude" },
+            // Extra Perseverance & Motivation
+            { text: "Perseverance is not a long race; it is many short races one after the other.", author: "Walter Elliot", category: "Perseverance" },
+            { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson", category: "Motivation" },
+            { text: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius", category: "Perseverance" },
+            { text: "Energy and persistence conquer all things.", author: "Benjamin Franklin", category: "Perseverance" },
+            { text: "Great works are performed not by strength but by perseverance.", author: "Samuel Johnson", category: "Perseverance" },
+            { text: "The harder the battle, the sweeter the victory.", author: "Les Brown", category: "Motivation" },
+            { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt", category: "Motivation" },
+            { text: "You are never too old to set another goal or to dream a new dream.", author: "C.S. Lewis", category: "Motivation" },
+            // More Quotes
+            { text: "Difficulties in life are intended to make us better, not bitter.", author: "Dan Reeves", category: "Resilience" },
+            { text: "Act as if what you do makes a difference. It does.", author: "William James", category: "Motivation" },
+            { text: "Start where you are. Use what you have. Do what you can.", author: "Arthur Ashe", category: "Perseverance" },
+            { text: "You are braver than you believe, stronger than you seem, and smarter than you think.", author: "A.A. Milne", category: "Strength" },
+            { text: "When you come to the end of your rope, tie a knot and hang on.", author: "Franklin D. Roosevelt", category: "Perseverance" },
+            { text: "Sometimes the smallest step in the right direction ends up being the biggest step of your life.", author: "Naeem Callaway", category: "Motivation" },
+            { text: "If you're going through hell, keep going.", author: "Winston Churchill", category: "Perseverance" },
+            { text: "Happiness can be found even in the darkest of times, if one only remembers to turn on the light.", author: "J.K. Rowling", category: "Hope" },
+            { text: "No act of kindness, no matter how small, is ever wasted.", author: "Aesop", category: "Support" },
+            { text: "The best way out is always through.", author: "Robert Frost", category: "Perseverance" }
+        ];
+
+        let currentQuoteIndex = 0;
+
+        function showQuotes() {
+            document.querySelector('.content-section').style.display = 'none';
+            quotesContent.style.display = 'block';
+            displayQuote(currentQuoteIndex);
+        }
+
+        function displayQuote(index) {
+            const quote = quotes[index];
+            const container = document.querySelector('.quote-container');
+            const categoryEl = container.querySelector('.quote-category');
+            const textEl = container.querySelector('.quote-text');
+            const authorEl = container.querySelector('.quote-author');
+            categoryEl.textContent = quote.category;
+            categoryEl.setAttribute('data-translate', quote.category);
+            textEl.textContent = `"${quote.text}"`;
+            textEl.setAttribute('data-translate', quote.text);
+            authorEl.textContent = `- ${quote.author}`;
+            authorEl.setAttribute('data-translate', `- ${quote.author}`);
+            // Re-translate after updating
+            if (typeof batchTranslateAllText === 'function') {
+                batchTranslateAllText(localStorage.getItem('selectedLanguage') || 'en');
+            }
+        }
+
+        function nextQuote() {
+            currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
+            displayQuote(currentQuoteIndex);
+        }
+
+        // Initialize first quote
+        displayQuote(0);
+    </script>
+</body>
+</html> 

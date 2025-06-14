@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyboard - Communication Board</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500&display=swap');
+
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --item-bg: #f5f5f7;
+            --item-border: #d2d2d7;
+            --item-hover: #e8e8ed;
+            --item-selected: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--text-color);
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .container {
+            background: var(--bg-color);
+            border-radius: 18px;
+            padding: 40px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 500;
+            font-size: 2.5em;
+            color: var(--text-color);
+        }
+
+        .keyboard {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+            position: relative;
+            touch-action: none;
+        }
+
+        .key {
+            background: var(--item-bg);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.5em;
+            position: relative;
+        }
+
+        .key:hover {
+            background: var(--item-hover);
+        }
+
+        .key.wide {
+            grid-column: span 2;
+        }
+
+        .selected-choices {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .selected-choices h2 {
+            margin-top: 0;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .selected-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 50px;
+        }
+
+        .selected-item {
+            background: var(--bg-color);
+            border: 1px solid var(--item-border);
+            border-radius: 20px;
+            padding: 5px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .speak-button {
+            background: var(--text-color);
+            border: none;
+            color: var(--bg-color);
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .speak-button:hover {
+            opacity: 0.8;
+        }
+
+        .back-button {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            color: var(--text-color);
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-button:hover {
+            background: var(--item-hover);
+        }
+
+        #glideCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        #debugInfo {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px;
+            font-family: monospace;
+        }
+    </style>
+    <script src="https://unpkg.com/compromise@14.8.2/builds/compromise.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Glide Typing Keyboard</h1>
+        <div class="keyboard" id="keyboard">
+            <div class="key">Q</div>
+            <div class="key">W</div>
+            <div class="key">E</div>
+            <div class="key">R</div>
+            <div class="key">T</div>
+            <div class="key">Y</div>
+            <div class="key">U</div>
+            <div class="key">I</div>
+            <div class="key">O</div>
+            <div class="key">P</div>
+            <div class="key">A</div>
+            <div class="key">S</div>
+            <div class="key">D</div>
+            <div class="key">F</div>
+            <div class="key">G</div>
+            <div class="key">H</div>
+            <div class="key">J</div>
+            <div class="key">K</div>
+            <div class="key">L</div>
+            <div class="key">!</div>
+            <div class="key">Z</div>
+            <div class="key">X</div>
+            <div class="key">C</div>
+            <div class="key">V</div>
+            <div class="key">B</div>
+            <div class="key">N</div>
+            <div class="key">M</div>
+            <div class="key">,</div>
+            <div class="key">.</div>
+            <div class="key">?</div>
+            <div class="key wide">Space</div>
+            <div class="key wide">Backspace</div>
+            <div class="key wide">Clear</div>
+            <canvas id="glideCanvas"></canvas>
+        </div>
+        <div class="selected-choices">
+            <h2>Selected Choices</h2>
+            <div class="selected-list" id="selectedList"></div>
+            <button class="speak-button" id="speakButton">Speak Selections</button>
+        </div>
+        <a href="pic.html" class="back-button">Back to Home</a>
+    </div>
+    <div id="debugInfo"></div>
+
+    <script>
+        const keys = document.querySelectorAll('.key');
+        const selectedList = document.getElementById('selectedList');
+        const speakButton = document.getElementById('speakButton');
+        const debugInfo = document.getElementById('debugInfo');
+        let currentText = '';
+
+        const keyboard = document.getElementById('keyboard');
+        const canvas = document.getElementById('glideCanvas');
+        const ctx = canvas.getContext('2d');
+        let isGliding = false;
+        let glidePath = [];
+        let glideWord = '';
+
+        function resizeCanvas() {
+            canvas.width = keyboard.offsetWidth;
+            canvas.height = keyboard.offsetHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        keyboard.addEventListener('pointerdown', startGlide);
+        keyboard.addEventListener('pointermove', continueGlide);
+        keyboard.addEventListener('pointerup', endGlide);
+        keyboard.addEventListener('pointercancel', endGlide);
+
+        function startGlide(e) {
+            isGliding = true;
+            glidePath = [];
+            glideWord = '';
+            addPointToPath(e);
+        }
+
+        function continueGlide(e) {
+            if (!isGliding) return;
+            addPointToPath(e);
+        }
+
+        function endGlide() {
+            if (!isGliding) return;
+            isGliding = false;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (glideWord) {
+                const predictedWord = predictWord(glideWord);
+                currentText += predictedWord + ' ';
+                updateSelectedList();
+            }
+            updateDebugInfo();
+        }
+
+        function addPointToPath(e) {
+            const rect = keyboard.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            glidePath.push({x, y});
+            
+            const key = document.elementFromPoint(e.clientX, e.clientY);
+            if (key && key.classList.contains('key') && key.textContent.length === 1) {
+                glideWord += key.textContent.toLowerCase();
+            }
+            
+            drawGlidePath();
+            updateDebugInfo();
+        }
+
+        function drawGlidePath() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.moveTo(glidePath[0].x, glidePath[0].y);
+            for (let i = 1; i < glidePath.length; i++) {
+                ctx.lineTo(glidePath[i].x, glidePath[i].y);
+            }
+            ctx.strokeStyle = 'rgba(0, 122, 255, 0.5)';
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.stroke();
+        }
+
+        function predictWord(input) {
+            // Use compromise to predict the word
+            const doc = nlp(input);
+            const suggestions = doc.words().data();
+            
+            if (suggestions.length > 0) {
+                // Return the first suggestion
+                return suggestions[0].normal;
+            } else {
+                // If no suggestion, return the original input
+                return input;
+            }
+        }
+
+        function updateDebugInfo() {
+            debugInfo.textContent = `Glide Word: ${glideWord}\nPredicted: ${predictWord(glideWord)}`;
+        }
+
+        // Modify the existing key click event to work alongside glide typing
+        keys.forEach(key => {
+            key.addEventListener('click', (e) => {
+                if (!isGliding) {
+                    if (key.textContent === 'Space') {
+                        currentText += ' ';
+                    } else if (key.textContent === 'Backspace') {
+                        currentText = currentText.slice(0, -1);
+                    } else if (key.textContent === 'Clear') {
+                        currentText = '';
+                    } else {
+                        currentText += key.textContent.toLowerCase();
+                    }
+                    updateSelectedList();
+                }
+            });
+        });
+
+        function updateSelectedList() {
+            selectedList.innerHTML = `<div class="selected-item">${currentText}</div>`;
+        }
+
+        speakButton.addEventListener('click', () => {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(currentText);
+                utterance.onend = () => {
+                    speakButton.disabled = false;
+                };
+                speakButton.disabled = true;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert('Text-to-speech is not supported in this browser.');
+            }
+        });
+    </script>
+</body>
+</html>

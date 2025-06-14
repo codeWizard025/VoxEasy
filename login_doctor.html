@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Meta tags and title -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoxEasy - Staff Login</title>
+
+    <!-- CSS Styles -->
+    <style>
+        /* Disable dragging for all elements */
+        * {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+
+        :root {
+            /* Updated color variables for Vision Pro style */
+            --bg-color: rgba(255, 255, 255, 0.18);
+            --text-color: #333333;
+            --item-bg: rgba(255, 255, 255, 0.15);
+            --item-border: rgba(255, 255, 255, 0.2);
+            --item-hover: rgba(255, 255, 255, 0.25);
+            --item-selected: rgba(51, 51, 51, 0.15);
+            --shadow-light: rgba(255, 255, 255, 0.5);
+            --shadow-dark: rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #cfeaff 0%, #f3f3f4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--text-color);
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            background: var(--bg-color);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 
+                0 8px 24px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+            max-width: 800px;
+            width: 100%;
+            position: relative;
+            padding-top: 70px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            max-height: 1800px;
+            height: 100%;
+            border: 1px solid var(--item-border);
+            animation: containerFadeIn 0.5s ease-out;
+        }
+
+        @keyframes containerFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 500;
+            font-size: 2.5em;
+            color: var(--text-color);
+        }
+
+        .toggle-switch {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+        }
+
+        .toggle-input {
+            display: none;
+        }
+
+        .toggle-label {
+            display: inline-block;
+            width: 70px;
+            height: 40px;
+            background-color: var(--text-color);
+            border-radius: 40px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-label:before {
+            content: '';
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            top: 4px;
+            left: 4px;
+            background-color: var(--bg-color);
+            transition: 0.3s ease;
+        }
+
+        .toggle-input:checked+.toggle-label {
+            background-color: #ccc;
+        }
+
+        .toggle-input:checked+.toggle-label:before {
+            transform: translateX(30px);
+            background-color: var(--text-color);
+        }
+
+        .dark-mode {
+            --bg-color: rgba(0, 0, 0, 0.18);
+            --text-color: #ffffff;
+            --item-bg: rgba(255, 255, 255, 0.1);
+            --item-border: rgba(255, 255, 255, 0.1);
+            --item-hover: rgba(255, 255, 255, 0.15);
+            --item-selected: rgba(255, 255, 255, 0.2);
+            --shadow-light: rgba(255, 255, 255, 0.1);
+            --shadow-dark: rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2e 100%);
+        }
+
+        .dark-mode .container {
+            box-shadow: 
+                0 8px 32px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+
+
+        /* Form Styles */
+        .doctor-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .doctor-form .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .doctor-form label {
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: var(--text-color);
+            font-size: 1.2em;
+        }
+
+        .doctor-form input {
+            padding: 14px;
+            border: 1px solid var(--item-border);
+            border-radius: 14px;
+            background-color: var(--item-bg);
+            color: var(--text-color);
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 4px 6px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .doctor-form input:focus {
+            outline: none;
+            border-color: var(--text-color);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 16px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .doctor-form button {
+            padding: 16px;
+            background: rgba(51, 51, 51, 0.8);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            color: white;
+            border: none;
+            border-radius: 18px;
+            font-size: 1.3em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .doctor-form button:hover {
+            background: rgba(51, 51, 51, 0.9);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.15),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .doctor-form button:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+        }
+
+        .dark-mode input[type="date"] {
+            color-scheme: dark;
+        }
+
+        .doctor-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            text-align: right;
+            background-color: var(--item-bg);
+            padding: 15px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 4px 12px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .home-button {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            padding: 12px 24px;
+            text-decoration: none;
+            color: var(--text-color);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border-radius: 24px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1; /* Ensure it appears above other elements */
+            font-size: 1.2em;
+        }
+
+        .home-button:hover {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.15),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .home-button:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="index.html" class="home-button nav-item" data-translate>Home</a>
+        
+        <!-- Toggle Switch -->
+        <div class="toggle-switch">
+            <input type="checkbox" id="switch" class="toggle-input" />
+            <label for="switch" class="toggle-label"></label>
+        </div>
+
+
+
+        <!-- Title -->
+        <h1 data-translate>Medical Staff Login</h1>
+
+        <!-- Form -->
+        <form action="#" method="post" class="doctor-form">
+            <div class="form-group">
+                <label for="first-name" data-translate>First Name</label>
+                <input type="text" id="first-name" name="first-name" required />
+            </div>
+            <div class="form-group">
+                <label for="last-name" data-translate>Last Name</label>
+                <input type="text" id="last-name" name="last-name" required />
+            </div>
+            <div class="form-group">
+                <label for="medical-id" data-translate>Medical ID</label>
+                <input type="text" id="medical-id" name="medical-id" required />
+            </div>
+            <!-- Patient information fields -->
+            <div class="form-group">
+                <label for="patient-full-name" data-translate>Patient Full Name</label>
+                <input type="text" id="patient-full-name" name="patient-full-name" required />
+            </div>
+            <div class="form-group">
+                <label for="patient-birth-date" data-translate>Patient Birth Date</label>
+                <input type="date" id="patient-birth-date" name="patient-birth-date" required />
+            </div>
+            <button type="submit" data-translate>Submit</button>
+        </form>
+    </div>
+
+    <script>
+        const toggleSwitch = document.getElementById('switch');
+        const body = document.body;
+
+        // Check the initial state from local storage
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            toggleSwitch.checked = true;
+        }
+
+        toggleSwitch.addEventListener('change', function () {
+            if (this.checked) {
+                console.log('Switch is ON - Dark Mode');
+                body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                console.log('Switch is OFF - Light Mode');
+                body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        });
+
+        // Initialize translation based on saved language
+        const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+        if (savedLang !== 'en') translatePage(savedLang);
+
+        // Translation functions
+        async function translateText(text, targetLang) {
+            if (!text.trim()) return text;
+            const apiKey = 'AIzaSyC1RWlflkLkg10IB6zv4HNzzq1y5qJgoh0';
+            const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify({ q: text, target: targetLang }),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                return data.data.translations[0].translatedText;
+            } catch (error) {
+                console.error('Translation error:', error);
+                return text; // Return original text if translation fails
+            }
+        }
+
+        async function translatePage(targetLang) {
+            if (targetLang === 'en') {
+                // Reset to original English text
+                const elements = document.querySelectorAll('[data-translate]');
+                for (const el of elements) {
+                    const original = el.getAttribute('data-original');
+                    if (original) {
+                        el.textContent = original;
+                    }
+                }
+                return;
+            }
+
+            const elements = document.querySelectorAll('[data-translate]');
+            for (const el of elements) {
+                const original = el.getAttribute('data-original') || el.textContent;
+                el.setAttribute('data-original', original);
+                el.textContent = await translateText(original, targetLang);
+            }
+        }
+
+        // Listen for language changes from other pages
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'selectedLanguage' && e.newValue !== e.oldValue) {
+                translatePage(e.newValue || 'en');
+            }
+        });
+
+        console.log('Doctor registration page script loaded');
+
+        const form = document.querySelector('.doctor-form');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission behavior
+
+            const firstName = document.getElementById('first-name').value;
+            const lastName = document.getElementById('last-name').value;
+            const medicalId = document.getElementById('medical-id').value;
+            const patientFullName = document.getElementById('patient-full-name').value;
+            const patientBirthDate = document.getElementById('patient-birth-date').value;
+
+            const doctorInfo = {
+                firstName,
+                lastName,
+                medicalId,
+                patients: [
+                    {
+                        fullName: patientFullName,
+                        birthDate: patientBirthDate
+                    }
+                ]
+            };
+
+            // Retrieve existing doctors from local storage or initialize an empty array
+            const doctors = JSON.parse(localStorage.getItem('doctors')) || [];
+            doctors.push(doctorInfo);
+
+            // Save updated doctors list to local storage
+            localStorage.setItem('doctors', JSON.stringify(doctors));
+
+            // Store timestamp of doctor login
+            localStorage.setItem('lastDoctorLogin', new Date().toISOString());
+
+            // Redirect to admin.html after storing doctor information
+            window.location.href = 'admin.html';
+        });
+    </script>
+</body>
+
+</html>

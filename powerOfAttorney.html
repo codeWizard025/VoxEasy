@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>General Power of Attorney</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background-color: white;
+            --text-color: black;
+        }
+
+        [data-theme="dark"] {
+            --background-color: black;
+            --text-color: white;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.25rem;
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+
+        p, ul {
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .signature-container {
+            margin: 20px 0;
+        }
+
+        .signature-canvas {
+            border: 1px solid var(--text-color);
+            background: var(--background-color);
+            cursor: crosshair;
+        }
+
+        .clear-signature {
+            display: block;
+            margin: 10px 0;
+            padding: 8px 16px;
+            background: var(--background-color);
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .clear-signature:hover {
+            background: var(--text-color);
+            color: var(--background-color);
+        }
+
+        .clear-signature:active {
+            transform: scale(0.98);
+        }
+
+        .form-input {
+            background: var(--background-color);
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            padding: 5px;
+            margin: 5px 0;
+            width: 300px;
+        }
+
+        .save-button {
+            display: block;
+            margin: 30px auto;
+            padding: 12px 24px;
+            background: var(--background-color);
+            color: var(--text-color);
+            border: 2px solid var(--text-color);
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .save-button:hover {
+            background: var(--text-color);
+            color: var(--background-color);
+        }
+
+        .save-button:active {
+            transform: scale(0.98);
+        }
+
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            
+            #pdf-content {
+                width: 100%;
+                padding: 0;
+            }
+
+            .signature-container {
+                page-break-inside: avoid;
+            }
+
+            h1, h2, h3 {
+                page-break-after: avoid;
+            }
+
+            p {
+                orphans: 3;
+                widows: 3;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="pdf-content">
+        <h1>Durable Power of Attorney for Healthcare</h1>
+
+        <h2>Declaration</h2>
+        <p>I, <span class="text-field" data-placeholder="Your Full Name"></span>, residing at <span class="text-field" data-placeholder="Your Address"></span>, hereby appoint <span class="text-field" data-placeholder="Agent's Full Name"></span>, residing at <span class="text-field" data-placeholder="Agent's Address"></span>, as my Attorney-in-Fact ("Agent").</p>
+
+        <h2>Grant of Authority</h2>
+        <p>I grant my Agent the authority to act for me in all matters, including but not limited to:</p>
+        <ul>
+            <li><strong>Financial Transactions:</strong>
+                <ul>
+                    <li>Managing bank accounts, including deposits, withdrawals, and transfers.</li>
+                    <li>Investing in securities, bonds, and other financial instruments.</li>
+                    <li>Handling real estate transactions, including buying, selling, and leasing properties.</li>
+                    <li>Managing retirement accounts and pensions.</li>
+                    <li>Filing and paying taxes.</li>
+                </ul>
+            </li>
+            <li><strong>Legal Matters:</strong>
+                <ul>
+                    <li>Initiating or defending lawsuits.</li>
+                    <li>Managing legal claims and settlements.</li>
+                    <li>Handling estate planning and administration.</li>
+                </ul>
+            </li>
+            <li><strong>Business Operations:</strong>
+                <ul>
+                    <li>Managing business interests, including signing contracts and agreements.</li>
+                    <li>Hiring or terminating employees.</li>
+                    <li>Overseeing daily business operations.</li>
+                </ul>
+            </li>
+            <li><strong>Personal Matters:</strong>
+                <ul>
+                    <li>Managing personal property and assets.</li>
+                    <li>Handling insurance claims and policies.</li>
+                    <li>Making gifts on my behalf.</li>
+                </ul>
+            </li>
+            <li><strong>Government Benefits:</strong>
+                <ul>
+                    <li>Applying for and managing government benefits, including Social Security and Medicare.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2>Durability Clause</h2>
+        <p>This Power of Attorney is durable, meaning it remains in effect even if I become incapacitated or unable to make decisions for myself.</p>
+
+        <h2>Effective Date and Termination</h2>
+        <p>Effective Date: This Power of Attorney becomes effective immediately upon my signing.</p>
+        <p>Termination: This Power of Attorney will remain in effect until my death, revocation in writing, or as otherwise provided by law.</p>
+
+        <h2>Nomination of Guardian</h2>
+        <p>In the event a court decides to appoint a guardian of my estate or person, I nominate <span class="text-field" data-placeholder="Guardian's Full Name"></span> as the guardian.</p>
+
+        <h2>Reliance on Agent</h2>
+        <p>Any person, including my Agent, may rely upon the validity of this Power of Attorney or a copy of it unless that person has actual knowledge that it has been revoked or terminated.</p>
+
+        <h2>Revocation of Prior Powers of Attorney</h2>
+        <p>I hereby revoke any and all prior Powers of Attorney executed by me, whether general or specific, Durable or non-Durable.</p>
+
+        <h2>Special Instructions (Optional)</h2>
+        <p>[Insert any specific instructions or limitations on the Agent's authority here.]</p>
+
+        <h2>Signatures and Acknowledgments</h2>
+        <p>Principal's Signature:</p>
+        <div class="signature-field"></div>
+        <p>Date: <span class="text-field" data-placeholder="MM/DD/YYYY"></span></p>
+
+        <h3>Witnesses:</h3>
+        <p>Witness 1 Signature:</p>
+        <div class="signature-field"></div>
+        <p>Name: <span class="text-field" data-placeholder="Enter witness name"></span></p>
+        <p>Address: <span class="text-field" data-placeholder="Enter witness address"></span></p>
+        <p>Date: <span class="text-field" data-placeholder="MM/DD/YYYY"></span></p>
+
+        <p>Witness 2 Signature:</p>
+        <div class="signature-field"></div>
+        <p>Name: <span class="text-field" data-placeholder="Enter witness name"></span></p>
+        <p>Address: <span class="text-field" data-placeholder="Enter witness address"></span></p>
+        <p>Date: <span class="text-field" data-placeholder="MM/DD/YYYY"></span></p>
+
+        <h3>Notary Public Section:</h3>
+        <p>State of <span class="text-field" data-placeholder="Enter state"></span></p>
+        <p>County of <span class="text-field" data-placeholder="Enter county"></span></p>
+        <p>Notary Public Signature:</p>
+        <div class="signature-field"></div>
+        <p>Commission Expires: <span class="text-field" data-placeholder="MM/DD/YYYY"></span></p>
+
+        <h2>Acknowledgment by Agent</h2>
+        <p>I, <span class="text-field" data-placeholder="Agent's Full Name"></span>, hereby accept the appointment as Attorney-in-Fact and agree to act in the best interests of <span class="text-field" data-placeholder="Your Full Name"></span>.</p>
+        <p>Agent's Signature:</p>
+        <div class="signature-field"></div>
+        <p>Date: <span class="text-field" data-placeholder="MM/DD/YYYY"></span></p>
+
+        <h2>Instructions for Use</h2>
+        <ul>
+            <li>Fill in the Blanks: Replace all placeholders (e.g., [Your Full Name], [Agent's Full Name]) with the appropriate information.</li>
+            <li>Customize Authority: Modify the "Grant of Authority" section to include or exclude specific powers as needed.</li>
+            <li>Witnesses: Most jurisdictions require at least two witnesses who are not related to you or the Agent. Ensure witnesses sign in your presence.</li>
+            <li>Notarization: While not always mandatory, notarizing the document can enhance its legitimacy and acceptance by financial institutions and other entities.</li>
+            <li>Legal Review: Have the document reviewed by a legal professional to ensure it meets all legal requirements and accurately reflects your intentions.</li>
+            <li>Distribute Copies: Provide copies to your Agent, financial institutions, attorney, and keep the original in a safe place.</li>
+        </ul>
+
+        <h2>Key Considerations</h2>
+        <ul>
+            <li>Choosing an Agent: Select someone you trust implicitly, as they will have significant control over your financial and legal matters.</li>
+            <li>Scope of Authority: Be clear about the powers you are granting. If you prefer to limit the Agent's authority, specify these limitations explicitly.</li>
+            <li>Revocation: You can revoke the Power of Attorney at any time, provided you are mentally competent. Revocation must be in writing and communicated to your Agent and any institutions relying on the POA.</li>
+            <li>Legal Requirements: Power of Attorney laws vary by state and country. Ensure compliance with local regulations to make the document valid and enforceable.</li>
+            <li>Regular Updates: Review and update your Power of Attorney periodically or when significant life changes occur (e.g., marriage, divorce, change in financial status).</li>
+        </ul>
+
+        <h2>Summary</h2>
+        <p>A General Power of Attorney is a powerful legal tool that allows you to designate someone to manage your affairs comprehensively. It is essential to approach the creation of this document thoughtfully, ensuring that it aligns with your needs and provides clear instructions to your Agent. Always seek professional legal advice to customize the document appropriately and to safeguard your interests.</p>
+
+        <button id="savePDF" class="save-button">Save as PDF</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="documentFunctions.js"></script>
+</body>
+</html>
