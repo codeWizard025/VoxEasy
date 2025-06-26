@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoxEasy - Read</title>
+    <style>
+        /* Import SF Pro Display font */
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+
+        /* Disable dragging for all elements */
+        * {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            /* Unified warm palette */
+            --bg-main: #F5E6D3;
+            --bg-container: rgba(176, 106, 52, 0.08);
+            --text-main: #2C1810;
+            --accent: #B06B34;
+            --accent-hover: #C97B4A;
+            --accent-active: #8B4A20;
+            --border: #B06B34;
+            --shadow: rgba(176, 106, 52, 0.15);
+        }
+
+        html, body {
+            background: var(--bg-main) !important;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            background: var(--bg-container);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 20px;
+            padding: 45px;
+            box-shadow: 0 8px 24px var(--shadow), inset 0 1px 1px var(--shadow);
+            max-width: 1500px;
+            width: 100%;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            max-height: 90vh;
+            height: auto;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1.5px solid var(--border);
+            animation: containerFadeIn 0.5s ease-out;
+        }
+
+        @keyframes containerFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 500;
+            margin: 0;
+            color: var(--text-main);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: var(--text-main);
+            opacity: 0.8;
+            margin: 10px 0 0;
+        }
+
+        .reading-container {
+            display: block;
+            width: 100%;
+            flex: 1;
+            min-height: 600px;
+            margin-top: 20px;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 4px 6px var(--shadow), inset 0 1px 1px var(--shadow);
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .reading-iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            border: none;
+            box-sizing: border-box;
+            display: block;
+            border-radius: 20px;
+        }
+
+        .back-to-entertainment {
+            position: absolute;
+            top: 24px;
+            left: 32px;
+            background: var(--accent);
+            border: 1.5px solid var(--border);
+            color: #fff;
+            padding: 10px 22px;
+            border-radius: 20px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 2px 6px var(--shadow), inset 0 1px 1px var(--shadow);
+        }
+
+        .back-to-entertainment:hover {
+            background: var(--accent-hover);
+        }
+
+        .back-to-entertainment:active {
+            background: var(--accent-active);
+        }
+
+        .site-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .site-btn {
+            background: #A8744F;
+            border: none;
+            color: #fff;
+            padding: 14px 36px;
+            border-radius: 18px;
+            font-size: 1.2em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+            box-shadow: 0 4px 16px var(--shadow);
+            outline: none;
+            margin: 0 8px;
+        }
+
+        .site-btn.active, .site-btn:focus {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 8px 24px var(--shadow);
+        }
+
+        .site-btn:hover {
+            background: #B06B34;
+            color: #fff;
+            box-shadow: 0 12px 24px var(--shadow);
+        }
+
+
+
+        /* Fullscreen button styles */
+        .fullscreen-btn {
+            position: absolute;
+            top: 24px;
+            right: 32px;
+            background: var(--accent);
+            border: 1.5px solid var(--border);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 2px 6px var(--shadow), inset 0 1px 1px var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .fullscreen-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .fullscreen-btn:active {
+            background: var(--accent-active);
+        }
+
+        .fullscreen-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+
+        /* Add exit fullscreen overlay for touch devices */
+        .exit-fullscreen-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .exit-fullscreen-overlay.visible {
+            display: flex;
+        }
+
+        .exit-fullscreen-message {
+            color: white;
+            font-size: 1.2em;
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            max-width: 80%;
+        }
+
+        .exit-fullscreen-btn {
+            background: var(--accent);
+            border: 1.5px solid var(--border);
+            color: #fff;
+            padding: 15px 30px;
+            border-radius: 20px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px var(--shadow), inset 0 1px 1px var(--shadow);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .exit-fullscreen-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .exit-fullscreen-btn:active {
+            background: var(--accent-active);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="back-to-entertainment" onclick="window.location.href='entertainment.html'" data-translate>← Back</button>
+        <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleFullscreen()" data-translate>
+            <svg viewBox="0 0 24 24">
+                <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+            </svg>
+            <span>Fullscreen</span>
+        </button>
+        <div class="header">
+            <h1 data-translate>Books & Articles</h1>
+            <p data-translate>Choose a reading platform to start exploring</p>
+        </div>
+        <div class="site-toggle">
+            <button class="site-btn active" id="gutenbergBtn" onclick="switchSite('gutenberg')" data-translate>Project Gutenberg</button>
+            <button class="site-btn" id="archiveBtn" onclick="switchSite('archive')" data-translate>Internet Archive</button>
+        </div>
+        <div class="reading-container" id="readingContainer" style="display: block;">
+            <iframe id="readingIframe" class="reading-iframe" src="https://www.gutenberg.org/" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <!-- Add exit fullscreen overlay -->
+    <div class="exit-fullscreen-overlay" id="exitFullscreenOverlay">
+        <div class="exit-fullscreen-message" data-translate>
+            Tap anywhere or use the button below to exit fullscreen
+        </div>
+        <button class="exit-fullscreen-btn" onclick="exitFullscreen()" data-translate>
+            Exit Fullscreen
+        </button>
+    </div>
+
+    <script>
+        function switchSite(site) {
+            const iframe = document.getElementById('readingIframe');
+            const gutenbergBtn = document.getElementById('gutenbergBtn');
+            const archiveBtn = document.getElementById('archiveBtn');
+            
+            if (site === 'gutenberg') {
+                iframe.src = 'https://www.gutenberg.org/';
+                gutenbergBtn.classList.add('active');
+                archiveBtn.classList.remove('active');
+            } else {
+                iframe.src = 'https://archive.org/details/texts';
+                archiveBtn.classList.add('active');
+                gutenbergBtn.classList.remove('active');
+            }
+        }
+
+
+
+        // Add batch translation logic
+        const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+        if (savedLang !== 'en') batchTranslateAllText(savedLang);
+
+        async function batchTranslateAllText(targetLang) {
+            // Gather all text nodes except inside iframes
+            const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            let node;
+            const textNodes = [];
+            while ((node = walker.nextNode())) {
+                if (node.parentNode && node.textContent.trim() && node.parentNode.offsetParent !== null && node.parentNode.tagName !== 'IFRAME') {
+                    textNodes.push(node);
+                }
+            }
+            // Gather all translatable attributes (not inside iframes)
+            const attrNodes = [];
+            const all = document.querySelectorAll(':not(iframe) [placeholder], :not(iframe) [alt], :not(iframe) [value], :not(iframe) [aria-label]');
+            for (const el of all) {
+                if (el.placeholder) attrNodes.push({el, attr: 'placeholder', value: el.placeholder});
+                if (el.alt) attrNodes.push({el, attr: 'alt', value: el.alt});
+                if (el.value && (el.tagName === 'BUTTON' || el.tagName === 'INPUT')) attrNodes.push({el, attr: 'value', value: el.value});
+                if (el.getAttribute('aria-label')) attrNodes.push({el, attr: 'aria-label', value: el.getAttribute('aria-label')});
+            }
+            // Prepare all strings for translation
+            const allStrings = [...textNodes.map(n => n.textContent), ...attrNodes.map(a => a.value)];
+            if (allStrings.length === 0) return;
+            const apiKey = 'AIzaSyC1RWlflkLkg10IB6zv4HNzzq1y5qJgoh0';
+            const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+            const response = await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify({ q: allStrings, target: targetLang }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+            const translations = data.data.translations.map(t => t.translatedText);
+            // Update text nodes
+            textNodes.forEach((n, i) => { n.textContent = translations[i]; });
+            // Update attributes
+            attrNodes.forEach((a, i) => { a.el[a.attr] = translations[textNodes.length + i]; });
+        }
+
+        // Listen for language changes
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'selectedLanguage' && e.newValue !== e.oldValue) {
+                batchTranslateAllText(e.newValue);
+            }
+        });
+
+        // Add fullscreen functionality
+        function toggleFullscreen() {
+            const container = document.querySelector('.reading-container');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            const fullscreenIcon = fullscreenBtn.querySelector('svg');
+            const fullscreenText = fullscreenBtn.querySelector('span');
+            const exitOverlay = document.getElementById('exitFullscreenOverlay');
+
+            if (!document.fullscreenElement) {
+                // Enter fullscreen
+                if (container.requestFullscreen) {
+                    container.requestFullscreen();
+                } else if (container.webkitRequestFullscreen) { // Safari
+                    container.webkitRequestFullscreen();
+                } else if (container.msRequestFullscreen) { // IE11
+                    container.msRequestFullscreen();
+                }
+                fullscreenIcon.innerHTML = '<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>';
+                fullscreenText.textContent = 'Exit Fullscreen';
+                
+                // Show exit overlay for touch devices
+                if ('ontouchstart' in window) {
+                    setTimeout(() => {
+                        exitOverlay.classList.add('visible');
+                    }, 1000); // Show after 1 second
+                }
+            } else {
+                exitFullscreen();
+            }
+        }
+
+        function exitFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) { // Safari
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) { // IE11
+                document.msExitFullscreen();
+            }
+            
+            // Hide exit overlay
+            document.getElementById('exitFullscreenOverlay').classList.remove('visible');
+            
+            // Update button state
+            updateFullscreenButton();
+        }
+
+        // Listen for fullscreen changes
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+        function handleFullscreenChange() {
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            const fullscreenIcon = fullscreenBtn.querySelector('svg');
+            const fullscreenText = fullscreenBtn.querySelector('span');
+            const exitOverlay = document.getElementById('exitFullscreenOverlay');
+            
+            if (document.fullscreenElement) {
+                fullscreenIcon.innerHTML = '<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>';
+                fullscreenText.textContent = 'Exit Fullscreen';
+                
+                // Show exit overlay for touch devices
+                if ('ontouchstart' in window) {
+                    setTimeout(() => {
+                        exitOverlay.classList.add('visible');
+                    }, 1000);
+                }
+            } else {
+                fullscreenIcon.innerHTML = '<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>';
+                fullscreenText.textContent = 'Fullscreen';
+                exitOverlay.classList.remove('visible');
+            }
+        }
+
+        // Add touch event listener to exit overlay
+        document.getElementById('exitFullscreenOverlay').addEventListener('click', function(e) {
+            if (e.target === this) { // Only if clicking the overlay itself, not its children
+                exitFullscreen();
+            }
+        });
+
+        // Add double-tap detection for touch devices
+        let lastTap = 0;
+        document.querySelector('.reading-container').addEventListener('touchend', function(e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            if (tapLength < 500 && tapLength > 0) {
+                // Double tap detected
+                if (document.fullscreenElement) {
+                    exitFullscreen();
+                } else {
+                    toggleFullscreen();
+                }
+            }
+            lastTap = currentTime;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Meta tags and title -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoxEasy - Patient Registration</title>
+
+    <!-- CSS Styles -->
+    <style>
+        /* Disable dragging for all elements */
+        * {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+
+        :root {
+            font-size: 16px; /* Base font size for rem calculations */
+            
+            --bg-color: rgba(235, 245, 255, 0.85);
+            --text-color: #333333;
+            --item-bg: rgba(255, 255, 255, 0.7);
+            --item-border: rgba(255, 255, 255, 0.3);
+            --item-hover: rgba(255, 255, 255, 0.85);
+            --item-selected: rgba(51, 51, 51, 0.15);
+            --shadow-light: rgba(255, 255, 255, 0.5);
+            --shadow-dark: rgba(0, 0, 0, 0.1);
+            --input-bg: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #cfeaff 0%, #f3f3f4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 1.25rem; /* 20px */
+            box-sizing: border-box;
+            color: var(--text-color);
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            background: var(--bg-color);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 1.5rem; /* 24px */
+            padding: 5rem 4.375rem; /* 80px 70px */
+            box-shadow: 
+                0 0.75rem 2rem var(--shadow-dark), /* 12px 32px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px 1px */
+            max-width: 50rem; /* 800px */
+            width: 100%;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            min-height: 46.875rem; /* 750px */
+            border: 1px solid var(--item-border);
+            animation: containerFadeIn 0.5s ease-out;
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @keyframes containerFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 3.125rem; /* 50px */
+            font-weight: 500;
+            font-size: 3rem; /* Changed from em to rem */
+            color: var(--text-color);
+        }
+
+        .controls-container {
+            position: absolute;
+            top: 1.25rem; /* 20px */
+            left: 1.25rem; /* 20px */
+            display: flex;
+            align-items: center;
+            gap: 1rem; /* 16px spacing between controls */
+            z-index: 2;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-input {
+            display: none;
+        }
+
+        .toggle-label {
+            display: inline-block;
+            width: 3.75rem; /* 60px */
+            height: 2.125rem; /* 34px */
+            background-color: var(--text-color);
+            border-radius: 2.125rem; /* 34px */
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-label:before {
+            content: '';
+            position: absolute;
+            width: 1.625rem; /* 26px */
+            height: 1.625rem; /* 26px */
+            border-radius: 50%;
+            top: 0.25rem; /* 4px */
+            left: 0.25rem; /* 4px */
+            background-color: var(--bg-color);
+            transition: 0.3s ease;
+        }
+
+        .toggle-input:checked+.toggle-label {
+            background-color: #ccc;
+        }
+
+        .toggle-input:checked+.toggle-label:before {
+            transform: translateX(1.625rem); /* 26px */
+            background-color: var(--text-color);
+        }
+
+        .zoom-controls {
+            display: flex;
+            gap: 0.5rem; /* 8px between zoom buttons */
+        }
+
+        .zoom-button {
+            width: 2.125rem; /* 34px - same height as toggle switch */
+            height: 2.125rem; /* 34px */
+            border: none;
+            border-radius: 50%;
+            background-color: var(--item-bg);
+            color: var(--text-color);
+            font-size: 1.25rem; /* 20px */
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0.25rem 0.375rem var(--shadow-dark),
+                inset 0 0.0625rem 0.0625rem var(--shadow-light);
+            border: 1px solid var(--item-border);
+        }
+
+        .zoom-button:hover {
+            background-color: var(--item-hover);
+            transform: translateY(-0.125rem); /* -2px */
+        }
+
+        .zoom-button:active {
+            transform: translateY(0);
+            background-color: var(--item-bg);
+        }
+
+        .zoom-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: var(--item-bg);
+            transform: none;
+        }
+
+        .zoom-button:disabled:hover {
+            background-color: var(--item-bg);
+            transform: none;
+        }
+
+        .dark-mode {
+            --bg-color: rgba(0, 0, 0, 0.7);
+            --text-color: #ffffff;
+            --item-bg: rgba(28, 28, 30, 0.7);
+            --item-border: rgba(44, 44, 46, 0.7);
+            --item-hover: rgba(44, 44, 46, 0.8);
+            --item-selected: rgba(255, 255, 255, 0.1);
+            --shadow-light: rgba(255, 255, 255, 0.1);
+            --shadow-dark: rgba(0, 0, 0, 0.3);
+            --input-bg: rgba(40, 40, 45, 0.8);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2e 100%);
+        }
+
+        .dark-mode .container {
+            box-shadow: 
+                0 8px 24px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        /* Form Styles */
+        .patient-form {
+            display: flex;
+            flex-direction: column;
+            gap: 2.1875rem; /* 35px */
+            margin-top: 0.625rem; /* 10px */
+            width: 100%;
+            max-width: 34.375rem; /* 550px */
+        }
+
+        .patient-form .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.625rem; /* 10px */
+        }
+
+        .patient-form label {
+            font-weight: 500;
+            color: var(--text-color);
+            font-size: 1.2rem; /* Changed from em to rem */
+            margin-left: 0.3125rem; /* 5px */
+        }
+
+        .patient-form input {
+            height: 4.375rem; /* 70px */
+            padding: 0 1.5625rem; /* 0 25px */
+            border: 1px solid var(--item-border);
+            border-radius: 1rem; /* 16px */
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 1.2rem; /* Changed from em to rem */
+            transition: all 0.3s ease;
+            box-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.05); /* 2px 6px */
+        }
+
+        .patient-form input:focus {
+            outline: none;
+            border-color: var(--text-color);
+            box-shadow: 
+                0 0 0 1px var(--text-color),
+                0 0.25rem 0.5rem rgba(0, 0, 0, 0.1); /* 4px 8px */
+        }
+
+        .gender-options {
+            display: flex;
+            gap: 0.9375rem; /* 15px */
+            margin-top: 0.625rem; /* 10px */
+        }
+
+        .gender-options input[type="radio"] {
+            display: none;
+        }
+
+        .gender-options label {
+            padding: 0.9375rem 1.5625rem; /* 15px 25px */
+            border: 1px solid var(--item-border);
+            border-radius: 0.75rem; /* 12px */
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--input-bg);
+            font-size: 1.1rem; /* Changed from em to rem */
+        }
+
+        .gender-options input[type="radio"]:checked + label {
+            background: var(--item-selected);
+            border-color: var(--text-color);
+            color: var(--text-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .patient-form button {
+            height: 4.375rem; /* 70px */
+            margin-top: 1.5625rem; /* 25px */
+            background: var(--item-bg);
+            color: var(--text-color);
+            border: 1px solid var(--item-border);
+            border-radius: 1rem; /* 16px */
+            font-size: 1.4rem; /* Changed from em to rem */
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0.25rem 0.5rem var(--shadow-dark), /* 4px 8px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px 1px */
+        }
+
+        .patient-form button:hover {
+            background: var(--item-hover);
+            transform: translateY(-0.125rem); /* -2px */
+            box-shadow: 
+                0 0.375rem 0.75rem var(--shadow-dark), /* 6px 12px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px 1px */
+        }
+
+        .patient-form button:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 0.125rem 0.25rem var(--shadow-dark), /* 2px 4px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px 1px */
+        }
+
+        .home-button {
+            position: absolute;
+            top: 1.25rem; /* 20px */
+            right: 1.25rem; /* 20px */
+            padding: 0.625rem 1.5625rem; /* 10px 25px */
+            text-decoration: none;
+            color: var(--text-color);
+            background: var(--item-bg);
+            border-radius: 1.5rem; /* 24px */
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 1;
+            box-shadow: 
+                0 0.25rem 0.375rem var(--shadow-dark), /* 4px 6px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px 1px */
+            border: 1px solid var(--item-border);
+            font-weight: 500;
+            font-size: 1.1rem; /* Changed from em to rem */
+        }
+
+        .home-button:hover {
+            background: var(--item-hover);
+            transform: translateY(-0.125rem); /* -2px */
+            box-shadow: 
+                0 0.375rem 0.625rem var(--shadow-dark), /* 6px 10px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px 1px */
+        }
+
+        .home-button:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 0.125rem 0.25rem var(--shadow-dark), /* 2px 4px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px 1px */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="index.html" class="home-button" data-translate>Home</a>
+        <!-- Controls container with toggle and zoom controls -->
+        <div class="controls-container">
+            <div class="toggle-switch">
+                <input type="checkbox" id="switch" class="toggle-input" />
+                <label for="switch" class="toggle-label"></label>
+            </div>
+            <div class="zoom-controls">
+                <button class="zoom-button" id="zoomOut">-</button>
+                <button class="zoom-button" id="zoomIn">+</button>
+            </div>
+        </div>
+
+        <!-- Title -->
+        <h1 data-translate>User Login</h1>
+
+        <!-- Form -->
+        <form action="#" method="post" class="patient-form">
+            <div class="form-group">
+                <label for="first-name" data-translate>First Name</label>
+                <input type="text" id="first-name" name="first-name" required />
+            </div>
+            <div class="form-group">
+                <label for="last-name" data-translate>Last Name</label>
+                <input type="text" id="last-name" name="last-name" required />
+            </div>
+            <div class="form-group">
+                <label for="dob" data-translate>Date of Birth</label>
+                <input type="date" id="dob" name="dob" required style="padding-right: 0.9375rem;" />
+            </div>
+            <button type="submit" data-translate>Submit</button>
+        </form>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        const toggleSwitch = document.getElementById('switch');
+        const body = document.body;
+
+        // Check the initial state from local storage
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            toggleSwitch.checked = true;
+        }
+
+        toggleSwitch.addEventListener('change', function () {
+            if (this.checked) {
+                console.log('Switch is ON - Dark Mode');
+                body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                console.log('Switch is OFF - Light Mode');
+                body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        });
+
+        console.log('Patient registration page script loaded');
+
+        // Zoom functionality
+        let currentZoom = parseInt(localStorage.getItem('login-patient-zoom-level')) || 100;
+        const zoomInBtn = document.getElementById('zoomIn');
+        const zoomOutBtn = document.getElementById('zoomOut');
+
+        function updateZoom() {
+            document.documentElement.style.fontSize = (16 * currentZoom / 100) + 'px';
+            localStorage.setItem('login-patient-zoom-level', currentZoom);
+            
+            // Update button states
+            zoomInBtn.disabled = currentZoom >= 200;
+            zoomOutBtn.disabled = currentZoom <= 50;
+        }
+
+        function zoomIn() {
+            if (currentZoom < 200) {
+                currentZoom += 10;
+                updateZoom();
+            }
+        }
+
+        function zoomOut() {
+            if (currentZoom > 50) {
+                currentZoom -= 10;
+                updateZoom();
+            }
+        }
+
+        function resetZoom() {
+            currentZoom = 100;
+            updateZoom();
+        }
+
+        // Initialize zoom
+        updateZoom();
+
+        // Event listeners
+        zoomInBtn.addEventListener('click', zoomIn);
+        zoomOutBtn.addEventListener('click', zoomOut);
+
+        // Double-click to reset zoom
+        zoomInBtn.addEventListener('dblclick', resetZoom);
+        zoomOutBtn.addEventListener('dblclick', resetZoom);
+
+        const form = document.querySelector('.patient-form');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission behavior
+
+            const firstName = document.getElementById('first-name').value;
+            const lastName = document.getElementById('last-name').value;
+            const dob = document.getElementById('dob').value;
+            
+            if (!firstName || !lastName || !dob) {
+                alert('Please fill out all fields.');
+                return;
+            }
+
+            // Get the current date and time
+            const loginTimestamp = new Date().toLocaleString();
+
+            const currentPatientData = {
+                firstName,
+                lastName,
+                dob,
+            };
+
+            // Store the current patient's info. This will be used by other pages.
+            localStorage.setItem('currentPatient', JSON.stringify(currentPatientData));
+
+            // Retrieve existing patients from local storage or initialize an empty array
+            const patients = JSON.parse(localStorage.getItem('patients')) || [];
+            
+            // Find if this patient has logged in before
+            const existingPatientIndex = patients.findIndex(p => p.firstName === firstName && p.lastName === lastName && p.dob === dob);
+
+            if (existingPatientIndex > -1) {
+                // If patient exists, just update their login timestamp
+                patients[existingPatientIndex].loginTimestamp = loginTimestamp;
+            } else {
+                // Otherwise, create a new patient record
+                const newPatientInfo = {
+                    ...currentPatientData,
+                    loginTimestamp,
+                    activities: []
+                };
+                patients.push(newPatientInfo);
+            }
+
+            // Save updated patients list to local storage
+            localStorage.setItem('patients', JSON.stringify(patients));
+
+            // Redirect to the main application page
+            window.location.href = 'pic.html';
+        });
+
+        // Language auto-translation logic (no selector)
+        const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+        if (savedLang !== 'en') translatePage(savedLang);
+        async function translateText(text, targetLang) {
+          if (!text.trim()) return text;
+          const apiKey = 'AIzaSyC1RWlflkLkg10IB6zv4HNzzq1y5qJgoh0';
+          const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+          const response = await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify({ q: text, target: targetLang }),
+            headers: { 'Content-Type': 'application/json' }
+          });
+          const data = await response.json();
+          return data.data.translations[0].translatedText;
+        }
+        async function translatePage(targetLang) {
+          const elements = document.querySelectorAll('[data-translate]');
+          for (const el of elements) {
+            const original = el.getAttribute('data-original') || el.textContent;
+            el.setAttribute('data-original', original);
+            el.textContent = await translateText(original, targetLang);
+          }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoxEasy - VoxAI</title>
+    <script src="documentFunctions.js" defer></script>
+    <style>
+        /* Disable dragging for all elements */
+        * {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+
+
+        :root {
+            font-size: 16px; /* Base font size for rem calculations */
+            
+            /* Updated color variables for Vision Pro style */
+            --bg-color: rgba(255, 255, 255, 0.18);
+            --text-color: #333333;
+            --item-bg: rgba(255, 255, 255, 0.15);
+            --item-border: rgba(255, 255, 255, 0.2);
+            --item-hover: rgba(255, 255, 255, 0.25);
+            --item-selected: rgba(51, 51, 51, 0.15);
+            --shadow-light: rgba(255, 255, 255, 0.5);
+            --shadow-dark: rgba(0, 0, 0, 0.15);
+        }
+
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #cfeaff 0%, #f3f3f4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 1.25rem; /* 20px */
+            box-sizing: border-box;
+            color: var(--text-color);
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+
+        .container {
+            background: var(--bg-color);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 1.25rem; /* 20px */
+            padding: 2.8125rem; /* 45px */
+            box-shadow: 
+                0 0.5rem 1.5rem var(--shadow-dark), /* 8px 24px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px 1px */
+            max-width: 75rem; /* 1200px */
+            width: 100%;
+            position: relative;
+            padding-top: 2.8125rem; /* 45px */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            max-height: 50rem; /* 800px */
+            min-height: 37.5rem; /* 600px */
+            height: 100%;
+            border: 1px solid var(--item-border);
+            animation: containerFadeIn 0.5s ease-out;
+            overflow: visible;
+        }
+
+
+        @keyframes containerFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+
+        h1 {
+            text-align: center;
+            margin-bottom: 1.875rem; /* 30px */
+            font-weight: 500;
+            font-size: 2.5rem; /* Changed from em to rem */
+            color: var(--text-color);
+        }
+
+
+        .choice-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); /* 160px */
+            gap: 1.25rem; /* 20px */
+            margin-bottom: 1.875rem; /* 30px */
+            padding-top: 0.75rem; /* 12px */
+            position: relative;
+            z-index: 0;
+        }
+
+
+        .choice-item {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 4px 6px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+            position: relative;
+            z-index: 1;
+        }
+
+
+        .choice-item:hover {
+            /* Remove all hover styles */
+        }
+
+
+        .choice-item:active {
+            transform: translateY(0);
+            background: var(--item-bg);
+        }
+
+
+        .choice-item.selected {
+            transform: translateY(-4px);
+            box-shadow: 
+                0 8px 16px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+            background: var(--item-hover);
+            border-color: var(--item-border);
+            z-index: 2;
+        }
+
+
+        .choice-item.selected:active {
+            transform: translateY(-4px);
+            box-shadow: 
+                0 4px 8px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+
+        .choice-item img {
+            width: 70px;
+            height: 70px;
+            margin-bottom: 12px;
+            transition: all 0s ease;
+        }
+
+
+        .choice-item p {
+            margin: 0;
+            font-weight: 400;
+            font-size: 1.4em;
+            color: var(--text-color);
+        }
+
+
+        .selected-choices {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center; /* Center the text horizontally */
+            box-shadow: 
+                0 4px 12px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+
+        .selected-choices h2 {
+            margin-top: 0;
+            font-weight: 500;
+            color: var(--text-color);
+            font-size: 1.3em; /* Adjust the font size to be smaller */
+            cursor: pointer;
+        }
+
+
+        .selected-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 40px; /* Ensure there's always space for at least one item */
+        }
+
+
+        .selected-item {
+            background: var(--bg-color);
+            border: 1px solid var(--item-border);
+            border-radius: 20px;
+            padding: 5px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+
+        .speak-button {
+            background: var(--text-color);
+            border: none;
+            color: var(--bg-color);
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 20px;
+            transition: all 0s ease;
+        }
+
+
+        .speak-button:hover {
+            opacity: 0.8;
+        }
+
+
+        @media (max-width: 600px) {
+            .choice-board {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+
+        .voice-selector {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--item-border);
+            background-color: var(--item-bg);
+            color: var(--text-color);
+        }
+
+
+        .choice-item a {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+
+        .view-log-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+
+        .view-log-button {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --item-bg: #f5f5f7;
+            --item-border: #d2d2d7;
+            --item-hover: #e8e8ed;
+            --item-selected: rgba(0, 0, 0, 0.1);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0s;
+        }
+
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5625rem; /* 25px */
+            padding-top: 1.5625rem; /* 25px */
+            border-top: 1px solid var(--item-border);
+        }
+
+
+        .nav-item {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            padding: 0.75rem 1.5625rem; /* 12px 25px */
+            margin: 0 0.375rem; /* 6px */
+            text-decoration: none;
+            color: var(--text-color);
+            border-radius: 1.25rem; /* 20px */
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 0.5rem 2rem rgba(0, 0, 0, 0.1), /* 8px 32px */
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            font-size: 1rem; /* Changed from em to rem */
+        }
+
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.15),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+
+        /* Active state for Entertainment page */
+        .nav-item[href="entertainment.html"] {
+            background: rgba(255, 255, 255, 0.12) !important;
+            box-shadow: 
+                0 16px 48px rgba(0, 0, 0, 0.2),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.1) !important;
+            transform: translateY(-2px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+
+
+        /* Remove any other specific nav-item styles except Entertainment */
+        .nav-item[href="pic.html"],
+        .nav-item[href="prompts.html"],
+        .nav-item[href="pain.html"],
+        .nav-item[href="keyboard.html"],
+        .nav-item[href="documents.html"],
+        .nav-item[href="mood.html"],
+        .nav-item[href="voxai.html"] {
+            background: rgba(255, 255, 255, 0.05) !important;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05) !important;
+            transform: none !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+
+
+        /* Remove highlight for other nav items in dark mode except Entertainment */
+        .dark-mode .nav-item[href="entertainment.html"] {
+            background: rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 
+                0 16px 48px rgba(0, 0, 0, 0.3),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05) !important;
+        }
+
+        .dark-mode .nav-item[href="entertainment.html"]::before {
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.1),
+                rgba(255, 255, 255, 0.05)
+            ) !important;
+        }
+
+        /* Remove highlight for other nav items in dark mode */
+        .dark-mode .nav-item[href="pic.html"],
+        .dark-mode .nav-item[href="prompts.html"],
+        .dark-mode .nav-item[href="pain.html"],
+        .dark-mode .nav-item[href="keyboard.html"],
+        .dark-mode .nav-item[href="documents.html"],
+        .dark-mode .nav-item[href="mood.html"],
+        .dark-mode .nav-item[href="voxai.html"] {
+            background: rgba(0, 0, 0, 0.05) !important;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.02) !important;
+            transform: none !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .dark-mode {
+            --bg-color: rgba(0, 0, 0, 0.18);
+            --text-color: #ffffff;
+            --item-bg: rgba(255, 255, 255, 0.1);
+            --item-border: rgba(255, 255, 255, 0.1);
+            --item-hover: rgba(255, 255, 255, 0.15);
+            --item-selected: rgba(255, 255, 255, 0.2);
+            --shadow-light: rgba(255, 255, 255, 0.1);
+            --shadow-dark: rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2e 100%);
+        }
+
+
+        .dark-mode .container {
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+
+        .dark-mode .nav-item {
+            background: rgba(0, 0, 0, 0.05);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.02);
+        }
+
+
+        .dark-mode .nav-item:hover {
+            background: rgba(0, 0, 0, 0.08);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.25),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+        }
+
+
+        .dark-mode .nav-item:active {
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.15),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.02);
+        }
+
+
+        .dark-mode .nav-item[href="pic.html"] {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 16px 48px rgba(0, 0, 0, 0.3),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+        }
+
+
+        .dark-mode .nav-item[href="pic.html"]::before {
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.1),
+                rgba(255, 255, 255, 0.05)
+            );
+        }
+
+
+        .logout-button {
+            background-color: rgba(255, 59, 48, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 4px 6px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+
+        .logout-button:hover {
+            /* Remove all hover styles */
+        }
+
+
+        .logout-button:active {
+            transform: translateY(0);
+            background-color: rgba(255, 59, 48, 0.7);
+        }
+
+
+        .navigation-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+
+        .slide-indicators {
+            display: flex;
+            justify-content: center;
+            margin: 0 20px; /* Add horizontal space between buttons and dots */
+        }
+
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center; /* Keep buttons vertically centered */
+        }
+
+
+        .choice-item img[alt="Blanket"] {
+            width: 72px;  /* Slightly larger than the default 60px */
+            height: 72px; /* Slightly larger than the default 60px */
+        }
+
+        .controls-container {
+            position: absolute;
+            top: 2.8125rem; /* 45px */
+            left: 2.8125rem; /* 45px */
+            display: flex;
+            align-items: center;
+            gap: 1rem; /* 16px spacing between controls */
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-input {
+            display: none;
+        }
+
+        .toggle-label {
+            display: inline-block;
+            width: 3.75rem; /* 60px */
+            height: 2.125rem; /* 34px */
+            background-color: var(--text-color);
+            border-radius: 2.125rem; /* 34px */
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .zoom-controls {
+            display: flex;
+            gap: 0.5rem; /* 8px between zoom buttons */
+        }
+
+        .zoom-button {
+            width: 2.125rem; /* 34px - same height as toggle switch */
+            height: 2.125rem; /* 34px */
+            border: none;
+            border-radius: 50%;
+            background-color: var(--item-bg);
+            color: var(--text-color);
+            font-size: 1.25rem; /* 20px */
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0.25rem 0.375rem var(--shadow-dark),
+                inset 0 0.0625rem 0.0625rem var(--shadow-light);
+            border: 1px solid var(--item-border);
+        }
+
+        .zoom-button:hover {
+            background-color: var(--item-hover);
+            transform: translateY(-0.125rem); /* -2px */
+        }
+
+        .zoom-button:active {
+            transform: translateY(0);
+            background-color: var(--item-bg);
+        }
+
+        .toggle-label:before {
+            content: '';
+            position: absolute;
+            width: 1.625rem; /* 26px */
+            height: 1.625rem; /* 26px */
+            border-radius: 50%;
+            top: 0.25rem; /* 4px */
+            left: 0.25rem; /* 4px */
+            background-color: var(--bg-color);
+            transition: 0.3s ease;
+        }
+
+        .toggle-input:checked + .toggle-label {
+            background-color: #ccc;
+        }
+
+        .toggle-input:checked + .toggle-label:before {
+            transform: translateX(1.625rem); /* 26px */
+            background-color: var(--text-color);
+        }
+
+        .top-right-container {
+            position: absolute;
+            top: 45px;
+            right: 45px;
+            font-size: 1.2em;
+            color: var(--text-color);
+        }
+
+        .slide-container {
+            display: flex;
+            overflow: hidden;
+            width: 100%;
+            max-width: 800px;
+            position: relative;
+        }
+
+        .slide {
+            min-width: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .nav-button {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            color: var(--text-color);
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 4px 6px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .nav-button:hover {
+            /* Remove all hover styles */
+        }
+
+        .nav-button:active {
+            transform: translateY(0);
+            background: var(--item-bg);
+        }
+
+        .slide-indicators {
+            display: flex;
+            justify-content: center;
+            margin: 0 20px;
+        }
+
+        .dot {
+            height: 8px;
+            width: 8px;
+            margin: 0 5px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 50%;
+            display: inline-block;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .dot.active {
+            background-color: rgba(0, 0, 0, 0.5);
+            transform: scale(1.2);
+        }
+
+        .dark-mode .dot {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .dark-mode .dot.active {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        #clearSelectedChoices {
+            cursor: pointer;
+            font-size: 1.3em;
+            color: var(--text-color);
+            margin: 0;
+        }
+
+        #clearSelectedChoices:hover {
+            text-decoration: none;
+        }
+
+        .placeholder {
+            color: var(--item-border);
+            font-style: italic;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .logout-container {
+            position: absolute;
+            top: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        /* Entertainment Grid Styles */
+        .entertainment-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.625rem; /* 10px */
+            padding: 0;
+            margin-top: 0.625rem; /* 10px */
+            align-items: center;
+            height: 100%;
+            justify-content: center;
+        }
+
+        .entertainment-item {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            border-radius: 1.25rem; /* 20px */
+            padding: 0.75rem; /* 12px */
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0.25rem 0.375rem var(--shadow-dark), /* 4px 6px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px 1px */
+            min-height: 5rem; /* 80px */
+            width: 90%;
+            max-width: 43.75rem; /* 700px */
+            margin: 0 auto;
+        }
+
+        .entertainment-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 8px 16px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+            background: var(--item-hover);
+        }
+
+        .entertainment-item:active {
+            transform: translateY(-2px);
+        }
+
+        .entertainment-item .emoji {
+            font-size: 3.5rem; /* Changed from em to rem */
+            margin-bottom: 0.9375rem; /* 15px */
+        }
+
+        .entertainment-item .title {
+            font-size: 1.8rem; /* Changed from em to rem */
+            font-weight: 500;
+            color: var(--text-color);
+            margin: 0;
+        }
+
+        .entertainment-item .subtitle {
+            font-size: 1rem; /* Changed from em to rem */
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-top: 0.625rem; /* 10px */
+        }
+
+        @media (max-width: 37.5rem) { /* 600px */
+            .entertainment-grid {
+                gap: 0.375rem; /* 6px */
+                margin-top: 0.375rem; /* 6px */
+            }
+            .entertainment-item {
+                min-height: 3.75rem; /* 60px */
+                padding: 0.4375rem; /* 7px */
+                max-width: 98vw;
+            }
+        }
+
+        /* Remove chat container styles */
+        .chat-container {
+            display: none;
+        }
+
+        /* Add new styles for watch options and iframe */
+        .watch-options {
+            display: none;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        .watch-option {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 4px 6px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+            min-height: 200px;
+        }
+
+        .watch-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 8px 16px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+            background: var(--item-hover);
+        }
+
+        .watch-option:active {
+            transform: translateY(-2px);
+        }
+
+        .watch-option .emoji {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+        }
+
+        .watch-option .title {
+            font-size: 1.8em;
+            font-weight: 500;
+            color: var(--text-color);
+            margin: 0;
+        }
+
+        .watch-option .subtitle {
+            font-size: 1em;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+
+        .streaming-container {
+            display: none;
+            width: 100%;
+            height: 600px;
+            margin-top: 40px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 
+                0 4px 6px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .streaming-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .back-button {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            color: var(--text-color);
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 4px 6px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+            display: none;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            background: var(--item-hover);
+        }
+
+        .back-button:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 37.5rem) { /* 600px */
+            .watch-options {
+                grid-template-columns: 1fr;
+                gap: 1.25rem; /* 20px */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Add the controls container with toggle and zoom controls here -->
+        <div class="controls-container">
+            <div class="toggle-switch">
+                <input type="checkbox" id="switch" class="toggle-input" />
+                <label for="switch" class="toggle-label"></label>
+            </div>
+            <div class="zoom-controls">
+                <button class="zoom-button" id="zoomOut">-</button>
+                <button class="zoom-button" id="zoomIn">+</button>
+            </div>
+        </div>
+        <!-- Title -->
+        <h1 data-translate>Entertainment</h1>
+        <!-- Entertainment Grid -->
+        <div class="entertainment-grid">
+            <div class="entertainment-item" onclick="handleEntertainmentClick('read')">
+                <div class="emoji">📚</div>
+                <h2 class="title" data-translate>Read</h2>
+                <p class="subtitle" data-translate>Books & Articles</p>
+            </div>
+            <div class="entertainment-item" onclick="handleEntertainmentClick('play')">
+                <div class="emoji">🎮</div>
+                <h2 class="title" data-translate>Play</h2>
+                <p class="subtitle" data-translate>Games & Interactive Fun</p>
+            </div>
+            <div class="entertainment-item" onclick="handleEntertainmentClick('feelgood')">
+                <div class="emoji">😄</div>
+                <h2 class="title" data-translate>Feel Good</h2>
+                <p class="subtitle" data-translate>Positive & Uplifting Content</p>
+            </div>
+        </div>
+
+        <!-- Watch Options -->
+        <!-- Removed watch-options and its options as per user request -->
+
+        <!-- Streaming Container -->
+        <!-- Removed streamingContainer and its iframe as per user request -->
+
+        <button class="back-button" id="backButton" onclick="handleBackClick()">Back to Options</button>
+
+        <!-- Navigation bar -->
+        <nav class="navigation">
+            <a href="pic.html" class="nav-item" data-translate>Picture Board</a>   
+            <a href="prompts.html" class="nav-item" data-translate>Prompts</a>         
+            <a href="pain.html" class="nav-item" data-translate>Pain</a>
+            <a href="keyboard.html" class="nav-item" data-translate>Keyboard</a>
+            <a href="voxai.html" class="nav-item" data-translate>VoxAI</a>
+            <a href="entertainment.html" class="nav-item" data-translate>Entertainment</a>
+            <a href="documents.html" class="nav-item" data-translate>Documents</a>
+            <a href="mood.html" class="nav-item" data-translate>Mood</a>
+        </nav>
+    </div>
+
+    <script>
+        const choiceItems = document.querySelectorAll('.choice-item');
+        const selectedList = document.getElementById('selectedList');
+        const selectedChoices = new Set();
+        const talkButton = document.getElementById('talkButton');
+        const toggleSwitch = document.getElementById('switch');
+        const body = document.body;
+
+        // Check the initial state from local storage
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            toggleSwitch.checked = true;
+            updateIconColors('white');
+        }
+
+        toggleSwitch.addEventListener('change', function() {
+            if (this.checked) {
+                console.log('Switch is ON - Dark Mode');
+                body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'enabled');
+                updateIconColors('white');
+                updateSendIconColor();
+            } else {
+                console.log('Switch is OFF - Light Mode');
+                body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'disabled');
+                updateIconColors('black');
+                updateSendIconColor();
+            }
+        });
+
+        function updateIconColors(color) {
+            const icons = document.querySelectorAll('.choice-item img');
+            icons.forEach(icon => {
+                const currentSrc = icon.src;
+                const newSrc = currentSrc.replace(/color=[^&]+/, `color=${color}`);
+                icon.src = newSrc;
+            });
+        }
+
+        function updateSelectedList() {
+            console.log('Updating selected list');
+            selectedList.innerHTML = '';
+            if (selectedChoices.size === 0) {
+                // Show placeholder if no choices are selected
+                const placeholder = document.createElement('div');
+                placeholder.id = 'placeholder';
+                placeholder.classList.add('selected-item', 'placeholder');
+                placeholder.textContent = 'No choices selected';
+                selectedList.appendChild(placeholder);
+            } else {
+                selectedChoices.forEach(choice => {
+                    const choiceElement = document.createElement('div');
+                    choiceElement.classList.add('selected-item');
+                    choiceElement.dataset.choice = choice; // Store choice text as data attribute
+                    const img = document.querySelector(`.choice-item img[alt="${choice}"]`).cloneNode(true);
+                    choiceElement.appendChild(img);
+                    choiceElement.appendChild(document.createTextNode(choice));
+                    
+                    // Add click event listener to remove the choice when clicked
+                    choiceElement.addEventListener('click', function() {
+                        const choiceText = this.dataset.choice;
+                        console.log('Selected choice clicked:', choiceText);
+                        
+                        // Remove from selectedChoices set
+                        selectedChoices.delete(choiceText);
+                        
+                        // Find and unselect the corresponding choice-item in the board
+                        const allChoiceItems = document.querySelectorAll('.choice-item');
+                        allChoiceItems.forEach(item => {
+                            const itemText = item.querySelector('p').textContent;
+                            if (itemText === choiceText) {
+                                item.classList.remove('selected');
+                            }
+                        });
+                        
+                        // Update the display
+                        updateSelectedList();
+                    });
+                    
+                    selectedList.appendChild(choiceElement);
+                });
+            }
+
+            // Save selected choices to local storage
+            localStorage.setItem('selectedChoices', JSON.stringify(Array.from(selectedChoices)));
+        }
+
+        talkButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            window.location.href = 'keyboard.html';
+        });
+
+        choiceItems.forEach(item => {
+            item.addEventListener('click', (event) => {
+                if (item.id !== 'talkButton') {
+                    event.preventDefault();
+                    const text = item.querySelector('p').textContent;
+                    console.log('Choice clicked:', text);
+
+                    if (selectedChoices.has(text)) {
+                        selectedChoices.delete(text);
+                        item.classList.remove('selected');
+                    } else {
+                        selectedChoices.add(text);
+                        item.classList.add('selected');
+                        speak(text);
+                        
+                        // Log the choice to ccpcsLog
+                        const timestamp = new Date().toISOString();
+                        const logEntry = { 
+                            action: `Pic Choice Spoken: "${text}"`, 
+                            timestamp 
+                        };
+                        const log = JSON.parse(localStorage.getItem('ccpcsLog') || '[]');
+                        log.push(logEntry);
+                        localStorage.setItem('ccpcsLog', JSON.stringify(log));
+                    }
+
+                    updateSelectedList();
+                }
+            });
+        });
+
+        document.addEventListener('click', function(event) {
+            const clickedElement = event.target;
+            
+            // Don't log navigation items or choice items (they're handled separately)
+            if (clickedElement.classList.contains('nav-item') || 
+                clickedElement.closest('.choice-item') || 
+                clickedElement.id === 'clearSelectedChoices' ||
+                clickedElement.classList.contains('nav-button') ||
+                clickedElement.classList.contains('dot')) {
+                return;
+            }
+
+            // Log other clicks
+            const textContent = clickedElement.textContent.trim();
+            if (textContent) {  // Only log if there's actual text content
+                const timestamp = new Date().toISOString();
+                const logEntry = { 
+                    action: `Button Clicked: "${textContent}"`, 
+                    timestamp 
+                };
+                
+                const log = JSON.parse(localStorage.getItem('ccpcsLog') || '[]');
+                log.push(logEntry);
+                localStorage.setItem('ccpcsLog', JSON.stringify(log));
+            }
+        });
+
+        function handleEntertainmentClick(category) {
+            const timestamp = new Date().toISOString();
+            const logEntry = { 
+                action: `Entertainment Category Selected: "${category}"`, 
+                timestamp 
+            };
+            const log = JSON.parse(localStorage.getItem('ccpcsLog') || '[]');
+            log.push(logEntry);
+            localStorage.setItem('ccpcsLog', JSON.stringify(log));
+
+            // Add visual feedback
+            const item = event.currentTarget;
+            item.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                item.style.transform = '';
+            }, 200);
+
+            // Handle category navigation
+            if (category === 'play') {
+                window.location.href = 'play.html';
+            } else if (category === 'read') {
+                window.location.href = 'read.html';
+            } else if (category === 'feelgood') {
+                window.location.href = 'feel.html';
+            }
+            // Add other category handlers here as needed
+        }
+
+        function handleBackClick() {
+            // Hide streaming container and watch options, show entertainment grid
+            document.getElementById('streamingContainer').style.display = 'none';
+            document.getElementById('watchOptions').style.display = 'none';
+            document.querySelector('.entertainment-grid').style.display = 'grid';
+            document.getElementById('backButton').style.display = 'none';
+            // Clear the iframe source and reset container height
+            const streamingContainer = document.getElementById('streamingContainer');
+            streamingContainer.style.height = '600px';
+            document.getElementById('streamingIframe').src = '';
+        }
+    </script>
+
+
+    <script>
+        // Retrieve the current patient's name from local storage
+        const currentPatient = JSON.parse(localStorage.getItem('currentPatient'));
+
+        if (currentPatient) {
+            const patientNameElement = document.getElementById('patient-name');
+            patientNameElement.textContent = `${currentPatient.firstName} ${currentPatient.lastName}`;
+        }
+    </script>
+
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.dot');
+        let currentSlide = 0;
+
+        // Only add event listeners if elements exist
+        const nextSlideButton = document.getElementById('nextSlide');
+        const prevSlideButton = document.getElementById('prevSlide');
+
+        if (nextSlideButton) {
+            nextSlideButton.addEventListener('click', () => {
+            // Update to allow circular navigation
+            currentSlide = (currentSlide + 1) % slides.length;
+            updateSlidePosition();
+        });
+        }
+
+        if (prevSlideButton) {
+            prevSlideButton.addEventListener('click', () => {
+            // Update to allow circular navigation
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            updateSlidePosition();
+        });
+        }
+
+        function updateSlidePosition() {
+            slides.forEach((slide, index) => {
+                slide.style.transform = `translateX(-${currentSlide * 100}%)`;
+            });
+            updateDots();
+        }
+
+        function updateDots() {
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        // Initialize the first dot as active only if dots exist
+        if (dots.length > 0) {
+        updateDots();
+        }
+    </script>
+
+
+    <script>
+        // Add event listener for the h2 element to clear selected choices
+        const clearSelectedChoicesBtn = document.getElementById('clearSelectedChoices');
+        if (clearSelectedChoicesBtn) {
+            clearSelectedChoicesBtn.addEventListener('click', () => {
+            selectedChoices.clear(); // Clear the set of selected choices
+            updateSelectedList(); // Update the displayed list
+            document.querySelectorAll('.choice-item.selected').forEach(item => {
+                item.classList.remove('selected'); // Remove the 'selected' class from all items
+            });
+            // Do not clear the saved choices in local storage
+        });
+        }
+    </script>
+
+
+    <script>
+        // Only add event listeners to dots if they exist
+        if (dots && dots.length > 0) {
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                currentSlide = index; // Set the current slide to the clicked dot's index
+                updateSlidePosition(); // Update the slide position
+            });
+        });
+        }
+    </script>
+
+    <script>
+        // Add batch translation logic
+        const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+        if (savedLang !== 'en') batchTranslateAllText(savedLang);
+
+        async function batchTranslateAllText(targetLang) {
+            // Gather all text nodes except inside iframes
+            const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            let node;
+            const textNodes = [];
+            while ((node = walker.nextNode())) {
+                if (node.parentNode && node.textContent.trim() && node.parentNode.offsetParent !== null && node.parentNode.tagName !== 'IFRAME') {
+                    textNodes.push(node);
+                }
+            }
+            // Gather all translatable attributes (not inside iframes)
+            const attrNodes = [];
+            const all = document.querySelectorAll(':not(iframe) [placeholder], :not(iframe) [alt], :not(iframe) [value], :not(iframe) [aria-label]');
+            for (const el of all) {
+                if (el.placeholder) attrNodes.push({el, attr: 'placeholder', value: el.placeholder});
+                if (el.alt) attrNodes.push({el, attr: 'alt', value: el.alt});
+                if (el.value && (el.tagName === 'BUTTON' || el.tagName === 'INPUT')) attrNodes.push({el, attr: 'value', value: el.value});
+                if (el.getAttribute('aria-label')) attrNodes.push({el, attr: 'aria-label', value: el.getAttribute('aria-label')});
+            }
+            // Prepare all strings for translation
+            const allStrings = [...textNodes.map(n => n.textContent), ...attrNodes.map(a => a.value)];
+            if (allStrings.length === 0) return;
+            const apiKey = 'AIzaSyC1RWlflkLkg10IB6zv4HNzzq1y5qJgoh0';
+            const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+            const response = await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify({ q: allStrings, target: targetLang }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+            const translations = data.data.translations.map(t => t.translatedText);
+            // Update text nodes
+            textNodes.forEach((n, i) => { n.textContent = translations[i]; });
+            // Update attributes
+            attrNodes.forEach((a, i) => { a.el[a.attr] = translations[textNodes.length + i]; });
+        }
+
+        // Listen for language changes
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'selectedLanguage' && e.newValue !== e.oldValue) {
+                batchTranslateAllText(e.newValue);
+            }
+        });
+
+        // --- Zoom Functionality ---
+        let currentZoom = parseFloat(localStorage.getItem('entertainment-zoom-level')) || 1.0;
+        const minZoom = 0.5; // 50%
+        const maxZoom = 2.0; // 200%
+        const zoomStep = 0.1; // 10% increments
+
+        // Apply saved zoom level on page load
+        document.documentElement.style.fontSize = `${currentZoom * 16}px`;
+
+        // Get zoom control buttons
+        const zoomInButton = document.getElementById('zoomIn');
+        const zoomOutButton = document.getElementById('zoomOut');
+
+        // Zoom in functionality
+        zoomInButton.addEventListener('click', () => {
+            if (currentZoom < maxZoom) {
+                currentZoom = Math.min(currentZoom + zoomStep, maxZoom);
+                applyZoom();
+            }
+        });
+
+        // Zoom out functionality
+        zoomOutButton.addEventListener('click', () => {
+            if (currentZoom > minZoom) {
+                currentZoom = Math.max(currentZoom - zoomStep, minZoom);
+                applyZoom();
+            }
+        });
+
+        // Apply zoom and save to localStorage
+        function applyZoom() {
+            document.documentElement.style.fontSize = `${currentZoom * 16}px`;
+            localStorage.setItem('entertainment-zoom-level', currentZoom.toFixed(1));
+            
+            // Update button states
+            zoomInButton.style.opacity = currentZoom >= maxZoom ? '0.5' : '1';
+            zoomOutButton.style.opacity = currentZoom <= minZoom ? '0.5' : '1';
+            zoomInButton.style.cursor = currentZoom >= maxZoom ? 'not-allowed' : 'pointer';
+            zoomOutButton.style.cursor = currentZoom <= minZoom ? 'not-allowed' : 'pointer';
+        }
+
+        // Initialize button states on page load
+        applyZoom();
+
+        // Optional: Reset zoom on double-click of either button
+        zoomInButton.addEventListener('dblclick', () => {
+            currentZoom = 1.0;
+            applyZoom();
+        });
+
+        zoomOutButton.addEventListener('dblclick', () => {
+            currentZoom = 1.0;
+            applyZoom();
+        });
+        // --- End of Zoom Functionality ---
+        
+    </script>
+</body>
+</html>

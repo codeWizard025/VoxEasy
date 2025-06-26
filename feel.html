@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoxEasy - Feel Good</title>
+    <style>
+        /* Import SF Pro Display font */
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+
+        /* Disable dragging for all elements */
+        * {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --bg-color: rgba(255, 255, 255, 0.18);
+            --text-color: #333333;
+            --item-bg: rgba(255, 255, 255, 0.15);
+            --item-border: rgba(255, 255, 255, 0.2);
+            --item-hover: rgba(255, 255, 255, 0.25);
+            --item-selected: rgba(51, 51, 51, 0.15);
+            --shadow-light: rgba(255, 255, 255, 0.5);
+            --shadow-dark: rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #cfeaff 0%, #f3f3f4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            background: var(--bg-color);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 20px;
+            padding: 45px;
+            box-shadow: 
+                0 8px 24px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+            max-width: 1400px;
+            width: 100%;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            max-height: 80vh;
+            height: auto;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--item-border);
+            animation: containerFadeIn 0.5s ease-out;
+        }
+
+        @keyframes containerFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 500;
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin: 10px 0 0;
+        }
+
+        .feel-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            padding: 25px;
+            margin-top: 25px;
+        }
+
+        .feel-item {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 4px 6px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+            min-height: 180px;
+        }
+
+        .feel-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 8px 16px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+            background: var(--item-hover);
+        }
+
+        .feel-item:active {
+            transform: translateY(-2px);
+        }
+
+        .feel-item .emoji {
+            font-size: 3.5em;
+            margin-bottom: 18px;
+        }
+
+        .feel-item .title {
+            font-size: 1.7em;
+            font-weight: 500;
+            color: var(--text-color);
+            margin: 0;
+        }
+
+        .feel-item .subtitle {
+            font-size: 1.1em;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-top: 12px;
+        }
+
+        .back-to-entertainment {
+            position: absolute;
+            top: 24px;
+            left: 32px;
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            color: var(--text-color);
+            padding: 10px 22px;
+            border-radius: 20px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 2px 6px var(--shadow-dark), inset 0 1px 1px var(--shadow-light);
+        }
+
+        .back-to-entertainment:hover {
+            background: var(--item-hover);
+            transform: translateY(-2px);
+        }
+
+        .back-to-entertainment:active {
+            transform: translateY(0);
+        }
+
+        /* Dark mode styles */
+        .dark-mode {
+            --bg-color: rgba(0, 0, 0, 0.18);
+            --text-color: #ffffff;
+            --item-bg: rgba(255, 255, 255, 0.1);
+            --item-border: rgba(255, 255, 255, 0.1);
+            --item-hover: rgba(255, 255, 255, 0.15);
+            --item-selected: rgba(255, 255, 255, 0.2);
+            --shadow-light: rgba(255, 255, 255, 0.1);
+            --shadow-dark: rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2e 100%);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .feel-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="back-to-entertainment" onclick="window.location.href='entertainment.html'" data-translate>← Back</button>
+        <div class="header">
+            <h1 data-translate>Feel Good</h1>
+            <p data-translate>Choose a category to uplift your mood</p>
+        </div>
+        <div class="feel-grid">
+            <div class="feel-item" onclick="handleFeelClick('meditation')">
+                <div class="emoji">🧘‍♀️</div>
+                <h2 class="title" data-translate>Meditation</h2>
+                <p class="subtitle" data-translate>Guided meditation and mindfulness</p>
+            </div>
+            <div class="feel-item" onclick="handleFeelClick('quotes')">
+                <div class="emoji">💭</div>
+                <h2 class="title" data-translate>Positive Quotes</h2>
+                <p class="subtitle" data-translate>Inspirational and uplifting quotes</p>
+            </div>
+            <div class="feel-item" onclick="handleFeelClick('animals')">
+                <div class="emoji">🐾</div>
+                <h2 class="title" data-translate>Animal Videos</h2>
+                <p class="subtitle" data-translate>Cute and heartwarming moments</p>
+            </div>
+            <div class="feel-item" onclick="handleFeelClick('humor')">
+                <div class="emoji">😊</div>
+                <h2 class="title" data-translate>Light Humor</h2>
+                <p class="subtitle" data-translate>Fun and gentle jokes</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check for dark mode
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+        }
+
+        function handleFeelClick(category) {
+            const timestamp = new Date().toISOString();
+            const logEntry = { 
+                action: `Feel Good Category Selected: "${category}"`, 
+                timestamp 
+            };
+            const log = JSON.parse(localStorage.getItem('ccpcsLog') || '[]');
+            log.push(logEntry);
+            localStorage.setItem('ccpcsLog', JSON.stringify(log));
+
+            // Add visual feedback
+            const item = event.currentTarget;
+            item.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                item.style.transform = '';
+            }, 200);
+
+            // Handle category navigation
+            switch(category) {
+                case 'meditation':
+                    window.location.href = 'meditation.html';
+                    break;
+                case 'quotes':
+                    window.location.href = 'quotes.html';
+                    break;
+                case 'animals':
+                    window.location.href = 'animals.html';
+                    break;
+                case 'humor':
+                    window.location.href = 'humor.html';
+                    break;
+            }
+        }
+
+        // Add batch translation logic
+        const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+        if (savedLang !== 'en') batchTranslateAllText(savedLang);
+
+        async function batchTranslateAllText(targetLang) {
+            // Gather all text nodes except inside iframes
+            const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            let node;
+            const textNodes = [];
+            while ((node = walker.nextNode())) {
+                if (node.parentNode && node.textContent.trim() && node.parentNode.offsetParent !== null && node.parentNode.tagName !== 'IFRAME') {
+                    textNodes.push(node);
+                }
+            }
+            // Gather all translatable attributes (not inside iframes)
+            const attrNodes = [];
+            const all = document.querySelectorAll(':not(iframe) [placeholder], :not(iframe) [alt], :not(iframe) [value], :not(iframe) [aria-label]');
+            for (const el of all) {
+                if (el.placeholder) attrNodes.push({el, attr: 'placeholder', value: el.placeholder});
+                if (el.alt) attrNodes.push({el, attr: 'alt', value: el.alt});
+                if (el.value && (el.tagName === 'BUTTON' || el.tagName === 'INPUT')) attrNodes.push({el, attr: 'value', value: el.value});
+                if (el.getAttribute('aria-label')) attrNodes.push({el, attr: 'aria-label', value: el.getAttribute('aria-label')});
+            }
+            // Prepare all strings for translation
+            const allStrings = [...textNodes.map(n => n.textContent), ...attrNodes.map(a => a.value)];
+            if (allStrings.length === 0) return;
+            const apiKey = 'AIzaSyC1RWlflkLkg10IB6zv4HNzzq1y5qJgoh0';
+            const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+            const response = await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify({ q: allStrings, target: targetLang }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+            const translations = data.data.translations.map(t => t.translatedText);
+            // Update text nodes
+            textNodes.forEach((n, i) => { n.textContent = translations[i]; });
+            // Update attributes
+            attrNodes.forEach((a, i) => { a.el[a.attr] = translations[textNodes.length + i]; });
+        }
+
+        // Listen for language changes
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'selectedLanguage' && e.newValue !== e.oldValue) {
+                batchTranslateAllText(e.newValue);
+            }
+        });
+    </script>
+</body>
+</html> 

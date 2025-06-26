@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoxEasy - Pain Diagram</title>
+    <style>
+        /* Disable dragging for all elements */
+        * {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+
+        :root {
+            /* Set base font size for rem calculations (1rem = 10px) */
+            font-size: 62.5%;
+            
+            /* Updated color variables for Vision Pro style */
+            --bg-color: rgba(255, 255, 255, 0.18);
+            --text-color: #333333;
+            --item-bg: rgba(255, 255, 255, 0.15);
+            --item-border: rgba(255, 255, 255, 0.2);
+            --item-hover: rgba(255, 255, 255, 0.25);
+            --item-selected: rgba(51, 51, 51, 0.15);
+            --shadow-light: rgba(255, 255, 255, 0.5);
+            --shadow-dark: rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 1.6rem; /* Default font size */
+            background: linear-gradient(135deg, #cfeaff 0%, #f3f3f4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 2rem;
+            box-sizing: border-box;
+            color: var(--text-color);
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            background: var(--bg-color);
+            backdrop-filter: blur(3rem);
+            -webkit-backdrop-filter: blur(3rem);
+            border-radius: 1.9rem;
+            padding: 2.1rem;
+            box-shadow: 
+                0 0.8rem 2.4rem var(--shadow-dark),
+                inset 0 0.1rem 0.1rem var(--shadow-light);
+            max-width: 160rem;
+            width: 100%;
+            position: relative;
+            padding-top: 3rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            max-height: 90vh;
+            height: 82rem;
+            border: 0.1rem solid var(--item-border);
+            animation: containerFadeIn 0.5s ease-out;
+        }
+
+        @keyframes containerFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Controls container styles */
+        .controls-container {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.6rem; /* 16px spacing between toggle and zoom controls */
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-input {
+            display: none;
+        }
+
+        .toggle-label {
+            display: inline-block;
+            width: 6rem; /* 60px */
+            height: 3.4rem; /* 34px */
+            background-color: var(--text-color);
+            border-radius: 3.4rem; /* 34px */
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-label:before {
+            content: '';
+            position: absolute;
+            width: 2.6rem; /* 26px */
+            height: 2.6rem; /* 26px */
+            border-radius: 50%;
+            top: 0.4rem; /* 4px */
+            left: 0.4rem; /* 4px */
+            background-color: var(--bg-color);
+            transition: 0.3s ease;
+        }
+
+        .toggle-input:checked + .toggle-label {
+            background-color: #ccc;
+        }
+
+        .toggle-input:checked + .toggle-label:before {
+            transform: translateX(2.6rem); /* 26px */
+            background-color: var(--text-color);
+        }
+
+        .zoom-controls {
+            display: flex;
+            gap: 0.8rem; /* 8px between zoom buttons */
+        }
+
+        .zoom-button {
+            width: 3.4rem; /* 34px - same height as toggle switch */
+            height: 3.4rem; /* 34px */
+            border: none;
+            border-radius: 50%;
+            background-color: var(--item-bg);
+            color: var(--text-color);
+            font-size: 2rem; /* 20px */
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(1rem);
+            -webkit-backdrop-filter: blur(1rem);
+            box-shadow: 
+                0 0.4rem 0.6rem var(--shadow-dark),
+                inset 0 0.1rem 0.1rem var(--shadow-light);
+            border: 0.1rem solid var(--item-border);
+        }
+
+        .zoom-button:hover {
+            background-color: var(--item-hover);
+            transform: translateY(-0.2rem); /* -2px */
+        }
+
+        .zoom-button:active {
+            transform: translateY(0);
+            background-color: var(--item-bg);
+        }
+
+        .dark-mode {
+            --bg-color: rgba(0, 0, 0, 0.18);
+            --text-color: #ffffff;
+            --item-bg: rgba(255, 255, 255, 0.1);
+            --item-border: rgba(255, 255, 255, 0.1);
+            --item-hover: rgba(255, 255, 255, 0.15);
+            --item-selected: rgba(255, 255, 255, 0.2);
+            --shadow-light: rgba(255, 255, 255, 0.1);
+            --shadow-dark: rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2e 100%);
+        }
+
+        .dark-mode .container {
+            box-shadow: 0 0.8rem 2.4rem var(--shadow-dark),
+                inset 0 0.1rem 0.1rem var(--shadow-light);
+        }
+
+        /* Navigation bar styles */
+        .navigation {
+            display: flex;
+            justify-content: center;
+            margin-top: 3rem;
+            padding-top: 2.1rem;
+            border-top: 0.1rem solid var(--item-border);
+            margin-bottom: 1rem;
+        }
+
+        .nav-item {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(3rem) saturate(180%);
+            -webkit-backdrop-filter: blur(3rem) saturate(180%);
+            padding: 1.3rem 2.8rem;
+            margin: 0 0.5rem;
+            text-decoration: none;
+            color: var(--text-color);
+            border-radius: 2.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 0.8rem 3.2rem rgba(0, 0, 0, 0.1),
+                inset 0 0 0 0.1rem rgba(255, 255, 255, 0.1),
+                inset 0 0 0 0.2rem rgba(255, 255, 255, 0.05);
+            border: 0.1rem solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.1),
+                rgba(255, 255, 255, 0.05)
+            );
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 1.2rem 4rem rgba(0, 0, 0, 0.15),
+                inset 0 0 0 0.1rem rgba(255, 255, 255, 0.15),
+                inset 0 0 0 0.2rem rgba(255, 255, 255, 0.1);
+            transform: translateY(-0.2rem);
+        }
+
+        .nav-item:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 0.4rem 1.6rem rgba(0, 0, 0, 0.1),
+                inset 0 0 0 0.1rem rgba(255, 255, 255, 0.1),
+                inset 0 0 0 0.2rem rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item[href="pain.html"] {
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 
+                0 1.6rem 4.8rem rgba(0, 0, 0, 0.2),
+                inset 0 0 0 0.1rem rgba(255, 255, 255, 0.2),
+                inset 0 0 0 0.2rem rgba(255, 255, 255, 0.1);
+            transform: translateY(-0.2rem);
+            border: 0.1rem solid rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-item[href="pain.html"]::before {
+            opacity: 1;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.15),
+                rgba(255, 255, 255, 0.08)
+            );
+        }
+
+        /* Pain diagram specific styles */
+        .diagram {
+            position: relative;
+            width: 70%;
+            min-width: 40rem;
+            max-width: 102.5rem;
+            height: 61.5rem;
+            margin-bottom: 1rem;
+            margin-left: 2.1rem;
+            margin-right: 0;
+            padding-top: 3rem;
+        }
+
+        .diagram img {
+            width: 100%;
+            height: auto;
+            border-radius: 1.2rem;
+            box-shadow: 0 0.4rem 0.8rem var(--shadow-dark);
+        }
+
+        .marker {
+            position: absolute;
+            width: 2rem;
+            height: 2rem;
+            background-color: transparent;
+            border: 0.3rem solid red;
+            border-radius: 50%;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0.2rem 0.4rem rgba(0, 0, 0, 0.2);
+        }
+
+        .marker::before {
+            content: '';
+            width: 0.6rem;
+            height: 0.6rem;
+            background-color: red;
+            border-radius: 50%;
+        }
+
+        .content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 0 1rem;
+            position: relative;
+        }
+
+        .right-panel {
+            width: 40%;
+            min-width: 34.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-left: 4.1rem;
+            gap: 7.2rem;
+            height: auto;
+        }
+
+        .mark-pain-btn {
+            width: 100%;
+            max-width: 45.5rem;
+            padding: 2.2rem 0;
+            margin-bottom: 0;
+            border-radius: 1.6rem;
+            background: var(--item-bg);
+            border: 0.1rem solid var(--item-border);
+            color: var(--text-color);
+            font-size: 1.4em;
+            cursor: pointer;
+            display: block;
+            box-shadow: 0 0.4rem 0.6rem var(--shadow-dark), inset 0 0.1rem 0.1rem var(--shadow-light);
+            transition: all 0.3s ease;
+            position: relative;
+            text-align: center;
+        }
+        .mark-pain-btn.marking {
+            background: #e74c3c !important;
+            color: #fff;
+            border: 0.1rem solid #e74c3c;
+        }
+        .mark-pain-btn:hover {
+            background: var(--item-hover);
+            box-shadow: 0 0.8rem 1.6rem var(--shadow-dark), inset 0 0.1rem 0.1rem var(--shadow-light);
+            transform: translateY(-0.2rem);
+        }
+        .mark-pain-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 0.4rem 1.6rem var(--shadow-dark), inset 0 0.1rem 0.1rem var(--shadow-light);
+            background: var(--item-bg);
+        }
+        .mark-pain-btn.done {
+            background: #27ae60 !important;
+            color: #fff;
+            border: 0.1rem solid #27ae60;
+        }
+
+        .choice-board {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.1rem;
+            margin-left: 0;
+            width: 100%;
+            position: static;
+            left: unset;
+            top: unset;
+            transform: none;
+            max-width: 45.5rem;
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        .choice-button {
+            background: var(--item-bg);
+            border: 0.1rem solid var(--item-border);
+            border-radius: 1.6rem;
+            padding: 2.2rem 0;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(1rem);
+            -webkit-backdrop-filter: blur(1rem);
+            box-shadow: 
+                0 0.4rem 0.6rem var(--shadow-dark),
+                inset 0 0.1rem 0.1rem var(--shadow-light);
+            position: relative;
+            color: var(--text-color);
+            font-size: 1.3em;
+        }
+
+        .choice-button.active {
+            transform: translateY(-0.2rem);
+            box-shadow: 
+                0 0.8rem 1.6rem var(--shadow-dark),
+                inset 0 0.1rem 0.1rem var(--shadow-light);
+            background: var(--item-hover);
+            border-color: var(--item-border);
+        }
+
+        .pain-scale {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 0;
+            color: var(--text-color);
+            width: 100%;
+            padding: 0;
+            position: static;
+            gap: 1.6rem;
+            max-width: 45.5rem;
+        }
+
+        .pain-scale > div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+
+        .pain-scale label {
+            margin-right: 1rem;
+        }
+
+        .pain-scale input {
+            margin: 0 1.2rem;
+            width: 36.5rem;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(to right, #ffcccc, #ff0000);
+            height: 2.2rem;
+            border-radius: 1.4rem;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 0.2rem 0.4rem var(--shadow-dark),
+                inset 0 0.1rem 0.1rem var(--shadow-light);
+        }
+
+        .pain-scale input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 3.9rem;
+            height: 3.9rem;
+            background: #ff0000;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 0.2rem 0.6rem rgba(0, 0, 0, 0.3);
+        }
+
+        .pain-scale input::-moz-range-thumb {
+            width: 3.9rem;
+            height: 3.9rem;
+            background: #ff0000;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 0.2rem 0.6rem rgba(0, 0, 0, 0.3);
+        }
+
+        .pain-slider {
+            position: static;
+            left: unset;
+            bottom: unset;
+            transform: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.1rem;
+            margin-top: 1.1rem;
+            width: 100%;
+            font-size: 1.3em;
+        }
+
+        .gender-selector {
+            position: static;
+            left: unset;
+            top: unset;
+            transform: none;
+            display: flex;
+            gap: 1rem;
+            margin: 0 0 1rem 0;
+            z-index: 10;
+        }
+
+        .gender-button {
+            background: var(--item-bg);
+            border: 0.1rem solid var(--item-border);
+            border-radius: 2rem;
+            padding: 1rem 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(1rem);
+            -webkit-backdrop-filter: blur(1rem);
+            box-shadow: 
+                0 0.4rem 0.6rem var(--shadow-dark),
+                inset 0 0.1rem 0.1rem var(--shadow-light);
+            color: var(--text-color);
+            font-size: 1.6rem;
+        }
+
+        .gender-button.active {
+            transform: translateY(-0.2rem);
+            box-shadow: 
+                0 0.8rem 1.6rem var(--shadow-dark),
+                inset 0 0.1rem 0.1rem var(--shadow-light);
+            background: var(--item-hover);
+            border-color: var(--item-border);
+        }
+
+        .clear-button {
+            position: static;
+            margin-left: 0;
+            margin-bottom: 1rem;
+        }
+
+        .nav-button, .clear-button {
+            background: var(--item-bg);
+            border: 0.1rem solid var(--item-border);
+            color: var(--text-color);
+            padding: 1rem 2rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(1rem);
+            -webkit-backdrop-filter: blur(1rem);
+            box-shadow: 
+                0 0.4rem 0.6rem var(--shadow-dark),
+                inset 0 0.1rem 0.1rem var(--shadow-light);
+        }
+
+        .dark-mode .nav-item {
+            background: rgba(0, 0, 0, 0.05);
+            box-shadow: 
+                0 0.8rem 3.2rem rgba(0, 0, 0, 0.2),
+                inset 0 0 0 0.1rem rgba(255, 255, 255, 0.05),
+                inset 0 0 0 0.2rem rgba(255, 255, 255, 0.02);
+        }
+
+        .dark-mode .nav-item:hover {
+            background: rgba(0, 0, 0, 0.08);
+            box-shadow: 
+                0 1.2rem 4rem rgba(0, 0, 0, 0.25),
+                inset 0 0 0 0.1rem rgba(255, 255, 255, 0.08),
+                inset 0 0 0 0.2rem rgba(255, 255, 255, 0.05);
+        }
+
+        .dark-mode .nav-item:active {
+            box-shadow: 
+                0 0.4rem 1.6rem rgba(0, 0, 0, 0.15),
+                inset 0 0 0 0.1rem rgba(255, 255, 255, 0.05),
+                inset 0 0 0 0.2rem rgba(255, 255, 255, 0.02);
+        }
+
+        .dark-mode .nav-item[href="pain.html"] {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 1.6rem 4.8rem rgba(0, 0, 0, 0.3),
+                inset 0 0 0 0.1rem rgba(255, 255, 255, 0.1),
+                inset 0 0 0 0.2rem rgba(255, 255, 255, 0.05);
+        }
+
+        .dark-mode .nav-item[href="pain.html"]::before {
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.1),
+                rgba(255, 255, 255, 0.05)
+            );
+        }
+
+        .top-right-container {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            font-size: 1.2em;
+            color: var(--text-color);
+            visibility: hidden;
+        }
+
+        .logout-container {
+            position: absolute;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .logout-button {
+            background-color: rgba(255, 59, 48, 0.7);
+            backdrop-filter: blur(1rem);
+            -webkit-backdrop-filter: blur(1rem);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 0.4rem 0.6rem var(--shadow-dark),
+                inset 0 0.1rem 0.1rem var(--shadow-light);
+        }
+
+        @media (max-width: 90rem) {
+            .content {
+                flex-direction: column;
+                align-items: center;
+            }
+            .diagram {
+                width: 100%;
+                min-width: 0;
+                max-width: 100%;
+                margin-left: 0;
+            }
+            .right-panel {
+                width: 100%;
+                min-width: 0;
+                max-width: 100%;
+                margin-left: 0;
+                height: auto;
+                margin-top: 3rem;
+            }
+            .mark-pain-btn, .choice-board, .pain-scale {
+                max-width: 100%;
+            }
+        }
+    </style>
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Logout button -->
+        
+
+        <!-- Add the toggle switch and zoom controls here -->
+        <div class="controls-container">
+            <div class="toggle-switch">
+                <input type="checkbox" id="switch" class="toggle-input" />
+                <label for="switch" class="toggle-label"></label>
+            </div>
+            <div class="zoom-controls">
+                <button class="zoom-button" id="zoomOut">-</button>
+                <button class="zoom-button" id="zoomIn">+</button>
+            </div>
+        </div>
+
+        <!-- Patient's name displayed in the top right -->
+        <div class="top-right-container">
+            <span id="patient-name"></span>
+        </div>
+
+        <br>
+        <br>
+
+        <!-- Pain diagram content and choice board -->
+        <div class="content">
+            <div class="diagram" id="diagram" style="position: relative;">
+                <model-viewer 
+                    src="VoxEasyPainDiagram.glb"
+                    alt="3D Human Body"
+                    camera-controls
+                    touch-action="pan-y"
+                    style="width: 100%; height: 100%; background: transparent; border-radius: 12px; box-shadow: 0 4px 8px var(--shadow-dark);"
+                    exposure="1"
+                    shadow-intensity="1"
+                ></model-viewer>
+                <canvas id="painOverlay" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:10;"></canvas>
+            </div>
+            <div class="right-panel">
+                <button id="markPainBtn" class="mark-pain-btn">Mark Pain Areas</button>
+                <div class="choice-board">
+                    <div class="choice-button" data-translate>Mild</div>
+                    <div class="choice-button" data-translate>Moderate</div>
+                    <div class="choice-button" data-translate>Severe</div>
+                    <div class="choice-button" data-translate>Throbbing</div>
+                    <div class="choice-button" data-translate>Sharp</div>
+                    <div class="choice-button" data-translate>Burning</div>
+                    <div class="choice-button" data-translate>Stabbing</div>
+                    <div class="choice-button" data-translate>Aching</div>
+                </div>
+                <div class="pain-scale">
+                    <div class="pain-slider">
+                        <label for="painLevel" data-translate></label>
+                        <input type="range" id="painLevel" min="1" max="10" value="1">
+                        <span id="painValue">1</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation bar -->
+        <nav class="navigation">
+            <a href="pic.html" class="nav-item" data-translate>Picture Board</a>   
+            <a href="prompts.html" class="nav-item" data-translate>Prompts</a>         
+            <a href="pain.html" class="nav-item" data-translate>Pain</a>
+            <a href="keyboard.html" class="nav-item" data-translate>Keyboard</a>
+            <a href="voxai.html" class="nav-item" data-translate>VoxAI</a>
+            <a href="entertainment.html" class="nav-item" data-translate>Entertainment</a>
+            <a href="documents.html" class="nav-item" data-translate>Documents</a>
+            <a href="mood.html" class="nav-item" data-translate>Mood</a>
+        </nav>
+    </div>
+
+    <script>
+        // JavaScript code for pain diagram
+        const diagram = document.getElementById('diagram');
+        const painLevel = document.getElementById('painLevel');
+        const painValue = document.getElementById('painValue');
+        let isDrawingMode = false; // for 2D marker logic
+        let isOverlayDrawingMode = false; // for overlay drawing
+        let isOverlayDrawing = false;
+        let lastX = 0, lastY = 0;
+
+        // Localize number according to selected language
+        function localizeNumber(num) {
+            const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+            return Number(num).toLocaleString(savedLang);
+        }
+
+        function createMarker(x, y) {
+            const marker = document.createElement('div');
+            marker.classList.add('marker');
+            marker.style.left = `${x}px`;
+            marker.style.top = `${y}px`;
+            marker.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent triggering other click events
+                marker.remove(); // Remove marker when clicked
+            });
+            diagram.appendChild(marker);
+        }
+
+        function isWithinImage(x, y) {
+            const img = document.getElementById('bodyImage');
+            const rect = img.getBoundingClientRect();
+            const diagramRect = diagram.getBoundingClientRect();
+            
+            // Convert coordinates to be relative to the image
+            const relativeX = x - (rect.left - diagramRect.left);
+            const relativeY = y - (rect.top - diagramRect.top);
+            
+            // Check if the coordinates are within the image boundaries
+            return relativeX >= 0 && relativeX <= rect.width &&
+                   relativeY >= 0 && relativeY <= rect.height;
+        }
+
+        diagram.addEventListener('mousedown', (event) => {
+            isDrawingMode = true;
+            const rect = diagram.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            if (isWithinImage(x, y)) {
+                createMarker(x, y);
+            }
+        });
+
+        diagram.addEventListener('mousemove', (event) => {
+            if (isDrawingMode) {
+                const rect = diagram.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+                
+                if (isWithinImage(x, y)) {
+                    createMarker(x, y);
+                }
+            }
+        });
+
+        diagram.addEventListener('mouseup', () => {
+            isDrawingMode = false;
+        });
+
+        diagram.addEventListener('mouseleave', () => {
+            isDrawingMode = false;
+        });
+
+        // Touch events for mobile
+        diagram.addEventListener('touchstart', (event) => {
+            isDrawingMode = true;
+            const rect = diagram.getBoundingClientRect();
+            const x = event.touches[0].clientX - rect.left;
+            const y = event.touches[0].clientY - rect.top;
+            
+            if (isWithinImage(x, y)) {
+                createMarker(x, y);
+            }
+        });
+
+        diagram.addEventListener('touchmove', (event) => {
+            if (isDrawingMode) {
+                const rect = diagram.getBoundingClientRect();
+                const x = event.touches[0].clientX - rect.left;
+                const y = event.touches[0].clientY - rect.top;
+                
+                if (isWithinImage(x, y)) {
+                    createMarker(x, y);
+                }
+            }
+        });
+
+        diagram.addEventListener('touchend', () => {
+            isDrawingMode = false;
+        });
+
+        painLevel.addEventListener('input', () => {
+            painValue.textContent = localizeNumber(painLevel.value);
+        });
+
+        // JavaScript code for toggle switch (dark mode)
+        const toggleSwitch = document.getElementById('switch');
+        const body = document.body;
+
+        // Check the initial state from local storage
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            toggleSwitch.checked = true;
+            updateIconColors('white');
+        } else {
+            updateIconColors('black');
+        }
+
+        toggleSwitch.addEventListener('change', function() {
+            if (this.checked) {
+                console.log('Switch is ON - Dark Mode');
+                body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'enabled');
+                updateIconColors('white');
+            } else {
+                console.log('Switch is OFF - Light Mode');
+                body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'disabled');
+                updateIconColors('black');
+            }
+        });
+
+        function updateIconColors(color) {
+            // This function is not needed for pain.html as it doesn't use icon SVGs
+            // But keeping it for consistency with index.html
+        }
+
+        // Add event listeners to choice buttons
+        const choiceButtons = document.querySelectorAll('.choice-button');
+
+        choiceButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                choiceButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to the clicked button
+                button.classList.add('active');
+            });
+        });
+
+        // Retrieve the current patient's name from local storage
+        const currentPatient = JSON.parse(localStorage.getItem('currentPatient'));
+
+        if (currentPatient) {
+            const patientNameElement = document.getElementById('patient-name');
+            patientNameElement.textContent = `${currentPatient.firstName} ${currentPatient.lastName}`;
+        }
+
+        // Align gender selector with body image
+        function alignGenderSelector() {
+            const bodyImage = document.getElementById('bodyImage');
+            const genderSelector = document.querySelector('.gender-selector');
+            const diagramRect = document.querySelector('.diagram').getBoundingClientRect();
+            
+            // Position the gender selector at the same left position as the diagram
+            genderSelector.style.left = `${diagramRect.left - genderSelector.parentElement.getBoundingClientRect().left}px`;
+        }
+
+        // Call the alignment function after the page loads
+        window.addEventListener('load', alignGenderSelector);
+        // Also call it when the window is resized
+        window.addEventListener('resize', alignGenderSelector);
+
+        // Batch translation logic for all visible text, placeholders, alt, button values, and aria-labels
+        const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+        if (savedLang !== 'en') batchTranslateAllText(savedLang);
+        async function batchTranslateAllText(targetLang) {
+          // Gather all text nodes
+          const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+          let node;
+          const textNodes = [];
+          while ((node = walker.nextNode())) {
+            if (node.parentNode && node.textContent.trim() && node.parentNode.offsetParent !== null) {
+              textNodes.push(node);
+            }
+          }
+          // Gather all translatable attributes
+          const attrNodes = [];
+          const all = document.querySelectorAll('[placeholder], [alt], [value], [aria-label]');
+          for (const el of all) {
+            if (el.placeholder) attrNodes.push({el, attr: 'placeholder', value: el.placeholder});
+            if (el.alt) attrNodes.push({el, attr: 'alt', value: el.alt});
+            if (el.value && (el.tagName === 'BUTTON' || el.tagName === 'INPUT')) attrNodes.push({el, attr: 'value', value: el.value});
+            if (el.getAttribute('aria-label')) attrNodes.push({el, attr: 'aria-label', value: el.getAttribute('aria-label')});
+          }
+          // Prepare all strings for translation
+          const allStrings = [...textNodes.map(n => n.textContent), ...attrNodes.map(a => a.value)];
+          if (allStrings.length === 0) return;
+          const apiKey = 'AIzaSyC1RWlflkLkg10IB6zv4HNzzq1y5qJgoh0';
+          const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+          const response = await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify({ q: allStrings, target: targetLang }),
+            headers: { 'Content-Type': 'application/json' }
+          });
+          const data = await response.json();
+          const translations = data.data.translations.map(t => t.translatedText);
+          // Update text nodes
+          textNodes.forEach((n, i) => { n.textContent = translations[i]; });
+          // Update attributes
+          attrNodes.forEach((a, i) => { a.el[a.attr] = translations[textNodes.length + i]; });
+        }
+
+        // --- Mark Pain Areas Overlay Logic ---
+        const markPainBtn = document.getElementById('markPainBtn');
+        const painOverlay = document.getElementById('painOverlay');
+        const diagramDiv = document.getElementById('diagram');
+
+        function resizeOverlayCanvas() {
+            const rect = diagramDiv.getBoundingClientRect();
+            painOverlay.width = rect.width;
+            painOverlay.height = rect.height;
+            painOverlay.style.width = rect.width + 'px';
+            painOverlay.style.height = rect.height + 'px';
+        }
+
+        function createOverlayMarker(x, y) {
+            const marker = document.createElement('div');
+            marker.classList.add('marker', 'overlay-marker');
+            marker.style.left = `${x}px`;
+            marker.style.top = `${y}px`;
+            marker.style.pointerEvents = 'auto';
+            marker.addEventListener('click', (event) => {
+                event.stopPropagation();
+                marker.remove();
+            });
+            // Place marker in diagramDiv so it overlays the 3D model
+            diagramDiv.appendChild(marker);
+        }
+
+        function removeAllOverlayMarkers() {
+            const overlayMarkers = document.querySelectorAll('.overlay-marker');
+            overlayMarkers.forEach(marker => marker.remove());
+        }
+
+        markPainBtn.addEventListener('click', () => {
+            isOverlayDrawingMode = !isOverlayDrawingMode;
+            if (isOverlayDrawingMode) {
+                resizeOverlayCanvas();
+                painOverlay.style.display = 'block';
+                painOverlay.style.pointerEvents = 'auto';
+                markPainBtn.textContent = 'Done Marking';
+                markPainBtn.classList.remove('marking');
+                markPainBtn.classList.add('done');
+            } else {
+                // Remove all overlay markers and hide overlay in one click
+                removeAllOverlayMarkers();
+                painOverlay.style.display = 'none';
+                painOverlay.style.pointerEvents = 'none';
+                markPainBtn.textContent = 'Mark Pain Areas';
+                markPainBtn.classList.remove('done');
+                markPainBtn.classList.add('marking');
+            }
+            // Translate the button if needed
+            const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+            if (savedLang !== 'en') batchTranslateAllText(savedLang);
+        });
+
+        // Place marker on click/tap
+        painOverlay.addEventListener('mousedown', (e) => {
+            if (!isOverlayDrawingMode) return;
+            const rect = painOverlay.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            createOverlayMarker(x, y);
+        });
+        // Touch events for mobile
+        painOverlay.addEventListener('touchstart', (e) => {
+            if (!isOverlayDrawingMode) return;
+            const rect = painOverlay.getBoundingClientRect();
+            const touch = e.touches[0];
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+            createOverlayMarker(x, y);
+        });
+        // Remove old drawing logic for lines on overlay
+
+        // Set initial state for Mark Pain Areas button
+        document.addEventListener('DOMContentLoaded', () => {
+            markPainBtn.classList.add('marking');
+        });
+
+        // Zoom functionality for pain.html only
+        let currentZoom = parseFloat(localStorage.getItem('pain-zoom-level')) || 1.0;
+        const minZoom = 0.5; // 50%
+        const maxZoom = 2.0; // 200%
+        const zoomStep = 0.1; // 10% increments
+
+        // Apply saved zoom level on page load
+        document.documentElement.style.fontSize = `${currentZoom * 62.5}%`;
+
+        // Get zoom control buttons
+        const zoomInButton = document.getElementById('zoomIn');
+        const zoomOutButton = document.getElementById('zoomOut');
+
+        // Zoom in functionality
+        zoomInButton.addEventListener('click', () => {
+            if (currentZoom < maxZoom) {
+                currentZoom = Math.min(currentZoom + zoomStep, maxZoom);
+                applyZoom();
+            }
+        });
+
+        // Zoom out functionality
+        zoomOutButton.addEventListener('click', () => {
+            if (currentZoom > minZoom) {
+                currentZoom = Math.max(currentZoom - zoomStep, minZoom);
+                applyZoom();
+            }
+        });
+
+        // Apply zoom and save to localStorage
+        function applyZoom() {
+            document.documentElement.style.fontSize = `${currentZoom * 62.5}%`;
+            localStorage.setItem('pain-zoom-level', currentZoom.toFixed(1));
+            
+            // Update button states
+            zoomInButton.style.opacity = currentZoom >= maxZoom ? '0.5' : '1';
+            zoomOutButton.style.opacity = currentZoom <= minZoom ? '0.5' : '1';
+            zoomInButton.style.cursor = currentZoom >= maxZoom ? 'not-allowed' : 'pointer';
+            zoomOutButton.style.cursor = currentZoom <= minZoom ? 'not-allowed' : 'pointer';
+        }
+
+        // Initialize button states on page load
+        applyZoom();
+
+        // Optional: Reset zoom on double-click of either button
+        zoomInButton.addEventListener('dblclick', () => {
+            currentZoom = 1.0;
+            applyZoom();
+        });
+
+        zoomOutButton.addEventListener('dblclick', () => {
+            currentZoom = 1.0;
+            applyZoom();
+        });
+    </script>
+</body>
+</html>

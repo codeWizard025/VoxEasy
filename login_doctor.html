@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Meta tags and title -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoxEasy - Staff Login</title>
+
+    <!-- CSS Styles -->
+    <style>
+        /* Disable dragging for all elements */
+        * {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+
+        :root {
+            font-size: 16px; /* Base font size for rem calculations */
+            
+            /* Updated color variables for Vision Pro style */
+            --bg-color: rgba(255, 255, 255, 0.18);
+            --text-color: #333333;
+            --item-bg: rgba(255, 255, 255, 0.15);
+            --item-border: rgba(255, 255, 255, 0.2);
+            --item-hover: rgba(255, 255, 255, 0.25);
+            --item-selected: rgba(51, 51, 51, 0.15);
+            --shadow-light: rgba(255, 255, 255, 0.5);
+            --shadow-dark: rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #cfeaff 0%, #f3f3f4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 1.25rem; /* 20px */
+            box-sizing: border-box;
+            color: var(--text-color);
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            background: var(--bg-color);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 1.5rem; /* 24px */
+            padding: 2.5rem; /* 40px */
+            box-shadow: 
+                0 0.5rem 1.5rem var(--shadow-dark), /* 8px 24px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px 1px */
+            max-width: 50rem; /* 800px */
+            width: 100%;
+            position: relative;
+            padding-top: 4.375rem; /* 70px */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            max-height: 112.5rem; /* 1800px */
+            height: 100%;
+            border: 1px solid var(--item-border);
+            animation: containerFadeIn 0.5s ease-out;
+        }
+
+        @keyframes containerFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 1.875rem; /* 30px */
+            font-weight: 500;
+            font-size: 2.5rem; /* Changed from em to rem */
+            color: var(--text-color);
+        }
+
+        .controls-container {
+            position: absolute;
+            top: 1.875rem; /* 30px */
+            left: 1.875rem; /* 30px */
+            display: flex;
+            align-items: center;
+            gap: 1rem; /* 16px spacing between controls */
+            z-index: 2;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-input {
+            display: none;
+        }
+
+        .toggle-label {
+            display: inline-block;
+            width: 4.375rem; /* 70px */
+            height: 2.5rem; /* 40px */
+            background-color: var(--text-color);
+            border-radius: 2.5rem; /* 40px */
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-label:before {
+            content: '';
+            position: absolute;
+            width: 2rem; /* 32px */
+            height: 2rem; /* 32px */
+            border-radius: 50%;
+            top: 0.25rem; /* 4px */
+            left: 0.25rem; /* 4px */
+            background-color: var(--bg-color);
+            transition: 0.3s ease;
+        }
+
+        .toggle-input:checked+.toggle-label {
+            background-color: #ccc;
+        }
+
+        .toggle-input:checked+.toggle-label:before {
+            transform: translateX(1.875rem); /* 30px */
+            background-color: var(--text-color);
+        }
+
+        .zoom-controls {
+            display: flex;
+            gap: 0.5rem; /* 8px between zoom buttons */
+        }
+
+        .zoom-button {
+            width: 2.5rem; /* 40px - same height as toggle switch */
+            height: 2.5rem; /* 40px */
+            border: none;
+            border-radius: 50%;
+            background-color: var(--item-bg);
+            color: var(--text-color);
+            font-size: 1.5rem; /* 24px */
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0.25rem 0.375rem var(--shadow-dark),
+                inset 0 0.0625rem 0.0625rem var(--shadow-light);
+            border: 1px solid var(--item-border);
+        }
+
+        .zoom-button:hover {
+            background-color: var(--item-hover);
+            transform: translateY(-0.125rem); /* -2px */
+        }
+
+        .zoom-button:active {
+            transform: translateY(0);
+            background-color: var(--item-bg);
+        }
+
+        .zoom-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: var(--item-bg);
+            transform: none;
+        }
+
+        .zoom-button:disabled:hover {
+            background-color: var(--item-bg);
+            transform: none;
+        }
+
+        .dark-mode {
+            --bg-color: rgba(0, 0, 0, 0.18);
+            --text-color: #ffffff;
+            --item-bg: rgba(255, 255, 255, 0.1);
+            --item-border: rgba(255, 255, 255, 0.1);
+            --item-hover: rgba(255, 255, 255, 0.15);
+            --item-selected: rgba(255, 255, 255, 0.2);
+            --shadow-light: rgba(255, 255, 255, 0.1);
+            --shadow-dark: rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2e 100%);
+        }
+
+        .dark-mode .container {
+            box-shadow: 
+                0 8px 32px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+
+
+        /* Form Styles */
+        .doctor-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem; /* 20px */
+            margin-top: 1.875rem; /* 30px */
+        }
+
+        .doctor-form .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .doctor-form label {
+            font-weight: 500;
+            margin-bottom: 0.625rem; /* 10px */
+            color: var(--text-color);
+            font-size: 1.2rem; /* Changed from em to rem */
+        }
+
+        .doctor-form input {
+            padding: 0.875rem; /* 14px */
+            border: 1px solid var(--item-border);
+            border-radius: 0.875rem; /* 14px */
+            background-color: var(--item-bg);
+            color: var(--text-color);
+            font-size: 1.1rem; /* Changed from em to rem */
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0.25rem 0.375rem var(--shadow-dark), /* 4px 6px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px 1px */
+        }
+
+        .doctor-form input:focus {
+            outline: none;
+            border-color: var(--text-color);
+            transform: translateY(-0.125rem); /* -2px */
+            box-shadow: 
+                0 0.5rem 1rem var(--shadow-dark), /* 8px 16px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px 1px */
+        }
+
+        .doctor-form button {
+            padding: 1rem; /* 16px */
+            background: rgba(51, 51, 51, 0.8);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            color: white;
+            border: none;
+            border-radius: 1.125rem; /* 18px */
+            font-size: 1.3rem; /* Changed from em to rem */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.9375rem; /* 15px */
+            box-shadow: 
+                0 0.5rem 2rem rgba(0, 0, 0, 0.1), /* 8px 32px */
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .doctor-form button:hover {
+            background: rgba(51, 51, 51, 0.9);
+            box-shadow: 
+                0 0.75rem 2.5rem rgba(0, 0, 0, 0.15), /* 12px 40px */
+                inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+            transform: translateY(-0.125rem); /* -2px */
+        }
+        
+        .doctor-form button:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 0.25rem 1rem rgba(0, 0, 0, 0.1), /* 4px 16px */
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+        }
+
+        .dark-mode input[type="date"] {
+            color-scheme: dark;
+        }
+
+        .doctor-info {
+            position: absolute;
+            top: 1.25rem; /* 20px */
+            right: 1.25rem; /* 20px */
+            text-align: right;
+            background-color: var(--item-bg);
+            padding: 0.9375rem; /* 15px */
+            border-radius: 0.75rem; /* 12px */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0.25rem 0.75rem var(--shadow-dark), /* 4px 12px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px 1px */
+        }
+
+        .home-button {
+            position: absolute;
+            top: 1.875rem; /* 30px */
+            right: 1.875rem; /* 30px */
+            padding: 0.75rem 1.5rem; /* 12px 24px */
+            text-decoration: none;
+            color: var(--text-color);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border-radius: 1.5rem; /* 24px */
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 0.5rem 2rem rgba(0, 0, 0, 0.1), /* 8px 32px */
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1; /* Ensure it appears above other elements */
+            font-size: 1.2rem; /* Changed from em to rem */
+        }
+
+        .home-button:hover {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 0.75rem 2.5rem rgba(0, 0, 0, 0.15), /* 12px 40px */
+                inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+            transform: translateY(-0.125rem); /* -2px */
+        }
+        
+        .home-button:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 0.25rem 1rem rgba(0, 0, 0, 0.1), /* 4px 16px */
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="index.html" class="home-button nav-item" data-translate>Home</a>
+        
+        <!-- Controls container with toggle and zoom controls -->
+        <div class="controls-container">
+            <div class="toggle-switch">
+                <input type="checkbox" id="switch" class="toggle-input" />
+                <label for="switch" class="toggle-label"></label>
+            </div>
+            <div class="zoom-controls">
+                <button class="zoom-button" id="zoomOut">-</button>
+                <button class="zoom-button" id="zoomIn">+</button>
+            </div>
+        </div>
+
+
+
+        <!-- Title -->
+        <h1 data-translate>Medical Staff Login</h1>
+
+        <!-- Form -->
+        <form action="#" method="post" class="doctor-form">
+            <div class="form-group">
+                <label for="first-name" data-translate>First Name</label>
+                <input type="text" id="first-name" name="first-name" required />
+            </div>
+            <div class="form-group">
+                <label for="last-name" data-translate>Last Name</label>
+                <input type="text" id="last-name" name="last-name" required />
+            </div>
+            <div class="form-group">
+                <label for="medical-id" data-translate>Medical ID</label>
+                <input type="text" id="medical-id" name="medical-id" required />
+            </div>
+            <!-- Patient information fields -->
+            <div class="form-group">
+                <label for="patient-full-name" data-translate>Patient Full Name</label>
+                <input type="text" id="patient-full-name" name="patient-full-name" required />
+            </div>
+            <div class="form-group">
+                <label for="patient-birth-date" data-translate>Patient Birth Date</label>
+                <input type="date" id="patient-birth-date" name="patient-birth-date" required />
+            </div>
+            <button type="submit" data-translate>Submit</button>
+        </form>
+    </div>
+
+    <script>
+        const toggleSwitch = document.getElementById('switch');
+        const body = document.body;
+
+        // Check the initial state from local storage
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            toggleSwitch.checked = true;
+        }
+
+        toggleSwitch.addEventListener('change', function () {
+            if (this.checked) {
+                console.log('Switch is ON - Dark Mode');
+                body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                console.log('Switch is OFF - Light Mode');
+                body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        });
+
+        // Initialize translation based on saved language
+        const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+        if (savedLang !== 'en') translatePage(savedLang);
+
+        // Translation functions
+        async function translateText(text, targetLang) {
+            if (!text.trim()) return text;
+            const apiKey = 'AIzaSyC1RWlflkLkg10IB6zv4HNzzq1y5qJgoh0';
+            const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify({ q: text, target: targetLang }),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                return data.data.translations[0].translatedText;
+            } catch (error) {
+                console.error('Translation error:', error);
+                return text; // Return original text if translation fails
+            }
+        }
+
+        async function translatePage(targetLang) {
+            if (targetLang === 'en') {
+                // Reset to original English text
+                const elements = document.querySelectorAll('[data-translate]');
+                for (const el of elements) {
+                    const original = el.getAttribute('data-original');
+                    if (original) {
+                        el.textContent = original;
+                    }
+                }
+                return;
+            }
+
+            const elements = document.querySelectorAll('[data-translate]');
+            for (const el of elements) {
+                const original = el.getAttribute('data-original') || el.textContent;
+                el.setAttribute('data-original', original);
+                el.textContent = await translateText(original, targetLang);
+            }
+        }
+
+        // Listen for language changes from other pages
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'selectedLanguage' && e.newValue !== e.oldValue) {
+                translatePage(e.newValue || 'en');
+            }
+        });
+
+        console.log('Doctor registration page script loaded');
+
+        // Zoom functionality
+        let currentZoom = parseInt(localStorage.getItem('login-doctor-zoom-level')) || 100;
+        const zoomInBtn = document.getElementById('zoomIn');
+        const zoomOutBtn = document.getElementById('zoomOut');
+
+        function updateZoom() {
+            document.documentElement.style.fontSize = (16 * currentZoom / 100) + 'px';
+            localStorage.setItem('login-doctor-zoom-level', currentZoom);
+            
+            // Update button states
+            zoomInBtn.disabled = currentZoom >= 200;
+            zoomOutBtn.disabled = currentZoom <= 50;
+        }
+
+        function zoomIn() {
+            if (currentZoom < 200) {
+                currentZoom += 10;
+                updateZoom();
+            }
+        }
+
+        function zoomOut() {
+            if (currentZoom > 50) {
+                currentZoom -= 10;
+                updateZoom();
+            }
+        }
+
+        function resetZoom() {
+            currentZoom = 100;
+            updateZoom();
+        }
+
+        // Initialize zoom
+        updateZoom();
+
+        // Event listeners
+        zoomInBtn.addEventListener('click', zoomIn);
+        zoomOutBtn.addEventListener('click', zoomOut);
+
+        // Double-click to reset zoom
+        zoomInBtn.addEventListener('dblclick', resetZoom);
+        zoomOutBtn.addEventListener('dblclick', resetZoom);
+
+        const form = document.querySelector('.doctor-form');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission behavior
+
+            const firstName = document.getElementById('first-name').value;
+            const lastName = document.getElementById('last-name').value;
+            const medicalId = document.getElementById('medical-id').value;
+            const patientFullName = document.getElementById('patient-full-name').value;
+            const patientBirthDate = document.getElementById('patient-birth-date').value;
+
+            const doctorInfo = {
+                firstName,
+                lastName,
+                medicalId,
+                patients: [
+                    {
+                        fullName: patientFullName,
+                        birthDate: patientBirthDate
+                    }
+                ]
+            };
+
+            // Retrieve existing doctors from local storage or initialize an empty array
+            const doctors = JSON.parse(localStorage.getItem('doctors')) || [];
+            doctors.push(doctorInfo);
+
+            // Save updated doctors list to local storage
+            localStorage.setItem('doctors', JSON.stringify(doctors));
+
+            // Store timestamp of doctor login
+            localStorage.setItem('lastDoctorLogin', new Date().toISOString());
+
+            // Redirect to admin.html after storing doctor information
+            window.location.href = 'admin.html';
+        });
+    </script>
+</body>
+
+</html>
