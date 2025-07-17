@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoxEasy - Animal Videos</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+
+        * {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --bg-color: rgba(240, 248, 240, 0.18);
+            --text-color: #2c4a3e;
+            --item-bg: rgba(255, 255, 255, 0.15);
+            --item-border: rgba(255, 255, 255, 0.2);
+            --item-hover: rgba(255, 255, 255, 0.25);
+            --item-selected: rgba(44, 74, 62, 0.15);
+            --shadow-light: rgba(255, 255, 255, 0.5);
+            --shadow-dark: rgba(0, 0, 0, 0.1);
+            --accent-color: #4a7c59;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            background: var(--bg-color);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 20px;
+            padding: 45px;
+            box-shadow: 
+                0 8px 24px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+            max-width: 1400px;
+            width: 100%;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            max-height: 80vh;
+            height: auto;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--item-border);
+            animation: containerFadeIn 0.5s ease-out;
+        }
+
+        @keyframes containerFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 500;
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin: 10px 0 0;
+        }
+
+        .back-to-feel {
+            position: absolute;
+            top: 24px;
+            left: 32px;
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            color: var(--text-color);
+            padding: 10px 22px;
+            border-radius: 20px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 2px 6px var(--shadow-dark), inset 0 1px 1px var(--shadow-light);
+        }
+
+        .back-to-feel:hover {
+            background: var(--item-hover);
+            transform: translateY(-2px);
+        }
+
+        .back-to-feel:active {
+            transform: translateY(0);
+        }
+
+        .slider-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            overflow: hidden;
+            border-radius: 16px;
+            background: var(--item-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .slider {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            height: 100%;
+        }
+
+        .slide {
+            min-width: 100%;
+            padding: 30px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .slide-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .slide h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        .slide p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: var(--text-color);
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .slide-button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .slide-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .slider-nav {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--item-bg);
+            border: 2px solid var(--accent-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot.active {
+            background: var(--accent-color);
+            transform: scale(1.2);
+        }
+
+        .slider-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            color: var(--text-color);
+            font-size: 2em;
+            box-shadow: 0 2px 8px var(--shadow-dark);
+        }
+
+        .slider-arrow:hover {
+            background: var(--item-hover);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .slider-arrow.prev {
+            left: 20px;
+        }
+
+        .slider-arrow.next {
+            right: 20px;
+        }
+
+        /* Dark mode styles */
+        .dark-mode {
+            --bg-color: rgba(44, 74, 62, 0.18);
+            --text-color: #e8f5e9;
+            --item-bg: rgba(255, 255, 255, 0.1);
+            --item-border: rgba(255, 255, 255, 0.1);
+            --item-hover: rgba(255, 255, 255, 0.15);
+            --item-selected: rgba(255, 255, 255, 0.2);
+            --shadow-light: rgba(255, 255, 255, 0.1);
+            --shadow-dark: rgba(0, 0, 0, 0.3);
+            --accent-color: #81c784;
+            background: linear-gradient(135deg, #1b3c2e 0%, #2c4a3e 100%);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .slider-container {
+                height: 350px;
+            }
+
+            .slider-arrow {
+                width: 35px;
+                height: 35px;
+            }
+        }
+
+        /* Video modal styles */
+        .video-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .video-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            padding: 30px;
+            max-width: 1200px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .video-item {
+            background: var(--item-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px var(--shadow-dark);
+            transition: transform 0.3s ease;
+            aspect-ratio: 16/9;
+        }
+
+        .video-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .video-item iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            color: var(--text-color);
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 2.2em;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .close-modal:hover {
+            background: var(--item-hover);
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .video-grid {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="back-to-feel" onclick="window.location.href='feel.html'" data-translate>← Back</button>
+        <div class="header">
+            <h1 data-translate>Animal Videos</h1>
+            <p data-translate>Enjoy heartwarming moments with our furry friends</p>
+        </div>
+        
+        <div class="slider-container">
+            <div class="slider">
+                <div class="slide">
+                    <div class="slide-content">
+                        <h2 data-translate>Cute Puppies & Dogs</h2>
+                        <p data-translate>Watch adorable puppies playing and dogs being their lovable selves. These videos are sure to brighten your day!</p>
+                        <button class="slide-button" data-translate>Watch Puppies & Dogs</button>
+                    </div>
+                </div>
+                <div class="slide">
+                    <div class="slide-content">
+                        <h2 data-translate>Adorable Kittens & Cats</h2>
+                        <p data-translate>Enjoy the playful antics and cute moments of kittens and cats. Their charm and personality will melt your heart.</p>
+                        <button class="slide-button" data-translate>Watch Kittens & Cats</button>
+                    </div>
+                </div>
+                <div class="slide">
+                    <div class="slide-content">
+                        <h2 data-translate>Wildlife Wonders</h2>
+                        <p data-translate>Experience the beauty of nature through amazing wildlife videos. From baby animals to majestic creatures in their natural habitat.</p>
+                        <button class="slide-button" data-translate>Watch Wildlife</button>
+                    </div>
+                </div>
+            </div>
+            <button class="slider-arrow prev" onclick="prevSlide()">←</button>
+            <button class="slider-arrow next" onclick="nextSlide()">→</button>
+            <div class="slider-nav">
+                <div class="nav-dot active" onclick="goToSlide(0)"></div>
+                <div class="nav-dot" onclick="goToSlide(1)"></div>
+                <div class="nav-dot" onclick="goToSlide(2)"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video modals for each category -->
+    <div class="video-modal" id="puppiesModal">
+        <button class="close-modal" onclick="closeVideoModal('puppiesModal')">×</button>
+        <div class="video-grid">
+            <div class="video-item">
+                <iframe src="https://www.youtube.com/embed/iucW5evsuLE" 
+                    title="Puppy Playtime" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+            <div class="video-item">
+                <iframe src="https://www.youtube.com/embed/TlQtd9ygxs4" 
+                    title="Puppy Training" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+    </div>
+
+    <div class="video-modal" id="kittensModal">
+        <button class="close-modal" onclick="closeVideoModal('kittensModal')">×</button>
+        <div class="video-grid">
+            <div class="video-item">
+                <iframe src="https://www.youtube.com/embed/fBKfTs3N8VU" 
+                    title="Kitten Playtime" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+            <div class="video-item">
+                <iframe src="https://www.youtube.com/embed/Lh225h3MKEs" 
+                    title="Cat Friends" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+    </div>
+
+    <div class="video-modal" id="wildlifeModal">
+        <button class="close-modal" onclick="closeVideoModal('wildlifeModal')">×</button>
+        <div class="video-grid">
+            <div class="video-item">
+                <iframe src="https://www.youtube.com/embed/r10g5gERB04" 
+                    title="Baby Animals" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+            <div class="video-item">
+                <iframe src="https://www.youtube.com/embed/5kozt0uDa4c" 
+                    title="Wildlife Moments" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+            <div class="video-item">
+                <iframe src="https://www.youtube.com/embed/5sSHzKDGgG8" 
+                    title="Nature's Wonders" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+            <div class="video-item">
+                <iframe src="https://www.youtube.com/embed/hpYJduVFMvk" 
+                    title="Wildlife Adventures" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check for dark mode
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+        }
+
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.nav-dot');
+        const slider = document.querySelector('.slider');
+
+        function updateSlider() {
+            slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            updateSlider();
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            updateSlider();
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateSlider();
+        }
+
+        // Add batch translation logic
+        const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+        if (savedLang !== 'en') batchTranslateAllText(savedLang);
+
+        async function batchTranslateAllText(targetLang) {
+            const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            let node;
+            const textNodes = [];
+            while ((node = walker.nextNode())) {
+                if (node.parentNode && node.textContent.trim() && node.parentNode.offsetParent !== null && node.parentNode.tagName !== 'IFRAME') {
+                    textNodes.push(node);
+                }
+            }
+            const attrNodes = [];
+            const all = document.querySelectorAll(':not(iframe) [placeholder], :not(iframe) [alt], :not(iframe) [value], :not(iframe) [aria-label]');
+            for (const el of all) {
+                if (el.placeholder) attrNodes.push({el, attr: 'placeholder', value: el.placeholder});
+                if (el.alt) attrNodes.push({el, attr: 'alt', value: el.alt});
+                if (el.value && (el.tagName === 'BUTTON' || el.tagName === 'INPUT')) attrNodes.push({el, attr: 'value', value: el.value});
+                if (el.getAttribute('aria-label')) attrNodes.push({el, attr: 'aria-label', value: el.getAttribute('aria-label')});
+            }
+            const allStrings = [...textNodes.map(n => n.textContent), ...attrNodes.map(a => a.value)];
+            if (allStrings.length === 0) return;
+            const apiKey = 'AIzaSyC1RWlflkLkg10IB6zv4HNzzq1y5qJgoh0';
+            const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+            const response = await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify({ q: allStrings, target: targetLang }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+            const translations = data.data.translations.map(t => t.translatedText);
+            textNodes.forEach((n, i) => { n.textContent = translations[i]; });
+            attrNodes.forEach((a, i) => { a.el[a.attr] = translations[textNodes.length + i]; });
+        }
+
+        // Listen for language changes
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'selectedLanguage' && e.newValue !== e.oldValue) {
+                batchTranslateAllText(e.newValue);
+            }
+        });
+
+        // Video modal functions
+        function showVideoModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeVideoModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+            
+            // Stop all videos when closing modal
+            const iframes = modal.getElementsByTagName('iframe');
+            for(let iframe of iframes) {
+                iframe.src = iframe.src;
+            }
+        }
+
+        // Add click handlers for the video buttons
+        document.querySelectorAll('.slide-button').forEach((button, index) => {
+            button.addEventListener('click', function() {
+                const modalIds = ['puppiesModal', 'kittensModal', 'wildlifeModal'];
+                showVideoModal(modalIds[index]);
+            });
+        });
+
+        // Close modals when clicking outside
+        document.querySelectorAll('.video-modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if(e.target === this) {
+                    closeVideoModal(this.id);
+                }
+            });
+        });
+
+        // Close modals with Escape key
+        document.addEventListener('keydown', function(e) {
+            if(e.key === 'Escape') {
+                document.querySelectorAll('.video-modal.active').forEach(modal => {
+                    closeVideoModal(modal.id);
+                });
+            }
+        });
+    </script>
+</body>
+</html> 

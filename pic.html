@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoxEasy - Picture Board</title>
+    <script src="documentFunctions.js" defer></script>
+    <style>
+        /* Disable dragging for all elements */
+        * {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+
+
+        :root {
+            font-size: 16px; /* Base font size for rem calculations */
+
+            /* Updated color variables for Vision Pro style */
+            --bg-color: rgba(255, 255, 255, 0.18);
+            --text-color: #333333;
+            --item-bg: rgba(255, 255, 255, 0.15);
+            --item-border: rgba(255, 255, 255, 0.2);
+            --item-hover: rgba(255, 255, 255, 0.25);
+            --item-selected: rgba(51, 51, 51, 0.15);
+            --shadow-light: rgba(255, 255, 255, 0.5);
+            --shadow-dark: rgba(0, 0, 0, 0.15);
+        }
+
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #cfeaff 0%, #f3f3f4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 1.25rem; /* 20px */
+            box-sizing: border-box;
+            color: var(--text-color);
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+
+        .container {
+            background: var(--bg-color);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 1.125rem; /* 18px */
+            padding: 1.875rem; /* 30px */
+            box-shadow: 
+                0 0.5rem 1.5rem var(--shadow-dark), /* 8px 24px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px 1px */
+            max-width: 93.75rem; /* 1500px */
+            width: 100%;
+            max-width: 100vw;
+            position: relative;
+            padding-top: 4.375rem; /* 70px */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--item-border);
+            animation: containerFadeIn 0.5s ease-out;
+            box-sizing: border-box;
+        }
+
+
+        @keyframes containerFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+
+        h1 {
+            text-align: center;
+            margin-bottom: 1.875rem; /* 30px */
+            font-weight: 500;
+            font-size: 2.5rem; /* Converted from em */
+            color: var(--text-color);
+        }
+
+
+        .choice-board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(3, auto);
+            gap: 0.9375rem; /* 15px */
+            margin-bottom: 1.875rem; /* 30px */
+            padding-top: 0.625rem; /* 10px */
+            padding-left: 0.9375rem; /* 15px */
+            padding-right: 0.9375rem; /* 15px */
+            position: relative;
+            z-index: 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .main-categories {
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: 1fr;
+            gap: 1.25rem; /* 20px */
+            max-width: 100%;
+            margin: 0 auto 1.875rem auto;
+            padding: 1.25rem;
+        }
+
+        .category-item {
+            min-height: 10rem; /* 160px */
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-item:hover {
+            transform: translateY(-0.5rem); /* -8px */
+            box-shadow: 
+                0 1rem 2rem var(--shadow-dark), /* 16px 32px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px */
+        }
+
+        .category-item img {
+            width: 7rem; /* 112px */
+            height: 7rem; /* 112px */
+            margin-bottom: 0.75rem; /* 12px */
+        }
+
+        .category-item p {
+            font-size: 1.125rem; /* 18px */
+            font-weight: 500;
+        }
+
+
+        .choice-item {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            border-radius: 0.75rem; /* 12px */
+            padding: 0.75rem; /* 12px */
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0.25rem 0.375rem var(--shadow-dark), /* 4px 6px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px */
+            position: relative;
+            z-index: 1;
+            aspect-ratio: 1;
+        }
+
+
+        .choice-item:hover {
+            /* Remove all hover styles */
+        }
+
+
+        .choice-item:active {
+            transform: translateY(0);
+            background: var(--item-bg);
+        }
+
+
+        .choice-item.selected {
+            transform: translateY(-0.25rem); /* -4px */
+            box-shadow: 
+                0 0.5rem 1rem var(--shadow-dark), /* 8px 16px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px */
+            background: var(--item-hover);
+            border-color: var(--item-border);
+            z-index: 2;
+        }
+
+
+        .choice-item.selected:active {
+            transform: translateY(-0.25rem); /* -4px */
+            box-shadow: 
+                0 0.25rem 0.5rem var(--shadow-dark), /* 4px 8px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px */
+        }
+
+
+        .choice-item img {
+            width: 50%;
+            height: 50%;
+            max-width: 5rem; /* 80px */
+            max-height: 5rem; /* 80px */
+            margin-bottom: 0.625rem; /* 10px */
+            display: block;
+        }
+
+
+        .choice-item p {
+            margin: 0;
+            font-weight: 450;
+            font-size: 1.3rem; /* Converted from em */
+            line-height: 1.1;
+            color: var(--text-color);
+            word-break: break-word;
+        }
+
+
+        .selected-choices {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            border-radius: 1.25rem; /* 20px */
+            padding: 1.25rem; /* 20px */
+            margin-top: 1.25rem; /* 20px */
+            text-align: center; /* Center the text horizontally */
+            box-shadow: 
+                0 0.25rem 0.75rem var(--shadow-dark), /* 4px 12px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+
+        .selected-choices h2 {
+            margin-top: 0;
+            font-weight: 500;
+            color: var(--text-color);
+            font-size: 1.3rem; /* Converted from em */
+            cursor: pointer;
+        }
+
+
+        .selected-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.625rem; /* 10px */
+            min-height: 2.5rem; /* 40px */
+        }
+
+
+        .selected-item {
+            background: var(--bg-color);
+            border: 1px solid var(--item-border);
+            border-radius: 1.25rem; /* 20px */
+            padding: 0.3125rem 0.9375rem; /* 5px 15px */
+            display: flex;
+            align-items: center;
+            gap: 0.625rem; /* 10px */
+        }
+
+        .selected-item img {
+            width: 1.25rem !important; /* 20px */
+            height: 1.25rem !important; /* 20px */
+            margin: 0 !important;
+            flex-shrink: 0;
+        }
+
+
+        .speak-button {
+            background: var(--text-color);
+            border: none;
+            color: var(--bg-color);
+            padding: 0.625rem 1.25rem; /* 10px 20px */
+            border-radius: 1.25rem; /* 20px */
+            cursor: pointer;
+            font-size: 1rem; /* Converted from em */
+            margin-top: 1.25rem; /* 20px */
+            transition: all 0s ease;
+        }
+
+
+        .speak-button:hover {
+            opacity: 0.8;
+        }
+
+
+        @media (max-width: 87.5em) { /* 1400px */
+            .choice-board {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
+
+
+        @media (max-width: 75em) { /* 1200px */
+            .choice-board {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+
+        @media (max-width: 50em) { /* 800px */
+            .choice-board {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+
+        @media (max-width: 37.5em) { /* 600px */
+            .choice-board {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .main-categories {
+                grid-template-columns: repeat(3, 1fr);
+                grid-template-rows: repeat(2, auto);
+            }
+        }
+
+        @media (max-width: 50em) { /* 800px */
+            .main-categories {
+                grid-template-columns: repeat(3, 1fr);
+                grid-template-rows: repeat(2, auto);
+            }
+        }
+
+
+        .voice-selector {
+            margin-bottom: 1.25rem; /* 20px */
+            text-align: center;
+        }
+        select {
+            padding: 0.625rem; /* 10px */
+            font-size: 1rem; /* 16px */
+            border-radius: 0.5rem; /* 8px */
+            border: 1px solid var(--item-border);
+            background-color: var(--item-bg);
+            color: var(--text-color);
+        }
+
+
+        .choice-item a {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+
+        .view-log-container {
+            text-align: center;
+            margin-top: 1.25rem; /* 20px */
+        }
+
+
+        .view-log-button {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --item-bg: #f5f5f7;
+            --item-border: #d2d2d7;
+            --item-hover: #e8e8ed;
+            --item-selected: rgba(0, 0, 0, 0.1);
+            border: none;
+            padding: 0.625rem 1.25rem; /* 10px 20px */
+            border-radius: 1.25rem; /* 20px */
+            font-size: 1rem; /* 16px */
+            cursor: pointer;
+            transition: background-color 0s;
+        }
+
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.25rem; /* 20px */
+            padding-top: 1.25rem; /* 20px */
+            border-top: 1px solid var(--item-border);
+        }
+
+
+        .nav-item {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            padding: 0.625rem 1.25rem; /* 10px 20px */
+            margin: 0 0.1875rem; /* 3px */
+            text-decoration: none;
+            color: var(--text-color);
+            border-radius: 1.25rem; /* 20px */
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 0.5rem 2rem rgba(0, 0, 0, 0.1), /* 8px 32px */
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            font-size: 1rem; /* Converted from em */
+        }
+
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.1),
+                rgba(255, 255, 255, 0.05)
+            );
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 0.75rem 2.5rem rgba(0, 0, 0, 0.15), /* 12px 40px */
+                inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+            transform: translateY(-0.125rem); /* -2px */
+        }
+
+
+        .nav-item:hover::before {
+            opacity: 1;
+        }
+
+
+        .nav-item:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 0.25rem 1rem rgba(0, 0, 0, 0.1), /* 4px 16px */
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+
+        /* Active state for Picture Board page */
+        .nav-item[href="pic.html"] {
+            background: rgba(255, 255, 255, 0.12) !important;
+            box-shadow: 
+                0 1rem 3rem rgba(0, 0, 0, 0.2), /* 16px 48px */
+                inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.1) !important;
+            transform: translateY(-0.125rem) !important; /* -2px */
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+
+
+        .nav-item[href="pic.html"]::before {
+            opacity: 1;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.15),
+                rgba(255, 255, 255, 0.08)
+            );
+        }
+
+
+        /* Remove any other specific nav-item styles except Picture Board */
+        .nav-item[href="prompts.html"],
+        .nav-item[href="pain.html"],
+        .nav-item[href="keyboard.html"],
+        .nav-item[href="voxai.html"],
+        .nav-item[href="entertainment.html"],
+        .nav-item[href="documents.html"],
+        .nav-item[href="mood.html"] {
+            background: rgba(255, 255, 255, 0.05) !important;
+            box-shadow: 
+                0 0.5rem 2rem rgba(0, 0, 0, 0.1), /* 8px 32px */
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05) !important;
+            transform: none !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+
+
+        /* Remove highlight for other nav items in dark mode except Picture Board */
+        .dark-mode .nav-item[href="pic.html"] {
+            background: rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 
+                0 1rem 3rem rgba(0, 0, 0, 0.3), /* 16px 48px */
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05) !important;
+        }
+
+
+        .dark-mode .nav-item[href="pic.html"]::before {
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.1),
+                rgba(255, 255, 255, 0.05)
+            ) !important;
+        }
+
+
+        /* Remove highlight for other nav items in dark mode */
+        .dark-mode .nav-item[href="prompts.html"],
+        .dark-mode .nav-item[href="pain.html"],
+        .dark-mode .nav-item[href="keyboard.html"],
+        .dark-mode .nav-item[href="voxai.html"],
+        .dark-mode .nav-item[href="entertainment.html"],
+        .dark-mode .nav-item[href="documents.html"],
+        .dark-mode .nav-item[href="mood.html"] {
+            background: rgba(0, 0, 0, 0.05) !important;
+            box-shadow: 
+                0 0.5rem 2rem rgba(0, 0, 0, 0.2), /* 8px 32px */
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.02) !important;
+            transform: none !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+
+
+        .logout-button {
+            background-color: rgba(255, 59, 48, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: white;
+            border: none;
+            padding: 0.625rem 1.25rem; /* 10px 20px */
+            border-radius: 1.25rem; /* 20px */
+            cursor: pointer;
+            font-size: 1rem; /* Converted from em */
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 0.25rem 0.375rem var(--shadow-dark), /* 4px 6px */
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+
+        .logout-button:hover {
+            /* Remove all hover styles */
+        }
+
+
+        .logout-button:active {
+            transform: translateY(0);
+            background-color: rgba(255, 59, 48, 0.7);
+        }
+
+
+        .navigation-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+
+        .slide-indicators {
+            display: flex;
+            justify-content: center;
+            margin: 0 1.25rem; /* 20px */
+        }
+
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center; /* Keep buttons vertically centered */
+        }
+
+
+        .choice-item img[alt="Blanket"] {
+            width: 4.5rem;  /* 72px */
+            height: 4.5rem; /* 72px */
+        }
+
+        .controls-container {
+            position: absolute;
+            top: 1.25rem; /* 20px */
+            left: 1.25rem; /* 20px */
+            display: flex;
+            align-items: center;
+            gap: 1rem; /* 16px spacing between toggle and zoom controls */
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-input {
+            display: none;
+        }
+
+        .toggle-label {
+            display: inline-block;
+            width: 3.75rem; /* 60px */
+            height: 2.125rem; /* 34px */
+            background-color: var(--text-color);
+            border-radius: 2.125rem; /* 34px */
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-label:before {
+            content: '';
+            position: absolute;
+            width: 1.625rem; /* 26px */
+            height: 1.625rem; /* 26px */
+            border-radius: 50%;
+            top: 0.25rem; /* 4px */
+            left: 0.25rem; /* 4px */
+            background-color: var(--bg-color);
+            transition: 0.3s ease;
+        }
+
+        .toggle-input:checked + .toggle-label {
+            background-color: #ccc;
+        }
+
+        .toggle-input:checked + .toggle-label:before {
+            transform: translateX(1.625rem); /* 26px */
+            background-color: var(--text-color);
+        }
+
+        .zoom-controls {
+            display: flex;
+            gap: 0.5rem; /* 8px between zoom buttons */
+        }
+
+        .zoom-button {
+            width: 2.125rem; /* 34px - same height as toggle switch */
+            height: 2.125rem; /* 34px */
+            border: none;
+            border-radius: 50%;
+            background-color: var(--item-bg);
+            color: var(--text-color);
+            font-size: 1.25rem; /* 20px */
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0.25rem 0.375rem var(--shadow-dark),
+                inset 0 0.0625rem 0.0625rem var(--shadow-light);
+            border: 1px solid var(--item-border);
+        }
+
+        .zoom-button:hover {
+            background-color: var(--item-hover);
+            transform: translateY(-0.125rem); /* -2px */
+        }
+
+        .zoom-button:active {
+            transform: translateY(0);
+            background-color: var(--item-bg);
+        }
+
+        .top-right-container {
+            position: absolute;
+            top: 1.25rem; /* 20px */
+            right: 1.25rem; /* 20px */
+            font-size: 1.2rem; /* Converted from em */
+            color: var(--text-color);
+        }
+
+        .slide-container {
+            display: flex;
+            overflow: hidden;
+            width: 100%;
+            position: relative;
+        }
+
+        .slide {
+            min-width: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .slide .choice-board {
+            width: 100%;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.25rem; /* 20px */
+        }
+
+        .nav-button {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            color: var(--text-color);
+            padding: 0.625rem 1.25rem; /* 10px 20px */
+            border-radius: 1.25rem; /* 20px */
+            cursor: pointer;
+            font-size: 1rem; /* Converted from em */
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0.25rem 0.375rem var(--shadow-dark), /* 4px 6px */
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .nav-button:hover {
+            /* Remove all hover styles */
+        }
+
+        .nav-button:active {
+            transform: translateY(0);
+            background: var(--item-bg);
+        }
+
+        .slide-indicators {
+            display: flex;
+            justify-content: center;
+            margin: 0 1.25rem; /* 20px */
+        }
+
+        .dot {
+            height: 0.5rem; /* 8px */
+            width: 0.5rem; /* 8px */
+            margin: 0 0.3125rem; /* 5px */
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 50%;
+            display: inline-block;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .dot.active {
+            background-color: rgba(0, 0, 0, 0.5);
+            transform: scale(1.2);
+        }
+
+        .dark-mode .dot {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .dark-mode .dot.active {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        #clearSelectedChoices {
+            cursor: pointer;
+            font-size: 1.3rem; /* Converted from em */
+            color: var(--text-color);
+            margin: 0;
+        }
+
+        #clearSelectedChoices:hover {
+            text-decoration: none;
+        }
+
+        .placeholder {
+            color: var(--item-border);
+            font-style: italic;
+            justify-content: center;
+            width: 100%;
+        }
+
+
+
+        .dark-mode {
+            --bg-color: rgba(0, 0, 0, 0.18);
+            --text-color: #ffffff;
+            --item-bg: rgba(255, 255, 255, 0.1);
+            --item-border: rgba(255, 255, 255, 0.1);
+            --item-hover: rgba(255, 255, 255, 0.15);
+            --item-selected: rgba(255, 255, 255, 0.2);
+            --shadow-light: rgba(255, 255, 255, 0.1);
+            --shadow-dark: rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2e 100%);
+        }
+
+        .dark-mode .container {
+            box-shadow: 0 0 1.25rem rgba(255, 255, 255, 0.2); /* 20px */
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 1.125rem; /* 18px */
+            padding: 2rem; /* 32px */
+            box-shadow: 
+                0 1rem 3rem rgba(0, 0, 0, 0.3),
+                inset 0 0.0625rem 0.0625rem var(--shadow-light);
+            border: 1px solid var(--item-border);
+            max-width: 25rem; /* 400px */
+            width: 90%;
+            text-align: center;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-1rem);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-content h2 {
+            color: #000000;
+            font-size: 1.5rem; /* 24px */
+            font-weight: 600;
+            margin: 0 0 1rem 0;
+        }
+
+        .modal-content p {
+            color: #000000;
+            font-size: 1rem; /* 16px */
+            margin: 0 0 2rem 0;
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem; /* 16px */
+            justify-content: center;
+        }
+
+        .modal-button {
+            padding: 0.75rem 1.5rem; /* 12px 24px */
+            border: none;
+            border-radius: 1.25rem; /* 20px */
+            font-size: 1rem; /* 16px */
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0.25rem 0.5rem rgba(0, 0, 0, 0.1),
+                inset 0 0.0625rem 0.0625rem var(--shadow-light);
+            border: 1px solid var(--item-border);
+        }
+
+        .cancel-button {
+            background: var(--item-bg);
+            color: #000000;
+        }
+
+        .cancel-button:hover {
+            background: var(--item-hover);
+            transform: translateY(-0.125rem);
+        }
+
+        .confirm-button {
+            background: rgba(255, 59, 48, 0.8);
+            color: white;
+            border: 1px solid rgba(255, 59, 48, 0.3);
+        }
+
+        .confirm-button:hover {
+            background: rgba(255, 59, 48, 0.9);
+            transform: translateY(-0.125rem);
+        }
+
+        .modal-button:active {
+            transform: translateY(0);
+        }
+
+        .dark-mode .modal-content {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 
+                0 1rem 3rem rgba(0, 0, 0, 0.5),
+                inset 0 0.0625rem 0.0625rem rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dark-mode .modal-content h2 {
+            color: #000000;
+        }
+
+        .dark-mode .modal-content p {
+            color: #000000;
+        }
+
+        .dark-mode .cancel-button {
+            background: rgba(255, 255, 255, 0.15);
+            color: #000000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Logout Modal -->
+        <div class="modal-overlay" id="logoutModal" style="display: none;">
+            <div class="modal-content">
+                <h2>Log Out</h2>
+                <p>Are you sure you want to log out?</p>
+                <div class="modal-buttons">
+                    <button class="modal-button cancel-button" id="cancelLogout">Cancel</button>
+                    <button class="modal-button confirm-button" id="confirmLogout">Log Out</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add the toggle switch and zoom controls here -->
+        <div class="controls-container">
+            <div class="toggle-switch">
+                <input type="checkbox" id="switch" class="toggle-input" />
+                <label for="switch" class="toggle-label"></label>
+            </div>
+            <div class="zoom-controls">
+                <button class="zoom-button" id="zoomOut">-</button>
+                <button class="zoom-button" id="zoomIn">+</button>
+            </div>
+        </div>
+
+        <!-- Logout button with user's name displayed in the top right -->
+        <div class="top-right-container">
+            <button class="logout-button" id="logoutButton">
+                <span id="logout-user-name">Logout</span>
+            </button>
+        </div>
+
+        <br>
+        <br>
+
+
+
+
+
+
+        <div class="slide-container">
+            <!-- Main Categories Board -->
+            <div class="slide" id="mainBoard">
+                <div class="choice-board main-categories">
+                    <div class="choice-item category-item" data-category="emergency">
+                        <img src="https://api.iconify.design/material-symbols:emergency-outline.svg?color=black&width=112&height=112" alt="Medical">
+                        <p>Medical</p>
+                    </div>
+                    <div class="choice-item category-item" data-category="room">
+                        <img src="https://api.iconify.design/material-symbols:sentiment-satisfied.svg?color=black&width=112&height=112" alt="Feelings + Symptoms">
+                        <p>Feelings + Symptoms</p>
+                    </div>
+                    <div class="choice-item category-item" data-category="food">
+                        <img src="https://api.iconify.design/material-symbols:restaurant.svg?color=black&width=112&height=112" alt="Food + Drink">
+                        <p>Food + Drink</p>
+                    </div>
+                    <div class="choice-item category-item" data-category="communication">
+                        <img src="https://api.iconify.design/material-symbols:chat-outline.svg?color=black&width=112&height=112" alt="Communication + Social">
+                        <p>Communication + Social</p>
+                    </div>
+                    <div class="choice-item category-item" data-category="entertainment">
+                        <img src="https://api.iconify.design/material-symbols:play-circle-outline.svg?color=black&width=112&height=112" alt="Entertainment">
+                        <p>Entertainment</p>
+                    </div>
+                    <div class="choice-item category-item" data-category="basic">
+                        <img src="https://api.iconify.design/material-symbols:support-agent.svg?color=black&width=112&height=112" alt="Assistance + Environment">
+                        <p>Assistance + Environment</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medical Category -->
+            <div class="slide category-slide" id="emergencyBoard" style="display: none;">
+                <div class="choice-board">
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:emergency.svg?color=red&width=64&height=64" alt="Emergency">
+                        <p>Emergency</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/healthicons:body-outline.svg?color=black&width=64&height=64" alt="Pain">
+                        <p>Pain</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:stethoscope.svg?color=black&width=64&height=64" alt="Nurse">
+                        <p>Nurse</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:medical-services-outline.svg?color=black&width=64&height=64" alt="Doctor">
+                        <p>Doctor</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:pill.svg?color=black&width=64&height=64" alt="Medication">
+                        <p>Medication</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:healing.svg?color=black&width=64&height=64" alt="Bandage">
+                        <p>Bandage</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:syringe.svg?color=black&width=64&height=64" alt="Injection">
+                        <p>Injection</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:bloodtype.svg?color=black&width=64&height=64" alt="Blood Pressure">
+                        <p>Blood Pressure</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:monitor-heart-outline.svg?color=black&width=64&height=64" alt="Heart Rate">
+                        <p>Heart Rate</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:thermometer.svg?color=black&width=64&height=64" alt="Temperature">
+                        <p>Temperature</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:sick.svg?color=black&width=64&height=64" alt="I Feel Sick">
+                        <p>I Feel Sick</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:rotate-right.svg?color=black&width=64&height=64" alt="Dizzy">
+                        <p>Dizzy</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:help-outline.svg?color=black&width=64&height=64" alt="I Need Help">
+                        <p>I Need Help</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:science.svg?color=black&width=64&height=64" alt="Lab Test">
+                        <p>Lab Test</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:vaccines.svg?color=black&width=64&height=64" alt="Vaccine">
+                        <p>Vaccine</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:notifications-active.svg?color=black&width=64&height=64" alt="Call Nurse">
+                        <p>Call Nurse</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feelings + Symptoms Category -->
+            <div class="slide category-slide" id="roomBoard" style="display: none;">
+                <div class="choice-board">
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:ac-unit.svg?color=black&width=64&height=64" alt="I'm Cold">
+                        <p>I'm Cold</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:local-fire-department.svg?color=black&width=64&height=64" alt="I'm Hot">
+                        <p>I'm Hot</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:airline-seat-recline-extra.svg?color=black&width=64&height=64" alt="Tired">
+                        <p>Tired</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:sentiment-satisfied.svg?color=black&width=64&height=64" alt="I'm Okay">
+                        <p>I'm Okay</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:sentiment-very-satisfied.svg?color=black&width=64&height=64" alt="I'm Happy">
+                        <p>I'm Happy</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:sentiment-worried.svg?color=black&width=64&height=64" alt="I'm Scared">
+                        <p>I'm Scared</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:sentiment-stressed.svg?color=black&width=64&height=64" alt="I'm Anxious">
+                        <p>I'm Anxious</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:help-outline.svg?color=black&width=64&height=64" alt="I'm Confused">
+                        <p>I'm Confused</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:sentiment-frustrated.svg?color=black&width=64&height=64" alt="I'm Frustrated">
+                        <p>I'm Frustrated</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:sentiment-dissatisfied.svg?color=black&width=64&height=64" alt="I'm Sad">
+                        <p>I'm Sad</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:sentiment-very-dissatisfied.svg?color=black&width=64&height=64" alt="I'm Angry">
+                        <p>I'm Angry</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:bedtime.svg?color=black&width=64&height=64" alt="I Can't Sleep">
+                        <p>I Can't Sleep</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:air.svg?color=black&width=64&height=64" alt="I Can't Breathe">
+                        <p>I Can't Breathe</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:sick.svg?color=black&width=64&height=64" alt="I Feel Nauseous">
+                        <p>I Feel Nauseous</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:spa.svg?color=black&width=64&height=64" alt="I Need Rest">
+                        <p>I Need Rest</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:favorite-outline.svg?color=black&width=64&height=64" alt="My Chest Hurts">
+                        <p>My Chest Hurts</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Communication + Social Category -->
+            <div class="slide category-slide" id="communicationBoard" style="display: none;">
+                <div class="choice-board">
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:group-outline.svg?color=black&width=64&height=64" alt="Family">
+                        <p>Family</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:group.svg?color=black&width=64&height=64" alt="Visitors">
+                        <p>Visitors</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:call-outline.svg?color=black&width=64&height=64" alt="Call">
+                        <p>Call</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:video-call.svg?color=black&width=64&height=64" alt="Video Call">
+                        <p>Video Call</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:keyboard-outline.svg?color=black&width=64&height=64" alt="Type">
+                        <p>Type</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:mail.svg?color=black&width=64&height=64" alt="Email">
+                        <p>Email</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:favorite-outline.svg?color=black&width=64&height=64" alt="Thank You">
+                        <p>Thank You</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:help-outline.svg?color=black&width=64&height=64" alt="Help">
+                        <p>Help</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:translate.svg?color=black&width=64&height=64" alt="Interpreter">
+                        <p>Interpreter</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:info-outline.svg?color=black&width=64&height=64" alt="More Info">
+                        <p>More Info</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:schedule.svg?color=black&width=64&height=64" alt="I Need Time">
+                        <p>I Need Time</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:priority-high.svg?color=black&width=64&height=64" alt="Urgent">
+                        <p>Urgent</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:sentiment-satisfied.svg?color=black&width=64&height=64" alt="I'm Okay">
+                        <p>I'm Okay</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:sentiment-very-satisfied.svg?color=black&width=64&height=64" alt="I'm Happy">
+                        <p>I'm Happy</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:sentiment-worried.svg?color=black&width=64&height=64" alt="I'm Scared">
+                        <p>I'm Scared</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:person-add.svg?color=black&width=64&height=64" alt="Can Someone Stay With Me?">
+                        <p>Can Someone Stay With Me?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Entertainment Category -->
+            <div class="slide category-slide" id="entertainmentBoard" style="display: none;">
+                <div class="choice-board">
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:music-note.svg?color=black&width=64&height=64" alt="I Want Music">
+                        <p>I Want Music</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:tv-outline.svg?color=black&width=64&height=64" alt="I Want TV">
+                        <p>I Want TV</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:movie-outline.svg?color=black&width=64&height=64" alt="I Want to Watch Something">
+                        <p>I Want to Watch Something</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:sports-esports.svg?color=black&width=64&height=64" alt="I Want to Play">
+                        <p>I Want to Play</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:book-outline.svg?color=black&width=64&height=64" alt="I Want to Read">
+                        <p>I Want to Read</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:spa.svg?color=black&width=64&height=64" alt="I Want to Relax">
+                        <p>I Want to Relax</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:nature-outline.svg?color=black&width=64&height=64" alt="Show Me Nature">
+                        <p>Show Me Nature</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:photo-library.svg?color=black&width=64&height=64" alt="I Want Family Photos">
+                        <p>I Want Family Photos</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:newspaper.svg?color=black&width=64&height=64" alt="I Want News">
+                        <p>I Want News</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/mdi:emoticon-excited-outline.svg?color=black&width=64&height=64" alt="I Want Something Funny">
+                        <p>I Want Something Funny</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:auto-stories.svg?color=black&width=64&height=64" alt="I Want Stories">
+                        <p>I Want Stories</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:palette-outline.svg?color=black&width=64&height=64" alt="I Want Art">
+                        <p>I Want Art</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:self-improvement.svg?color=black&width=64&height=64" alt="I Want Something Spiritual">
+                        <p>I Want Something Spiritual</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/mdi:meditation.svg?color=black&width=64&height=64" alt="I Want to Meditate">
+                        <p>I Want to Meditate</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:volume-off.svg?color=black&width=64&height=64" alt="I Want Quiet">
+                        <p>I Want Quiet</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/mdi:gift-outline.svg?color=black&width=64&height=64" alt="Surprise Me">
+                        <p>Surprise Me</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Food & Drink Category -->
+            <div class="slide category-slide" id="foodBoard" style="display: none;">
+                <div class="choice-board">
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:local-drink-outline.svg?color=black&width=64&height=64" alt="Water">
+                        <p>Water</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:local-bar.svg?color=black&width=64&height=64" alt="Juice">
+                        <p>Juice</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:blender-outline.svg?color=black&width=64&height=64" alt="Smoothie">
+                        <p>Smoothie</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:local-cafe-outline.svg?color=black&width=64&height=64" alt="Coffee">
+                        <p>Coffee</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:emoji-food-beverage.svg?color=black&width=64&height=64" alt="Tea">
+                        <p>Tea</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:cake-outline.svg?color=black&width=64&height=64" alt="Snack">
+                        <p>Snack</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:breakfast-dining.svg?color=black&width=64&height=64" alt="Breakfast">
+                        <p>Breakfast</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:lunch-dining-outline.svg?color=black&width=64&height=64" alt="Lunch">
+                        <p>Lunch</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:dinner-dining-outline.svg?color=black&width=64&height=64" alt="Dinner">
+                        <p>Dinner</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:soup-kitchen.svg?color=black&width=64&height=64" alt="Soup">
+                        <p>Soup</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:icecream-outline.svg?color=black&width=64&height=64" alt="Ice Cream">
+                        <p>Ice Cream</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:restaurant.svg?color=black&width=64&height=64" alt="I'm Hungry">
+                        <p>I'm Hungry</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:water-drop-outline.svg?color=black&width=64&height=64" alt="I'm Thirsty">
+                        <p>I'm Thirsty</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:room-service-outline.svg?color=black&width=64&height=64" alt="Room Service">
+                        <p>Room Service</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/mdi:food-apple-outline.svg?color=black&width=64&height=64" alt="Special Diet">
+                        <p>Special Diet</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:schedule.svg?color=black&width=64&height=64" alt="Can I Eat Now?">
+                        <p>Can I Eat Now?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assistance & Environment Category -->
+            <div class="slide category-slide" id="basicBoard" style="display: none;">
+                <div class="choice-board">
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:wc.svg?color=black&width=64&height=64" alt="Bathroom">
+                        <p>Bathroom</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:accessible.svg?color=black&width=64&height=64" alt="Assistance">
+                        <p>Assistance</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:open-with.svg?color=black&width=64&height=64" alt="Move Position">
+                        <p>Move Position</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:face-retouching-natural.svg?color=black&width=64&height=64" alt="Personal Care">
+                        <p>Personal Care</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:cleaning-services.svg?color=black&width=64&height=64" alt="Clean Me">
+                        <p>Clean Me</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:local-laundry-service.svg?color=black&width=64&height=64" alt="Laundry">
+                        <p>Laundry</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:bed.svg?color=black&width=64&height=64" alt="Change Sheets">
+                        <p>Change Sheets</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:checkroom.svg?color=black&width=64&height=64" alt="I Need a Blanket">
+                        <p>I Need a Blanket</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:local-fire-department.svg?color=black&width=64&height=64" alt="I'm Too Hot">
+                        <p>I'm Too Hot</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:ac-unit.svg?color=black&width=64&height=64" alt="I'm Too Cold">
+                        <p>I'm Too Cold</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:lightbulb-outline.svg?color=black&width=64&height=64" alt="Light On/Off">
+                        <p>Light On/Off</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:bed-outline.svg?color=black&width=64&height=64" alt="Adjust Bed">
+                        <p>Adjust Bed</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:sentiment-dissatisfied.svg?color=black&width=64&height=64" alt="I'm Uncomfortable">
+                        <p>I'm Uncomfortable</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:volume-off.svg?color=black&width=64&height=64" alt="I Need Silence">
+                        <p>I Need Silence</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:support-agent.svg?color=black&width=64&height=64" alt="I Need Support">
+                        <p>I Need Support</p>
+                    </div>
+                    <div class="choice-item">
+                        <img src="https://api.iconify.design/material-symbols:person-add.svg?color=black&width=64&height=64" alt="Can You Stay?">
+                        <p>Can You Stay?</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation-container">
+            <button class="nav-button" id="backToMain" style="display: none;">← Back to Main</button>
+            <div class="slide-indicators" id="slideIndicators">
+                <!-- Dots will be dynamically updated -->
+            </div>
+            <button class="nav-button" id="nextSlide" style="display: none;">Next</button>
+        </div>
+
+        <div class="selected-choices">
+            <h2 id="clearSelectedChoices">Selected Choices</h2> 
+            <br><!-- Clickable element -->
+            <div class="selected-list" id="selectedList">
+                <div id="placeholder" class="selected-item placeholder">No choices selected</div> <!-- Placeholder element -->
+            </div>
+        </div>
+        
+     
+
+
+        <!-- Add the navigation bar at the bottom -->
+        <nav class="navigation">
+            <a href="pic.html" class="nav-item">Picture Board</a>   
+            <a href="prompts.html" class="nav-item">Prompts</a>         
+            <a href="pain.html" class="nav-item">Pain</a>
+            <a href="keyboard.html" class="nav-item">Keyboard</a>
+            <a href="voxai.html" class="nav-item">VoxAI</a>
+            <a href="entertainment.html" class="nav-item">Entertainment</a>
+            <a href="documents.html" class="nav-item">Documents</a>
+            <a href="mood.html" class="nav-item">Mood</a>
+        </nav>
+    </div>
+
+
+    <script>
+        const selectedList = document.getElementById('selectedList');
+        const selectedChoices = new Set();
+        const toggleSwitch = document.getElementById('switch');
+        const body = document.body;
+
+        // Check the initial state from local storage
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            toggleSwitch.checked = true;
+            updateIconColors('white');
+        }
+
+        toggleSwitch.addEventListener('change', function() {
+            if (this.checked) {
+                console.log('Switch is ON - Dark Mode');
+                body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'enabled');
+                updateIconColors('white');
+            } else {
+                console.log('Switch is OFF - Light Mode');
+                body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'disabled');
+                updateIconColors('black');
+            }
+        });
+
+        function updateIconColors(color) {
+            const icons = document.querySelectorAll('.choice-item img');
+            icons.forEach(icon => {
+                const currentSrc = icon.src;
+                const newSrc = currentSrc.replace(/color=[^&]+/, `color=${color}`);
+                icon.src = newSrc;
+            });
+        }
+
+        function updateSelectedList() {
+            console.log('Updating selected list');
+            selectedList.innerHTML = '';
+            if (selectedChoices.size === 0) {
+                // Show placeholder if no choices are selected
+                const placeholder = document.createElement('div');
+                placeholder.id = 'placeholder';
+                placeholder.classList.add('selected-item', 'placeholder');
+                placeholder.textContent = 'No choices selected';
+                selectedList.appendChild(placeholder);
+            } else {
+                selectedChoices.forEach(choice => {
+                    const choiceElement = document.createElement('div');
+                    choiceElement.classList.add('selected-item');
+                    choiceElement.dataset.choice = choice; // Store choice text as data attribute
+                    const img = document.querySelector(`.choice-item img[alt="${choice}"]`).cloneNode(true);
+                    choiceElement.appendChild(img);
+                    choiceElement.appendChild(document.createTextNode(choice));
+                    
+                    // Add click event listener to remove the choice when clicked
+                    choiceElement.addEventListener('click', function() {
+                        const choiceText = this.dataset.choice;
+                        console.log('Selected choice clicked:', choiceText);
+                        
+                        // Remove from selectedChoices set
+                        selectedChoices.delete(choiceText);
+                        
+                        // Find and unselect the corresponding choice-item in the board
+                        const allChoiceItems = document.querySelectorAll('.choice-item');
+                        allChoiceItems.forEach(item => {
+                            const itemText = item.querySelector('p').textContent;
+                            if (itemText === choiceText) {
+                                item.classList.remove('selected');
+                            }
+                        });
+                        
+                        // Update the display
+                        updateSelectedList();
+                    });
+                    
+                    selectedList.appendChild(choiceElement);
+                });
+            }
+
+            // Save selected choices to local storage
+            localStorage.setItem('selectedChoices', JSON.stringify(Array.from(selectedChoices)));
+        }
+
+        // Handle choice item clicks (delegated event handling)
+        document.addEventListener('click', (event) => {
+            const choiceItem = event.target.closest('.choice-item');
+            
+            // Skip if not a choice item or if it's a category item
+            if (!choiceItem || choiceItem.classList.contains('category-item')) {
+                return;
+            }
+            
+            // Skip if this is the keyboard/Type button
+            const text = choiceItem.querySelector('p').textContent;
+            if (text === 'Type') {
+                event.preventDefault();
+                window.location.href = 'keyboard.html';
+                return;
+            }
+            
+            event.preventDefault();
+            console.log('Choice clicked:', text);
+
+            if (selectedChoices.has(text)) {
+                selectedChoices.delete(text);
+                choiceItem.classList.remove('selected');
+            } else {
+                selectedChoices.add(text);
+                choiceItem.classList.add('selected');
+                speak(text);
+                
+                // Log the choice using the centralized logAction function
+                logAction(`Pic Choice Spoken: "${text}"`);
+            }
+
+            updateSelectedList();
+        });
+    </script>
+
+
+    <script>
+        // Retrieve the current patient's name from local storage
+        const currentPatient = JSON.parse(localStorage.getItem('currentPatient'));
+
+        if (currentPatient) {
+            // Update logout button text with user's name
+            const logoutUserName = document.getElementById('logout-user-name');
+            logoutUserName.textContent = `${currentPatient.firstName} ${currentPatient.lastName}`;
+        }
+
+        // Logout modal functionality
+        const logoutButton = document.getElementById('logoutButton');
+        const logoutModal = document.getElementById('logoutModal');
+        const cancelLogout = document.getElementById('cancelLogout');
+        const confirmLogout = document.getElementById('confirmLogout');
+
+        // Show logout modal when logout button is clicked
+        logoutButton.addEventListener('click', () => {
+            logoutModal.style.display = 'flex';
+        });
+
+        // Hide modal when cancel is clicked
+        cancelLogout.addEventListener('click', () => {
+            logoutModal.style.display = 'none';
+        });
+
+        // Handle logout confirmation
+        confirmLogout.addEventListener('click', () => {
+            // Clear any session data if needed
+            localStorage.removeItem('currentPatient');
+            // Redirect to login page
+            window.location.href = 'index.html';
+        });
+
+        // Close modal when clicking outside of it
+        logoutModal.addEventListener('click', (event) => {
+            if (event.target === logoutModal) {
+                logoutModal.style.display = 'none';
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && logoutModal.style.display === 'flex') {
+                logoutModal.style.display = 'none';
+            }
+        });
+    </script>
+
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const categoryItems = document.querySelectorAll('.category-item');
+        const backButton = document.getElementById('backToMain');
+        const slideIndicators = document.getElementById('slideIndicators');
+        let currentView = 'main';
+
+        // Category navigation
+        categoryItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const category = item.getAttribute('data-category');
+                showCategory(category);
+            });
+        });
+
+        backButton.addEventListener('click', () => {
+            showMainBoard();
+        });
+
+        function showCategory(category) {
+            const mainBoard = document.getElementById('mainBoard');
+            const categoryBoard = document.getElementById(category + 'Board');
+            
+            if (categoryBoard) {
+                mainBoard.style.display = 'none';
+                categoryBoard.style.display = 'block';
+                backButton.style.display = 'block';
+                slideIndicators.style.display = 'none';
+                currentView = category;
+            }
+        }
+
+        function showMainBoard() {
+            const mainBoard = document.getElementById('mainBoard');
+            const categoryBoards = document.querySelectorAll('.category-slide');
+            
+            categoryBoards.forEach(board => board.style.display = 'none');
+            mainBoard.style.display = 'block';
+            backButton.style.display = 'none';
+            slideIndicators.style.display = 'flex';
+            currentView = 'main';
+        }
+
+        // Initialize main board
+        showMainBoard();
+
+        // Prevent image drag behavior
+        document.querySelectorAll('img').forEach(img => img.addEventListener('dragstart', (e) => e.preventDefault()));
+    </script>
+
+
+    <script>
+        // Add event listener for the h2 element to clear selected choices
+        document.getElementById('clearSelectedChoices').addEventListener('click', () => {
+            selectedChoices.clear(); // Clear the set of selected choices
+            updateSelectedList(); // Update the displayed list
+            document.querySelectorAll('.choice-item.selected').forEach(item => {
+                item.classList.remove('selected'); // Remove the 'selected' class from all items
+            });
+            // Do not clear the saved choices in local storage
+        });
+    </script>
+
+
+    <script>
+        // Dot navigation removed - using category-based navigation instead
+    </script>
+
+    <script>
+        // Zoom functionality for pic.html only
+        let currentZoom = parseFloat(localStorage.getItem('pic-zoom-level')) || 1.0;
+        const minZoom = 0.5; // 50%
+        const maxZoom = 2.0; // 200%
+        const zoomStep = 0.1; // 10% increments
+
+        // Apply saved zoom level on page load
+        document.documentElement.style.fontSize = `${currentZoom * 16}px`;
+
+        // Get zoom control buttons
+        const zoomInButton = document.getElementById('zoomIn');
+        const zoomOutButton = document.getElementById('zoomOut');
+
+        // Zoom in functionality
+        zoomInButton.addEventListener('click', () => {
+            if (currentZoom < maxZoom) {
+                currentZoom = Math.min(currentZoom + zoomStep, maxZoom);
+                applyZoom();
+            }
+        });
+
+        // Zoom out functionality
+        zoomOutButton.addEventListener('click', () => {
+            if (currentZoom > minZoom) {
+                currentZoom = Math.max(currentZoom - zoomStep, minZoom);
+                applyZoom();
+            }
+        });
+
+        // Apply zoom and save to localStorage
+        function applyZoom() {
+            document.documentElement.style.fontSize = `${currentZoom * 16}px`;
+            localStorage.setItem('pic-zoom-level', currentZoom.toFixed(1));
+            
+            // Update button states
+            zoomInButton.style.opacity = currentZoom >= maxZoom ? '0.5' : '1';
+            zoomOutButton.style.opacity = currentZoom <= minZoom ? '0.5' : '1';
+            zoomInButton.style.cursor = currentZoom >= maxZoom ? 'not-allowed' : 'pointer';
+            zoomOutButton.style.cursor = currentZoom <= minZoom ? 'not-allowed' : 'pointer';
+        }
+
+        // Initialize button states on page load
+        applyZoom();
+
+        // Optional: Reset zoom on double-click of either button
+        zoomInButton.addEventListener('dblclick', () => {
+            currentZoom = 1.0;
+            applyZoom();
+        });
+
+        zoomOutButton.addEventListener('dblclick', () => {
+            currentZoom = 1.0;
+            applyZoom();
+        });
+    </script>
+
+    <script>
+        // Batch translation logic for all visible text, placeholders, alt, button values, and aria-labels, with chunking
+        const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+        if (savedLang !== 'en') batchTranslateAllText(savedLang);
+        async function batchTranslateAllText(targetLang) {
+          // Gather all text nodes
+          const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+          let node;
+          const textNodes = [];
+          while ((node = walker.nextNode())) {
+            if (node.parentNode && node.textContent.trim() && node.parentNode.offsetParent !== null) {
+              textNodes.push(node);
+            }
+          }
+          // Gather all translatable attributes
+          const attrNodes = [];
+          const all = document.querySelectorAll('[placeholder], [alt], [value], [aria-label]');
+          for (const el of all) {
+            if (el.placeholder) attrNodes.push({el, attr: 'placeholder', value: el.placeholder});
+            if (el.alt) attrNodes.push({el, attr: 'alt', value: el.alt});
+            if (el.value && (el.tagName === 'BUTTON' || el.tagName === 'INPUT')) attrNodes.push({el, attr: 'value', value: el.value});
+            if (el.getAttribute('aria-label')) attrNodes.push({el, attr: 'aria-label', value: el.getAttribute('aria-label')});
+          }
+          // Prepare all strings for translation
+          const allStrings = [...textNodes.map(n => n.textContent), ...attrNodes.map(a => a.value)];
+          if (allStrings.length === 0) return;
+          const apiKey = 'AIzaSyC1RWlflkLkg10IB6zv4HNzzq1y5qJgoh0';
+          const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+          const chunkSize = 100;
+          let translations = [];
+          for (let i = 0; i < allStrings.length; i += chunkSize) {
+            const chunk = allStrings.slice(i, i + chunkSize);
+            try {
+              const response = await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify({ q: chunk, target: targetLang }),
+                headers: { 'Content-Type': 'application/json' }
+              });
+              const data = await response.json();
+              if (data && data.data && data.data.translations) {
+                translations = translations.concat(data.data.translations.map(t => t.translatedText));
+              } else {
+                console.error('Translation API error:', data);
+                // Fill with original text if failed
+                translations = translations.concat(chunk);
+              }
+            } catch (err) {
+              console.error('Translation chunk failed:', err);
+              translations = translations.concat(chunk);
+            }
+          }
+          // Update text nodes
+          textNodes.forEach((n, i) => { n.textContent = translations[i]; });
+          // Update attributes
+          attrNodes.forEach((a, i) => { a.el[a.attr] = translations[textNodes.length + i]; });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Meta tags and title -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoxEasy - Patient Data</title>
+
+    <!-- CSS Styles -->
+    <style>
+        /* Disable dragging for all elements */
+        * {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-select: none;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500&display=swap');
+
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --item-bg: #f5f5f7;
+            --item-border: #d2d2d7;
+            --item-hover: #e8e8ed;
+            --item-selected: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--text-color);
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            transition: background-color 0s, color 0s;
+        }
+
+        .container {
+            background: var(--bg-color);
+            border-radius: 18px;
+            padding: 40px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+            max-width: 800px;
+            width: 100%;
+            position: relative;
+            padding-top: 60px;
+            transition: box-shadow 0s ease;
+            max-height: 2000px;
+            height: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 500;
+            font-size: 2.5em;
+            color: var(--text-color);
+        }
+
+        .toggle-switch {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .toggle-input {
+            display: none;
+        }
+
+        .toggle-label {
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            background-color: var(--text-color);
+            border-radius: 34px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0s;
+        }
+
+        .toggle-label:before {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            top: 4px;
+            left: 4px;
+            background-color: var(--bg-color);
+            transition: 0s;
+        }
+
+        .toggle-input:checked+.toggle-label {
+            background-color: #ccc;
+        }
+
+        .toggle-input:checked+.toggle-label:before {
+            transform: translateX(26px);
+            background-color: var(--text-color);
+        }
+
+        .dark-mode {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --item-bg: #1c1c1e;
+            --item-border: #2c2c2e;
+            --item-hover: #2c2c2e;
+            --item-selected: rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .container {
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid var(--item-border);
+            text-align: left;
+            color: var(--text-color);
+        }
+
+        th {
+            background-color: var(--item-bg);
+            font-weight: 500;
+        }
+
+        tr:nth-child(even) td {
+            background-color: var(--item-hover);
+        }
+
+        tr:hover td {
+            background-color: var(--item-selected);
+        }
+
+        .clear-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #007bff; /* Example color for navigation buttons */
+            color: #ffffff; /* Text color for navigation buttons */
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: bold; /* Make text bold to match navigation buttons */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
+        }
+
+        .clear-button:hover {
+            background-color: #0056b3; /* Darker shade for hover effect */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Toggle Switch -->
+        <div class="toggle-switch">
+            <input type="checkbox" id="switch" class="toggle-input" />
+            <label for="switch" class="toggle-label"></label>
+        </div>
+
+        <!-- Clear Button -->
+        <button id="clear-data" class="clear-button">Clear All Data</button>
+
+        <!-- Title -->
+        <h1>Patient Data File</h1>
+
+        <!-- Patient Data Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Date of Birth</th>
+                    <th>Login Timestamp</th>
+                </tr>
+            </thead>
+            <tbody id="patient-list">
+                <!-- Patient data will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        const toggleSwitch = document.getElementById('switch');
+        const body = document.body;
+
+        // Check the initial state from local storage
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            toggleSwitch.checked = true;
+        }
+
+        toggleSwitch.addEventListener('change', function () {
+            if (this.checked) {
+                console.log('Switch is ON - Dark Mode');
+                body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                console.log('Switch is OFF - Light Mode');
+                body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        });
+
+        // Load patient data from local storage
+        let patients = JSON.parse(localStorage.getItem('patients')) || [];
+        const patientList = document.getElementById('patient-list');
+
+        function renderPatients() {
+            patientList.innerHTML = ''; // Clear existing rows
+            patients.forEach(patient => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${patient.firstName}</td>
+                    <td>${patient.lastName}</td>
+                    <td>${patient.dob}</td>
+                    <td>${patient.loginTimestamp || 'N/A'}</td>
+                `;
+                patientList.appendChild(row);
+            });
+        }
+
+        renderPatients();
+
+        // Clear data button functionality
+        const clearButton = document.getElementById('clear-data');
+        clearButton.addEventListener('click', function () {
+            localStorage.removeItem('patients'); // Clear patients data from local storage
+            patients = []; // Clear the local array
+            renderPatients(); // Re-render the table to show it's empty
+            console.log('All patient data cleared');
+        });
+
+        console.log('Patient Data page script loaded');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const logColumn = document.getElementById('logColumn'); // Ensure this ID matches your HTML structure
+            const selectedChoices = JSON.parse(localStorage.getItem('selectedChoices')) || [];
+
+            selectedChoices.forEach(choice => {
+                const logEntry = document.createElement('div');
+                logEntry.textContent = choice;
+                logColumn.appendChild(logEntry);
+            });
+        });
+    </script>
+</body>
+
+</html>

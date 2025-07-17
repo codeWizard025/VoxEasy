@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Meta tags and title -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoxEasy - Home</title>
+
+    <!-- CSS Styles -->
+    <style>
+        /* Disable dragging for all elements */
+        * {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+
+        :root {
+            font-size: 16px; /* Base font size for rem calculations */
+            
+            /* Updated color variables for Vision Pro style */
+            --bg-color: rgba(255, 255, 255, 0.18);
+            --text-color: #333333;
+            --item-bg: rgba(255, 255, 255, 0.15);
+            --item-border: rgba(255, 255, 255, 0.2);
+            --item-hover: rgba(255, 255, 255, 0.25);
+            --item-selected: rgba(51, 51, 51, 0.15);
+            --shadow-light: rgba(255, 255, 255, 0.5);
+            --shadow-dark: rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #cfeaff 0%, #f3f3f4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 1.25rem; /* 20px */
+            box-sizing: border-box;
+            color: var(--text-color);
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            background: var(--bg-color);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 1.375rem; /* 22px */
+            padding: 4.6875rem; /* 75px */
+            box-shadow: 
+                0 0.5rem 1.5rem var(--shadow-dark), /* 8px 24px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px 1px */
+            max-width: 75rem; /* 1200px */
+            width: 100%;
+            position: relative;
+            padding-top: 6.25rem; /* 100px */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            max-height: 150rem; /* 2400px */
+            height: 100%;
+            border: 1px solid var(--item-border);
+            animation: containerFadeIn 0.5s ease-out;
+            overflow: visible;
+        }
+
+        @keyframes containerFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 3.125rem; /* 50px */
+            font-weight: 500;
+            font-size: 3.6rem; /* Changed from em to rem */
+            color: var(--text-color);
+        }
+
+        p {
+            font-size: 1.8rem; /* Changed from em to rem */
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 3.125rem; /* 50px */
+        }
+
+        .home-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* Fixed 2 columns for first row */
+            gap: 1.875rem; /* 30px */
+            margin-top: 2.5rem; /* 40px */
+        }
+
+        .home-option {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            border-radius: 1rem; /* 16px */
+            padding: 1.875rem; /* 30px */
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: inherit;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0.25rem 0.375rem var(--shadow-dark), /* 4px 6px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px 1px */
+            position: relative;
+            z-index: 1;
+            height: 11.25rem; /* 180px */
+        }
+
+        .home-option.guest-option {
+            grid-column: 1 / -1; /* Span full width */
+            max-width: none; /* Remove width limitation */
+            margin: 0; /* Remove auto margin */
+        }
+
+        .home-option:hover {
+            background: var(--item-hover);
+            transform: translateY(-0.25rem); /* -4px */
+            box-shadow: 
+                0 0.5rem 1rem var(--shadow-dark), /* 8px 16px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px 1px */
+        }
+
+        .home-option img {
+            width: 5rem; /* 80px */
+            height: 5rem; /* 80px */
+            margin-bottom: 0.9375rem; /* 15px */
+            transition: all 0.3s ease;
+        }
+
+        .home-option p {
+            margin: 0;
+            font-weight: 400;
+            font-size: 1.8rem; /* Changed from em to rem */
+            color: var(--text-color);
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            margin-top: 2.5rem; /* 40px */
+            padding-top: 1.875rem; /* 30px */
+            border-top: 1px solid var(--item-border);
+        }
+
+        .nav-item {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            padding: 0.75rem 1.5rem; /* 12px 24px */
+            margin: 0 0.625rem; /* 10px */
+            text-decoration: none;
+            color: var(--text-color);
+            border-radius: 1.5rem; /* 24px */
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 0.5rem 2rem rgba(0, 0, 0, 0.1), /* 8px 32px */
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            font-size: 1.2rem; /* Changed from em to rem */
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.1),
+                rgba(255, 255, 255, 0.05)
+            );
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 0.75rem 2.5rem rgba(0, 0, 0, 0.15), /* 12px 40px */
+                inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+            transform: translateY(-0.125rem); /* -2px */
+        }
+
+        .nav-item:hover::before {
+            opacity: 1;
+        }
+
+        .nav-item:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 0.25rem 1rem rgba(0, 0, 0, 0.1), /* 4px 16px */
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 
+                0 1rem 3rem rgba(0, 0, 0, 0.2), /* 16px 48px */
+                inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+            transform: translateY(-0.125rem); /* -2px */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .controls-container {
+            position: absolute;
+            top: 1.25rem; /* 20px */
+            left: 1.25rem; /* 20px */
+            display: flex;
+            align-items: center;
+            gap: 1rem; /* 16px spacing between controls */
+            z-index: 2;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-input {
+            display: none;
+        }
+
+        .toggle-label {
+            display: inline-block;
+            width: 3.75rem; /* 60px */
+            height: 2.125rem; /* 34px */
+            background-color: var(--text-color);
+            border-radius: 2.125rem; /* 34px */
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-label:before {
+            content: '';
+            position: absolute;
+            width: 1.625rem; /* 26px */
+            height: 1.625rem; /* 26px */
+            border-radius: 50%;
+            top: 0.25rem; /* 4px */
+            left: 0.25rem; /* 4px */
+            background-color: var(--bg-color);
+            transition: 0.3s ease;
+        }
+
+        .toggle-input:checked+.toggle-label {
+            background-color: #ccc;
+        }
+
+        .toggle-input:checked+.toggle-label:before {
+            transform: translateX(1.625rem); /* 26px */
+            background-color: var(--text-color);
+        }
+
+        .zoom-controls {
+            display: flex;
+            gap: 0.5rem; /* 8px between zoom buttons */
+        }
+
+        .zoom-button {
+            width: 2.125rem; /* 34px - same height as toggle switch */
+            height: 2.125rem; /* 34px */
+            border: none;
+            border-radius: 50%;
+            background-color: var(--item-bg);
+            color: var(--text-color);
+            font-size: 1.25rem; /* 20px */
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0.25rem 0.375rem var(--shadow-dark),
+                inset 0 0.0625rem 0.0625rem var(--shadow-light);
+            border: 1px solid var(--item-border);
+        }
+
+        .zoom-button:hover {
+            background-color: var(--item-hover);
+            transform: translateY(-0.125rem); /* -2px */
+        }
+
+        .zoom-button:active {
+            transform: translateY(0);
+            background-color: var(--item-bg);
+        }
+
+        .zoom-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: var(--item-bg);
+            transform: none;
+        }
+
+        .zoom-button:disabled:hover {
+            background-color: var(--item-bg);
+            transform: none;
+        }
+
+        .dark-mode {
+            --bg-color: rgba(0, 0, 0, 0.18);
+            --text-color: #ffffff;
+            --item-bg: rgba(255, 255, 255, 0.1);
+            --item-border: rgba(255, 255, 255, 0.1);
+            --item-hover: rgba(255, 255, 255, 0.15);
+            --item-selected: rgba(255, 255, 255, 0.2);
+            --shadow-light: rgba(255, 255, 255, 0.1);
+            --shadow-dark: rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2e 100%);
+        }
+
+        .dark-mode .container {
+            box-shadow: 
+                0 8px 24px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .dark-mode .nav-item {
+            background: rgba(0, 0, 0, 0.05);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.02);
+        }
+
+        .dark-mode .nav-item:hover {
+            background: rgba(0, 0, 0, 0.08);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.25),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+        }
+
+        .dark-mode .nav-item:active {
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.15),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.02);
+        }
+
+        .home-button {
+            position: absolute;
+            top: 1.25rem; /* 20px */
+            right: 1.25rem; /* 20px */
+            padding: 0.75rem 1.5rem; /* 12px 24px */
+            text-decoration: none;
+            color: var(--text-color);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border-radius: 1.5rem; /* 24px */
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 0.5rem 2rem rgba(0, 0, 0, 0.1), /* 8px 32px */
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            font-size: 1.2rem; /* Changed from em to rem */
+        }
+
+        .home-button:hover {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 0.75rem 2.5rem rgba(0, 0, 0, 0.15), /* 12px 40px */
+                inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+            transform: translateY(-0.125rem); /* -2px */
+        }
+
+        @media (max-width: 37.5rem) { /* 600px */
+            .home-options {
+                grid-template-columns: 1fr; /* Single column on mobile */
+            }
+            .home-option.guest-option {
+                grid-column: 1; /* Reset for mobile */
+            }
+            .container {
+                padding: 1.875rem; /* 30px */
+                padding-top: 3.75rem; /* 60px */
+            }
+            .home-option {
+                padding: 1.25rem; /* 20px */
+                height: 9.375rem; /* 150px */
+            }
+            .home-option img {
+                width: 3.75rem; /* 60px */
+                height: 3.75rem; /* 60px */
+            }
+            .home-option p {
+                font-size: 1.5rem; /* Changed from em to rem */
+            }
+        }
+
+        .language-selector {
+            position: absolute;
+            top: 1.5rem; /* 24px */
+            right: 1.75rem; /* 28px */
+            z-index: 1000;
+            padding: 0.625rem 1.125rem; /* 10px 18px */
+            border-radius: 0.875rem; /* 14px */
+            background: var(--item-bg);
+            color: var(--text-color);
+            border: 1px solid var(--item-border);
+            box-shadow: 0 0.25rem 0.75rem var(--shadow-dark), inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 4px 12px, 1px 1px */
+            font-size: 1.1rem; /* Changed from em to rem */
+            font-family: inherit;
+            outline: none;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        .language-selector:focus, .language-selector:hover {
+            background: var(--item-hover);
+            box-shadow: 0 0.5rem 1.5rem var(--shadow-dark), 0 0 0 0.125rem var(--item-border); /* 8px 24px, 2px */
+        }
+
+        /* Language selector dropdown scaling */
+        .language-selector,
+        .language-selector * {
+            zoom: inherit !important;
+            -moz-transform: inherit !important;
+        }
+
+        .language-selector option {
+            font-size: 1.1rem;
+            padding: 0.5rem;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: inherit;
+        }
+        .dark-mode .language-selector {
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.18);
+        }
+        .dark-mode .language-selector:focus, .dark-mode .language-selector:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        .dark-mode select.language-selector,
+        .dark-mode select.language-selector option {
+            background: #222 !important;
+            color: #fff !important;
+        }
+
+        /* Print styles */
+        @media print {
+            html {
+                font-size: 16px !important; /* Reset to base size for printing */
+            }
+            
+            body {
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            .container {
+                background: white !important;
+                box-shadow: none !important;
+                border: none !important;
+                padding: 1rem !important;
+                margin: 0 !important;
+                max-width: none !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+            }
+            
+            /* Hide controls when printing */
+            .controls-container {
+                display: none !important;
+            }
+            
+            .language-selector {
+                display: none !important;
+            }
+            
+            .navigation {
+                display: none !important;
+            }
+            
+            h1 {
+                font-size: 24pt !important;
+                margin-bottom: 1rem !important;
+                color: black !important;
+            }
+            
+            p {
+                font-size: 14pt !important;
+                color: black !important;
+                margin-bottom: 1rem !important;
+            }
+            
+            .home-option p {
+                font-size: 12pt !important;
+                color: black !important;
+            }
+            
+            /* Ensure colors print properly */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Home Button -->
+
+        <!-- Controls container with toggle and zoom controls -->
+        <div class="controls-container">
+            <div class="toggle-switch">
+                <input type="checkbox" id="switch" class="toggle-input" />
+                <label for="switch" class="toggle-label"></label>
+            </div>
+            <div class="zoom-controls">
+                <button class="zoom-button" id="zoomOut">-</button>
+                <button class="zoom-button" id="zoomIn">+</button>
+            </div>
+        </div>
+
+        <!-- Language Selector -->
+        <select id="languageSelector" class="language-selector">
+          <option value="en">English</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+          <option value="it">Italiano</option>
+          <option value="pt">Português</option>
+          <option value="ru">Русский</option>
+          <option value="zh">中文</option>
+          <option value="ja">日本語</option>
+          <option value="ko">한국어</option>
+          <option value="hi">हिन्दी</option>
+        </select>
+
+        <!-- Title -->
+        <h1 data-translate>Welcome to VoxEasy</h1>
+        <!-- Introductory Paragraph -->
+        <p data-translate>Your Communication Companion For Personalized Care And Support</p>
+
+        <!-- Options Grid -->
+        <div class="home-options">
+            <a href="login_doctor.html" class="home-option">
+                <img src="https://api.iconify.design/mdi:account-supervisor.svg?color=black" alt="Provider">
+                <p data-translate>I am a provider</p>
+            </a>
+            <a href="login_patient.html" class="home-option">
+                <img src="https://api.iconify.design/mdi:account-outline.svg?color=black" alt="User">
+                <p data-translate>I am a user</p>
+            </a>
+            <a href="javascript:void(0)" class="home-option guest-option" onclick="guestLogin()">
+                <img src="https://api.iconify.design/mdi:account-off.svg?color=black" alt="Guest">
+                <p data-translate>Guest access</p>
+            </a>
+        </div>
+
+        <!-- Navigation Bar -->
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        const toggleSwitch = document.getElementById('switch');
+        const body = document.body;
+
+        // Check the initial state from local storage
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            toggleSwitch.checked = true;
+            updateIconColors('white');
+        }
+
+        toggleSwitch.addEventListener('change', function () {
+            if (this.checked) {
+                console.log('Switch is ON - Dark Mode');
+                body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'enabled');
+                updateIconColors('white');
+            } else {
+                console.log('Switch is OFF - Light Mode');
+                body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'disabled');
+                updateIconColors('black');
+            }
+        });
+
+        console.log('Home page script loaded');
+
+        // Zoom functionality
+        let currentZoom = parseInt(localStorage.getItem('index-zoom-level')) || 100;
+        const zoomInBtn = document.getElementById('zoomIn');
+        const zoomOutBtn = document.getElementById('zoomOut');
+
+        function updateZoom() {
+            document.documentElement.style.fontSize = (16 * currentZoom / 100) + 'px';
+            
+            // Force scaling for language selector
+            const langSelector = document.getElementById('languageSelector');
+            if (langSelector) {
+                langSelector.style.fontSize = `${1.1 * currentZoom / 100}rem`;
+                langSelector.style.zoom = `${currentZoom}%`;
+                
+                // Also update option elements
+                const options = langSelector.querySelectorAll('option');
+                options.forEach(option => {
+                    option.style.fontSize = `${1.1 * currentZoom / 100}rem`;
+                });
+            }
+            
+            localStorage.setItem('index-zoom-level', currentZoom);
+            
+            // Update button states
+            zoomInBtn.disabled = currentZoom >= 200;
+            zoomOutBtn.disabled = currentZoom <= 50;
+        }
+
+        function zoomIn() {
+            if (currentZoom < 200) {
+                currentZoom += 10;
+                updateZoom();
+            }
+        }
+
+        function zoomOut() {
+            if (currentZoom > 50) {
+                currentZoom -= 10;
+                updateZoom();
+            }
+        }
+
+        function resetZoom() {
+            currentZoom = 100;
+            updateZoom();
+        }
+
+        // Initialize zoom
+        updateZoom();
+
+        // Event listeners
+        zoomInBtn.addEventListener('click', zoomIn);
+        zoomOutBtn.addEventListener('click', zoomOut);
+
+        // Double-click to reset zoom
+        zoomInBtn.addEventListener('dblclick', resetZoom);
+        zoomOutBtn.addEventListener('dblclick', resetZoom);
+
+        // Language selector logic
+        const langSelector = document.getElementById('languageSelector');
+        const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+        langSelector.value = savedLang;
+        if (savedLang !== 'en') translatePage(savedLang);
+        langSelector.addEventListener('change', function() {
+          localStorage.setItem('selectedLanguage', this.value);
+          location.reload();
+        });
+        async function translateText(text, targetLang) {
+          if (!text.trim()) return text;
+          const apiKey = 'AIzaSyC1RWlflkLkg10IB6zv4HNzzq1y5qJgoh0';
+          const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+          const response = await fetch(url, {
+            method: 'POST',
+            body: JSON.stringify({ q: text, target: targetLang }),
+            headers: { 'Content-Type': 'application/json' }
+          });
+          const data = await response.json();
+          return data.data.translations[0].translatedText;
+        }
+        async function translatePage(targetLang) {
+          const elements = document.querySelectorAll('[data-translate]');
+          for (const el of elements) {
+            const original = el.getAttribute('data-original') || el.textContent;
+            el.setAttribute('data-original', original);
+            el.textContent = await translateText(original, targetLang);
+          }
+        }
+
+        // Guest login functionality
+        function guestLogin() {
+            // Set guest mode in localStorage
+            localStorage.setItem('userType', 'guest');
+            localStorage.setItem('guestMode', 'true');
+            localStorage.removeItem('username'); // Ensure no username is stored
+            localStorage.removeItem('userSession'); // Clear any existing session
+            
+            // Redirect to main application page (you can change this to your desired page)
+            window.location.href = 'pic.html'; // Change this to your main app page
+        }
+
+        // Function to update icon colors for guest option
+        function updateIconColors(color) {
+            const icons = document.querySelectorAll('.home-option img');
+            icons.forEach(icon => {
+                const currentSrc = icon.src;
+                const newSrc = currentSrc.replace(/color=[^&]+/, `color=${color}`);
+                icon.src = newSrc;
+            });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,2713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoxEasy - Keyboard</title>
+    <script src="documentFunctions.js" defer></script>
+    <style>
+        /* Disable dragging for all elements */
+        * {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Allow text selection in editable text area */
+        .selected-item {
+            user-select: text !important;
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+
+        :root {
+            font-size: 16px; /* Base font size for rem calculations */
+            
+            /* Updated color variables for Vision Pro style */
+            --bg-color: rgba(255, 255, 255, 0.18);
+            --text-color: #333333;
+            --item-bg: rgba(255, 255, 255, 0.15);
+            --item-border: rgba(255, 255, 255, 0.2);
+            --item-hover: rgba(255, 255, 255, 0.25);
+            --item-selected: rgba(51, 51, 51, 0.15);
+            --shadow-light: rgba(255, 255, 255, 0.5);
+            --shadow-dark: rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #cfeaff 0%, #f3f3f4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 1.25rem; /* 20px */
+            box-sizing: border-box;
+            color: var(--text-color);
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            background: var(--bg-color);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 1.125rem; /* 18px */
+            padding: 2.5rem; /* 40px */
+            box-shadow: 
+                0 0.5rem 1.5rem var(--shadow-dark), /* 8px 24px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px 1px */
+            max-width: 187.5rem; /* 3000px */
+            width: 100%;
+            max-height: 56.25rem; /* 900px */
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--item-border);
+            animation: containerFadeIn 0.5s ease-out;
+            overflow: visible;
+        }
+
+        @keyframes containerFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .keyboard {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 0.375rem; /* 6px */
+            padding: 0.625rem; /* 10px */
+        }
+
+        .key {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            border-radius: 0.75rem; /* 12px */
+            padding: 2.1875rem 0.9375rem; /* 35px 15px */
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.8rem; /* Changed from em to rem */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 1.875rem; /* 30px */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0.25rem 0.375rem var(--shadow-dark), /* 4px 6px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px 1px */
+        }
+
+        .key:hover {
+            background: var(--item-hover);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 16px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .key:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 4px 8px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .selected-choices {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            border-radius: 1.25rem; /* 20px */
+            padding: 1.25rem; /* 20px */
+            margin-bottom: 0.9375rem; /* 15px */
+            flex-grow: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 5rem; /* 80px */
+            max-height: 6.25rem; /* 100px */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0.25rem 0.75rem var(--shadow-dark), /* 4px 12px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px 1px */
+        }
+
+        .selected-item {
+            width: 100%;
+            background: var(--bg-color);
+            border: 1px solid var(--item-border);
+            border-radius: 0.9375rem; /* 15px */
+            padding: 0.625rem 0.9375rem; /* 10px 15px */
+            font-size: 1.3rem; /* Changed from em to rem */
+            line-height: 1.2;
+            min-height: 1.2rem; /* Changed from em to rem */
+            position: relative;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            cursor: text;
+            outline: none;
+        }
+
+        .selected-item:focus {
+            border-color: var(--item-hover);
+            box-shadow: 0 0 0 2px var(--shadow-light);
+        }
+
+        .speak-button {
+            background: #333333;
+            color: #ffffff;
+            border: none;
+            padding: 0.9375rem; /* 15px */
+            border-radius: 1.25rem; /* 20px */
+            cursor: pointer;
+            font-size: 1.6rem; /* Changed from em to rem */
+            transition: all 0.3s ease;
+            text-align: center;
+            box-shadow: 
+                0 0.25rem 0.375rem var(--shadow-dark), /* 4px 6px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px 1px */
+            flex: 0 0 8.75rem; /* 140px */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .speak-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 16px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .speak-button:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 4px 8px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .dark-mode .speak-button {
+            background: #ffffff;
+            color: #333333;
+        }
+
+        /* Voice icon styles */
+        .voice-icon {
+            width: 2rem;
+            height: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .voice-icon.microphone {
+            fill: currentColor;
+        }
+
+        .voice-icon.waves {
+            fill: currentColor;
+        }
+
+
+
+        /* Microphone icon styles */
+        .microphone-icon {
+            width: 3rem;
+            height: 3rem;
+            fill: currentColor;
+            transition: all 0.3s ease;
+            display: block;
+            min-width: 2.5rem;
+            min-height: 2.5rem;
+        }
+
+        /* Responsive sizing for different zoom levels */
+        @media (max-width: 768px) {
+            .microphone-icon {
+                width: 2.5rem;
+                height: 2.5rem;
+            }
+            
+            .wave-container {
+                height: 30px;
+                gap: 2px;
+            }
+            
+            .wave-bar {
+                width: 3px;
+            }
+            
+            .wave-bar:nth-child(1) { height: 10px; }
+            .wave-bar:nth-child(2) { height: 15px; }
+            .wave-bar:nth-child(3) { height: 20px; }
+            .wave-bar:nth-child(4) { height: 15px; }
+            .wave-bar:nth-child(5) { height: 10px; }
+        }
+
+        .speak-button:hover .microphone-icon {
+            transform: scale(1.1);
+        }
+
+        /* Enhanced wave styling */
+        .wave-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            height: 36px;
+        }
+
+        .wave-container.active {
+            opacity: 1;
+        }
+
+        .wave-bar {
+            width: 4px;
+            background: currentColor;
+            border-radius: 3px;
+            animation: waveAnimation 1.2s ease-in-out infinite;
+            transition: all 0.1s ease;
+        }
+
+        .wave-bar:nth-child(1) { animation-delay: 0s; height: 12px; }
+        .wave-bar:nth-child(2) { animation-delay: 0.1s; height: 18px; }
+        .wave-bar:nth-child(3) { animation-delay: 0.2s; height: 24px; }
+        .wave-bar:nth-child(4) { animation-delay: 0.3s; height: 18px; }
+        .wave-bar:nth-child(5) { animation-delay: 0.4s; height: 12px; }
+
+        @keyframes waveAnimation {
+            0%, 100% { 
+                transform: scaleY(0.5);
+                opacity: 0.6;
+            }
+            50% { 
+                transform: scaleY(1);
+                opacity: 1;
+            }
+        }
+
+        /* Enhanced wave animation for speaking state */
+        .wave-container.speaking .wave-bar {
+            animation-duration: 0.8s;
+        }
+
+        .wave-container.speaking .wave-bar:nth-child(1) { animation-delay: 0s; }
+        .wave-container.speaking .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+        .wave-container.speaking .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+        .wave-container.speaking .wave-bar:nth-child(4) { animation-delay: 0.3s; }
+        .wave-container.speaking .wave-bar:nth-child(5) { animation-delay: 0.4s; }
+
+        /* Dark mode adjustments for waves */
+        .dark-mode .wave-bar {
+            background: #ffffff;
+        }
+
+        /* Add subtle glow effect to waves when speaking */
+        .wave-container.speaking .wave-bar {
+            box-shadow: 0 0 4px currentColor;
+        }
+
+        /* Smooth transitions for wave bars */
+        .wave-bar {
+            transition: height 0.1s ease, opacity 0.1s ease, transform 0.1s ease, box-shadow 0.3s ease;
+        }
+
+        .prediction {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            border-radius: 0.75rem; /* 12px */
+            padding: 0.625rem 0.5rem; /* 10px 8px */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            margin: 0 0.3125rem; /* 5px */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 0;
+            font-size: 1rem; /* Changed from em to rem */
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0.25rem 0.375rem var(--shadow-dark), /* 4px 6px */
+                inset 0 0.0625rem 0.0625rem var(--shadow-light); /* 1px 1px */
+            position: relative;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .prediction:hover {
+            background: var(--item-hover);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 
+                0 8px 20px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .prediction:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: 
+                0 4px 8px var(--shadow-dark),
+                inset 0 1px 1px var(--shadow-light);
+        }
+
+        .prediction.contextual {
+            background: linear-gradient(135deg, var(--item-bg) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .prediction.completion {
+            background: var(--item-bg);
+            opacity: 0.85;
+        }
+
+        .prediction:empty {
+            opacity: 0.3;
+            pointer-events: none;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            padding: 12px 24px;
+            margin: 0 5px;
+            text-decoration: none;
+            color: var(--text-color);
+            border-radius: 24px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.15),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-item:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item[href="keyboard.html"] {
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 
+                0 16px 48px rgba(0, 0, 0, 0.2),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dark-mode {
+            --bg-color: rgba(0, 0, 0, 0.18);
+            --text-color: #ffffff;
+            --item-bg: rgba(255, 255, 255, 0.1);
+            --item-border: rgba(255, 255, 255, 0.1);
+            --item-hover: rgba(255, 255, 255, 0.15);
+            --item-selected: rgba(255, 255, 255, 0.2);
+            --shadow-light: rgba(255, 255, 255, 0.1);
+            --shadow-dark: rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2e 100%);
+        }
+
+        .dark-mode .container {
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .dark-mode .nav-item {
+            background: rgba(0, 0, 0, 0.05);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.02);
+        }
+
+        .dark-mode .nav-item:hover {
+            background: rgba(0, 0, 0, 0.08);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.25),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+        }
+
+        .dark-mode .nav-item:active {
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.15),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.02);
+        }
+
+        .dark-mode .nav-item[href="keyboard.html"] {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 16px 48px rgba(0, 0, 0, 0.3),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.25rem; /* 20px */
+            padding-top: 1.25rem; /* 20px */
+            border-top: 1px solid var(--item-border);
+            text-align: center;
+            width: 100%; /* Make the line span the entire width */
+        }
+
+        .nav-item {
+            padding: 0.625rem 1.25rem; /* 10px 20px */
+            margin: 0 0.3125rem; /* 5px */
+            text-decoration: none;
+            color: var(--text-color);
+            background-color: var(--item-bg);
+            border-radius: 1.25rem; /* 20px */
+            transition: background-color 0s;
+            text-align: center;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 1.875rem; /* 30px */
+            font-weight: 500;
+            font-size: 2.5rem; /* Changed from em to rem */
+            color: var(--text-color);
+        }
+
+        .key.wide {
+            grid-column: span 2;
+            font-size: 1.5em;
+            font-weight: 500;
+        }
+
+        .selected-list {
+            flex-grow: 1;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.2em;
+            background-color: var(--text-color);
+            margin-left: 1px;
+            animation: blink 0.7s infinite;
+            vertical-align: text-bottom;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-10px); }
+            15% { opacity: 1; transform: translateY(0); }
+            85% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+
+        .bottom-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .back-button {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            color: var(--text-color);
+            padding: 15px 30px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-button:hover {
+            background: var(--item-hover);
+        }
+
+        .backspace-icon {
+            width: 38px;
+            height: 38px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .shift-icon {
+            width: 32px;
+            height: 32px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        #shift.active .shift-icon {
+            filter: brightness(0) invert(1);
+        }
+
+        #shift.active {
+            background-color: var(--text-color);
+        }
+
+        .prediction-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem; /* 8px */
+            height: 3.125rem; /* 50px */
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.75rem; /* 12px */
+            padding: 0.3125rem; /* 5px */
+            border: 1px solid var(--item-border);
+        }
+
+        .keyboard-area {
+            display: flex;
+            gap: 0.9375rem; /* 15px */
+            margin-top: 0.9375rem; /* 15px */
+            align-items: stretch;
+        }
+
+        .keyboard-wrapper {
+            flex-grow: 1;
+        }
+
+        .toggle-switch {
+            margin-bottom: 20px;
+        }
+
+        .toggle-input {
+            display: none;
+        }
+
+        .toggle-label {
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            background-color: var(--text-color);
+            border-radius: 34px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0s;
+        }
+
+        .toggle-label:before {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            top: 4px;
+            left: 4px;
+            background-color: var(--bg-color);
+            transition: 0s;
+        }
+
+        .toggle-input:checked + .toggle-label {
+            background-color: #ccc;
+        }
+
+        .toggle-input:checked + .toggle-label:before {
+            transform: translateX(26px);
+            background-color: var(--text-color);
+        }
+
+        #backspace img.backspace-icon {
+            filter: brightness(0); /* Default to black in light mode */
+        }
+
+        .language-dropdown {
+            padding: 8px 15px;
+            border-radius: 12px;
+            font-size: 1em;
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            color: var(--text-color);
+            box-shadow: 0 4px 6px var(--shadow-dark);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23333333%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 12px;
+            padding-right: 30px;
+            width: 140px;
+        }
+        
+        .language-dropdown:hover {
+            background: var(--item-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px var(--shadow-dark);
+        }
+        
+        .language-dropdown:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--shadow-light), 0 8px 16px var(--shadow-dark);
+        }
+        
+        .dark-mode .language-dropdown {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+        }
+
+        /* Custom styling for dropdown options - requires a custom select implementation */
+        select.language-dropdown option {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 10px;
+            font-size: 1em;
+        }
+
+        .dark-mode select.language-dropdown option {
+            background-color: rgba(50, 50, 50, 0.95);
+            color: white;
+        }
+
+        /* For Firefox */
+        select.language-dropdown {
+            scrollbar-width: thin;
+            scrollbar-color: var(--item-border) var(--bg-color);
+        }
+
+        /* For Chrome/Edge/Safari */
+        select.language-dropdown::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        select.language-dropdown::-webkit-scrollbar-track {
+            background: var(--bg-color);
+            border-radius: 10px;
+        }
+
+        select.language-dropdown::-webkit-scrollbar-thumb {
+            background-color: var(--item-border);
+            border-radius: 10px;
+            border: 2px solid var(--bg-color);
+        }
+
+        .controls-container {
+            margin-bottom: 1.25rem; /* 20px */
+            display: flex;
+            align-items: center;
+            gap: 1rem; /* 16px spacing between controls */
+            justify-content: space-between;
+        }
+
+        .zoom-controls {
+            display: flex;
+            gap: 0.5rem; /* 8px between zoom buttons */
+        }
+
+        .zoom-button {
+            width: 2.125rem; /* 34px - same height as toggle switch */
+            height: 2.125rem; /* 34px */
+            border: none;
+            border-radius: 50%;
+            background-color: var(--item-bg);
+            color: var(--text-color);
+            font-size: 1.25rem; /* 20px */
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0.25rem 0.375rem var(--shadow-dark),
+                inset 0 0.0625rem 0.0625rem var(--shadow-light);
+            border: 1px solid var(--item-border);
+        }
+
+        .zoom-button:hover {
+            background-color: var(--item-hover);
+            transform: translateY(-0.125rem); /* -2px */
+        }
+
+        .zoom-button:active {
+            transform: translateY(0);
+            background-color: var(--item-bg);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Add language selector dropdown next to the toggle switch -->
+        <div class="controls-container">
+            <div class="toggle-switch">
+                <input type="checkbox" id="switch" class="toggle-input" />
+                <label for="switch" class="toggle-label"></label>
+            </div>
+            <div class="zoom-controls">
+                <button class="zoom-button" id="zoomOut">-</button>
+                <button class="zoom-button" id="zoomIn">+</button>
+            </div>
+            <div class="language-selector">
+                <select id="languageSelect" class="language-dropdown">
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                    <option value="fr">Français</option>
+                    <option value="de">Deutsch</option>
+                    <option value="it">Italiano</option>
+                    <option value="pt">Português</option>
+                    <option value="ru">Русский</option>
+                    <option value="zh">中文</option>
+                    <option value="ja">日本語</option>
+                    <option value="ko">한국어</option>
+                    <option value="hi">हिन्दी</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="selected-choices">
+            <div class="selected-list" id="selectedList"></div>
+        </div>
+        <div class="prediction-bar" id="predictionBar">
+            <div class="prediction"></div>
+            <div class="prediction"></div>
+            <div class="prediction"></div>
+        </div>
+        
+        <div class="keyboard-area">
+            <div class="keyboard-wrapper">
+                <div class="keyboard" id="alphabetKeyboard">
+                    <div class="key">Q</div>
+                    <div class="key">W</div>
+                    <div class="key">E</div>
+                    <div class="key">R</div>
+                    <div class="key">T</div>
+                    <div class="key">Y</div>
+                    <div class="key">U</div>
+                    <div class="key">I</div>
+                    <div class="key">O</div>
+                    <div class="key">P</div>
+                    <div class="key">A</div>
+                    <div class="key">S</div>
+                    <div class="key">D</div>
+                    <div class="key">F</div>
+                    <div class="key">G</div>
+                    <div class="key">H</div>
+                    <div class="key">J</div>
+                    <div class="key">K</div>
+                    <div class="key">L</div>
+                    <div class="key">!</div>
+                    <div class="key">?</div>
+                    <div class="key">Z</div>
+                    <div class="key">X</div>
+                    <div class="key">C</div>
+                    <div class="key">V</div>
+                    <div class="key">B</div>
+                    <div class="key">N</div>
+                    <div class="key">M</div>
+                    <div class="key wide" id="backspace">
+                        <img src="https://api.iconify.design/mdi:backspace-outline.svg?color=black" alt="Backspace" class="backspace-icon">
+                    </div>
+                    <div class="key wide" id="switchToNumbers">123</div>
+                    <div class="key wide" style="grid-column: span 4;">SPACE</div>
+                    <div class="key wide">CLEAR</div>
+                    <div class="key wide" id="toggleCase">SHIFT</div>
+                </div>
+                <div class="keyboard" id="numberKeyboard" style="display: none;">
+                    <div class="key">1</div>
+                    <div class="key">2</div>
+                    <div class="key">3</div>
+                    <div class="key">4</div>
+                    <div class="key">5</div>
+                    <div class="key">6</div>
+                    <div class="key">7</div>
+                    <div class="key">8</div>
+                    <div class="key">9</div>
+                    <div class="key">0</div>
+                    <div class="key wide" id="switchToAlphabet">ABC</div>
+                    <div class="key wide" style="grid-column: span 4;">SPACE</div>
+                    <div class="key wide">CLEAR</div>
+                    <div class="key wide" id="backspace">
+                        <img src="https://api.iconify.design/mdi:backspace-outline.svg?color=black" alt="Backspace" class="backspace-icon">
+                    </div>
+                </div>
+            </div>
+            <div class="speak-button" id="speakButton">
+                <svg class="microphone-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                    <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                </svg>
+                <div class="wave-container" id="waveContainer">
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                </div>
+            </div>
+        </div>
+        <div class="bottom-buttons">
+            <nav class="navigation">
+                <a href="pic.html" class="nav-item">Picture Board</a>   
+                <a href="prompts.html" class="nav-item">Prompts</a>         
+                <a href="pain.html" class="nav-item">Pain</a>
+                <a href="keyboard.html" class="nav-item">Keyboard</a>
+                <a href="voxai.html" class="nav-item">VoxAI</a>
+                <a href="entertainment.html" class="nav-item">Entertainment</a>
+                <a href="documents.html" class="nav-item">Documents</a>
+                <a href="mood.html" class="nav-item">Mood</a>
+            </nav>
+        </div>
+    </div>
+
+
+    <script>
+        const keys = document.querySelectorAll('.key');
+        const selectedList = document.getElementById('selectedList');
+        const speakButton = document.getElementById('speakButton');
+        const toggleCaseButton = document.getElementById('toggleCase');
+        const languageSelect = document.getElementById('languageSelect');
+        
+        languageSelect.addEventListener('change', async function() {
+            const textToTranslate = currentText;
+            const newLanguage = this.value;
+            const oldLanguage = currentLanguage;
+        
+            // Log the language change for debugging
+            console.log(`Language changed from ${oldLanguage} to ${newLanguage}`);
+            
+            // Immediately update the current language and save it
+            currentLanguage = newLanguage;
+            localStorage.setItem('keyboardLanguage', newLanguage);
+            localStorage.setItem('selectedLanguage', newLanguage); // Sync with global setting for TTS
+        
+            // Update the keyboard layout and navigation bar to the new language
+            await updateKeyboardLayout();
+            await translateNavBar(newLanguage);
+        
+            // Only translate if there is text in the input box
+            if (textToTranslate.trim() !== '') {
+                // Provide visual feedback that translation is in progress
+                selectedList.innerHTML = `<div class="selected-item">Translating...</div>`;
+                textElement = null; // Invalidate textElement so it gets recreated
+        
+                try {
+                    // Call the translation API
+                    const translatedText = await translateWithAPI(textToTranslate, newLanguage);
+                    currentText = translatedText;
+                    console.log('Translation successful:', currentText);
+                    // Update the display with the translated text
+                    updateSelectedList();
+                } catch (error) {
+                    console.error('Translation failed:', error);
+                    // If translation fails, revert the text to what it was before
+                    currentText = textToTranslate;
+                    
+                    // Show an error message to the user
+                    selectedList.innerHTML = `<div class="selected-item">Translation failed. Keeping original text.</div>`;
+                    textElement = null; // Invalidate textElement
+                    
+                    // After 2 seconds, clear the error and show the original text again
+                    setTimeout(() => {
+                        updateSelectedList();
+                    }, 2000);
+                }
+            }
+        });
+
+        let currentText = '';
+        let isUpperCase = true;
+        let isSpeaking = false;
+        let currentLanguage = 'en';
+        let cursorPosition = 0;
+        let textElement = null;
+        let backspaceInterval = null;
+        let backspaceTimeout = null;
+
+        // Keyboard layouts for different languages
+        const keyboardLayouts = {
+            en: {
+                main: [
+                    'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
+                    'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', '!',
+                    '?', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '', ''
+                ],
+                shiftText: 'SHIFT',
+                spaceText: 'SPACE',
+                backspaceText: '',
+                clearText: 'CLEAR',
+                numbersText: '123',
+                speakText: 'SPEAK'
+            },
+            es: {
+                main: [
+                    'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
+                    'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ñ',
+                    '?', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '¿', '¡'
+                ],
+                shiftText: 'MAYÚS',
+                spaceText: 'ESPACIO',
+                backspaceText: '',
+                clearText: 'BORRAR',
+                numbersText: '123',
+                speakText: 'HABLAR'
+            },
+            fr: {
+                main: [
+                    'A', 'Z', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
+                    'Q', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M',
+                    'W', 'X', 'C', 'V', 'B', 'N', 'É', 'È', 'Ç', 'À'
+                ],
+                shiftText: 'MAJ',
+                spaceText: 'ESPACE',
+                backspaceText: '',
+                clearText: 'EFFACER',
+                numbersText: '123',
+                speakText: 'PARLER'
+            },
+            de: {
+                main: [
+                    'Q', 'W', 'E', 'R', 'T', 'Z', 'U', 'I', 'O', 'P',
+                    'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ö',
+                    'Ü', 'Y', 'X', 'C', 'V', 'B', 'N', 'M', 'Ä', 'ß'
+                ],
+                shiftText: 'UMSCH',
+                spaceText: 'LEERTASTE',
+                backspaceText: '',
+                clearText: 'LÖSCHEN',
+                numbersText: '123',
+                speakText: 'SPRECHEN'
+            },
+            it: {
+                main: [
+                    'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
+                    'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'À',
+                    'È', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Ì', 'Ò'
+                ],
+                shiftText: 'MAIUSC',
+                spaceText: 'SPAZIO',
+                backspaceText: '',
+                clearText: 'CANCELLA',
+                numbersText: '123',
+                speakText: 'PARLARE'
+            },
+            pt: {
+                main: [
+                    'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
+                    'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ç',
+                    '?', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Ã', 'Õ'
+                ],
+                shiftText: 'SHIFT',
+                spaceText: 'ESPAÇO',
+                backspaceText: '',
+                clearText: 'LIMPAR',
+                numbersText: '123',
+                speakText: 'FALAR'
+            },
+            ru: {
+                main: [
+                    'Й', 'Ц', 'У', 'К', 'Е', 'Н', 'Г', 'Ш', 'Щ', 'З',
+                    'Ф', 'Ы', 'В', 'А', 'П', 'Р', 'О', 'Л', 'Д', 'Ж',
+                    'Э', 'Я', 'Ч', 'С', 'М', 'И', 'Т', 'Ь', 'Б', 'Ю'
+                ],
+                shiftText: 'ВЕРХ',
+                spaceText: 'ПРОБЕЛ',
+                backspaceText: '',
+                clearText: 'ОЧИСТИТЬ',
+                numbersText: '123',
+                speakText: 'ГОВОРИТЬ'
+            },
+            zh: {
+                main: [
+                    '你', '我', '他', 'の', '是', '了', '在', '有', '和', '人',
+                    '这', '中', '大', '为', '上', '个', '国', '生', '时', '会',
+                    '出', '要', '就', '那', '可', '到', '自', '年', '家', '能'
+                ],
+                shiftText: '转换',
+                spaceText: '空格',
+                backspaceText: '',
+                clearText: '清除',
+                numbersText: '123',
+                speakText: '说话'
+            },
+            ja: {
+                main: [
+                    'あ', 'い', 'う', 'え', 'お', 'か', 'き', 'く', 'け', 'こ',
+                    'さ', 'し', 'す', 'せ', 'そ', 'た', 'ち', 'つ', 'て', 'と',
+                    'な', 'に', 'ぬ', 'ね', 'の', 'は', 'ひ', 'ふ', 'へ', 'ほ'
+                ],
+                shiftText: '変換',
+                spaceText: 'スペース',
+                backspaceText: '',
+                clearText: 'クリア',
+                numbersText: '123',
+                speakText: '話す'
+            },
+            ko: {
+                main: [
+                    'ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅊ',
+                    'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ', 'ㅏ', 'ㅑ', 'ㅓ', 'ㅕ', 'ㅗ', 'ㅛ',
+                    'ㅜ', 'ㅠ', 'ㅡ', 'ㅣ', '가', '나', '다', '라', '마', '바'
+                ],
+                shiftText: '전환',
+                spaceText: '스페이스',
+                backspaceText: '',
+                clearText: '지우기',
+                numbersText: '123',
+                speakText: '말하기'
+            },
+            ar: {
+                main: [
+                    'ض', 'ص', 'ث', 'ق', 'ف', 'غ', 'ع', 'ه', 'خ', 'ح',
+                    'ش', 'س', 'ي', 'ب', 'ل', 'ا', 'ت', 'ن', 'م', 'ك',
+                    'ط', 'ئ', 'ء', 'ؤ', 'ر', 'لا', 'ى', 'ة', 'و', 'ز'
+                ],
+                shiftText: 'تبديل',
+                spaceText: 'مسافة',
+                backspaceText: '',
+                clearText: 'مسح',
+                numbersText: '123',
+                speakText: 'تحدث'
+            },
+            hi: {
+                main: [
+                    'ौ', 'ै', 'ा', 'ी', 'ू', 'ब', 'ह', 'ग', 'द', 'ज',
+                    'ो', 'े', 'ि', 'ु', 'प', 'र', 'क', 'त', 'च', 'ट',
+                    'ं', 'म', 'न', 'व', 'ल', 'स', 'य', 'थ', 'श', 'ष'
+                ],
+                shiftText: 'शिफ्ट',
+                spaceText: 'स्पेस',
+                backspaceText: '',
+                clearText: 'साफ़',
+                numbersText: '123',
+                speakText: 'बोलें'
+            }
+        };
+
+        // Initialize the appropriate keyboard layout
+        async function updateKeyboardLayout() {
+            const layout = keyboardLayouts[currentLanguage];
+            const keyElements = document.querySelectorAll('#alphabetKeyboard .key:not(.wide)');
+            
+            // Update regular keys
+            keyElements.forEach((key, index) => {
+                if (index < layout.main.length) {
+                    key.textContent = isUpperCase ? layout.main[index].toUpperCase() : layout.main[index].toLowerCase();
+                }
+            });
+            
+            // FORCE UPDATE all special keys regardless of current text
+            document.getElementById('toggleCase').textContent = layout.shiftText;
+            
+            // Find space key and update it
+            document.querySelectorAll('.key').forEach(key => {
+                // Reset any previous special actions
+                key.removeAttribute('data-action');
+                
+                // Check if this is the space key (it's the wide one in the middle of the bottom row)
+                if (key.className.includes('wide') && key.textContent.toLowerCase().includes('space') || 
+                    key.textContent.includes('スペース') || key.textContent.includes('ESPACE') || 
+                    key.textContent.includes('ESPACIO') || key.textContent.includes('LEERTASTE') ||
+                    key.textContent.includes('SPAZIO') || key.textContent.includes('ESPAÇO') ||
+                    key.textContent.includes('ПРОБЕЛ') || key.textContent.includes('空格') ||
+                    key.textContent.includes('스페이스') || key.textContent.includes('مسافة') ||
+                    key.textContent.includes('स्पेस')) {
+                    key.textContent = layout.spaceText;
+                    key.dataset.action = 'space';
+                }
+                
+                // Check if this is the clear key
+                else if (key.className.includes('wide') && (key.textContent.toLowerCase().includes('clear') || 
+                    key.textContent.includes('クリア') || key.textContent.includes('EFFACER') || 
+                    key.textContent.includes('BORRAR') || key.textContent.includes('LÖSCHEN') ||
+                    key.textContent.includes('CANCELLA') || key.textContent.includes('LIMPAR') ||
+                    key.textContent.includes('ОЧИСТИТЬ') || key.textContent.includes('清除') ||
+                    key.textContent.includes('지우기') || key.textContent.includes('مسح') ||
+                    key.textContent.includes('साफ़'))) {
+                    key.textContent = layout.clearText;
+                    key.dataset.action = 'clear';
+                }
+                
+                // Check if this is the numbers key
+                else if (key.id === 'switchToNumbers') {
+                    key.textContent = layout.numbersText;
+                }
+            });
+            
+            // Speak button now uses icons instead of text
+            
+            // Update speech synthesis language
+            if (window.speechSynthesis) {
+                speechSynthesis.cancel();
+            }
+        }
+        
+        const alphabetKeyboard = document.getElementById('alphabetKeyboard');
+        const numberKeyboard = document.getElementById('numberKeyboard');
+        const switchToNumbersButton = document.getElementById('switchToNumbers');
+        const switchToAlphabetButton = document.getElementById('switchToAlphabet');
+
+
+        function switchKeyboard(showNumbers) {
+            if (showNumbers) {
+                alphabetKeyboard.style.display = 'none';
+                numberKeyboard.style.display = 'grid';
+            } else {
+                alphabetKeyboard.style.display = 'grid';
+                numberKeyboard.style.display = 'none';
+            }
+        }
+
+
+        switchToNumbersButton.addEventListener('click', () => switchKeyboard(true));
+        switchToAlphabetButton.addEventListener('click', () => switchKeyboard(false));
+
+
+        function updateKeys() {
+            keys.forEach(key => {
+                if (key.textContent.length === 1 && key.textContent.match(/[a-zA-Z]/)) {
+                    key.textContent = isUpperCase ? key.textContent.toUpperCase() : key.textContent.toLowerCase();
+                }
+            });
+            
+            // Also update language-specific keyboard layout
+            updateKeyboardLayout();
+        }
+
+
+        function toggleCase() {
+            isUpperCase = !isUpperCase;
+            updateKeys();
+            toggleCaseButton.textContent = isUpperCase ? keyboardLayouts[currentLanguage].shiftText : keyboardLayouts[currentLanguage].shiftText;
+           
+            // Update the current text to match the new case
+            currentText = isUpperCase ? currentText.toUpperCase() : currentText.toLowerCase();
+            updateSelectedList();
+        }
+
+
+        toggleCaseButton.addEventListener('click', toggleCase);
+
+
+        // Enhanced autocorrect dictionary with comprehensive misspellings
+        const commonMisspellings = {
+            // Basic common misspellings
+            'teh': 'the', 'adn': 'and', 'taht': 'that', 'wiht': 'with', 'fro': 'for', 'fo': 'for',
+            'becuase': 'because', 'becaus': 'because', 'becase': 'because', 'beacuse': 'because',
+            'recieve': 'receive', 'recive': 'receive', 'seperate': 'separate', 'seprate': 'separate',
+            'definately': 'definitely', 'definitly': 'definitely', 'defintely': 'definitely',
+            'occured': 'occurred', 'ocurred': 'occurred', 'truely': 'truly', 'realy': 'really',
+            'useing': 'using', 'moveing': 'moving', 'comeing': 'coming', 'haveing': 'having',
+            'makeing': 'making', 'takeing': 'taking', 'giveing': 'giving', 'liveing': 'living',
+            
+            // Medical and health terms
+            'pian': 'pain', 'payn': 'pain', 'pein': 'pain', 'painn': 'pain', 'apain': 'a pain',
+            'hert': 'hurt', 'hurrt': 'hurt', 'hirt': 'hurt', 'hurts': 'hurts', 'hertd': 'hurt',
+            'docter': 'doctor', 'doctr': 'doctor', 'dokter': 'doctor', 'docctor': 'doctor',
+            'nerse': 'nurse', 'nurce': 'nurse', 'nurs': 'nurse', 'nuurse': 'nurse',
+            'medicin': 'medicine', 'medecine': 'medicine', 'medicene': 'medicine', 'medcine': 'medicine',
+            'feling': 'feeling', 'fealing': 'feeling', 'feelling': 'feeling', 'feleing': 'feeling',
+            'beter': 'better', 'bettr': 'better', 'bettter': 'better', 'beetter': 'better',
+            'wors': 'worse', 'worce': 'worse', 'werse': 'worse', 'woorse': 'worse',
+            'tierd': 'tired', 'tyred': 'tired', 'tirred': 'tired', 'tiired': 'tired',
+            'sleap': 'sleep', 'slepp': 'sleep', 'sleeep': 'sleep', 'slepe': 'sleep',
+            'hungrey': 'hungry', 'hungri': 'hungry', 'hunggry': 'hungry', 'hungrry': 'hungry',
+            'thirsty': 'thirsty', 'thersty': 'thirsty', 'thursty': 'thirsty', 'thristy': 'thirsty',
+            'bathrom': 'bathroom', 'bathrum': 'bathroom', 'bathroon': 'bathroom', 'bathrooom': 'bathroom',
+            'tolet': 'toilet', 'toilit': 'toilet', 'toylet': 'toilet', 'toielt': 'toilet',
+            
+            // Common words and phrases
+            'halp': 'help', 'hellp': 'help', 'healp': 'help', 'hhelp': 'help', 'heelp': 'help',
+            'nead': 'need', 'kneed': 'need', 'neeed': 'need', 'nede': 'need', 'neede': 'need',
+            'watter': 'water', 'watre': 'water', 'wotter': 'water', 'wator': 'water', 'wateer': 'water',
+            'plese': 'please', 'pleese': 'please', 'plz': 'please', 'pls': 'please', 'pleace': 'please',
+            'thnak': 'thank', 'thx': 'thanks', 'thnk': 'thank', 'thanx': 'thanks', 'thankz': 'thanks',
+            'yuo': 'you', 'yu': 'you', 'yoo': 'you', 'youu': 'you', 'u': 'you',
+            'yur': 'your', 'ur': 'your', 'yor': 'your', 'youre': 'you\'re', 'your\'e': 'you\'re',
+            'im': 'I\'m', 'i\'m': 'I\'m', 'iam': 'I am', 'i': 'I',
+            
+            // Comfort and emotions
+            'comfertable': 'comfortable', 'comftable': 'comfortable', 'comferble': 'comfortable',
+            'uncomfertable': 'uncomfortable', 'uncomftable': 'uncomfortable', 'uncomferble': 'uncomfortable',
+            'scered': 'scared', 'scarred': 'scared', 'skared': 'scared', 'scrd': 'scared',
+            'angri': 'angry', 'angrey': 'angry', 'anggry': 'angry', 'mad': 'mad',
+            'happie': 'happy', 'hapy': 'happy', 'happi': 'happy', 'happpy': 'happy',
+            'sadd': 'sad', 'sade': 'sad', 'saddd': 'sad',
+            
+            // Greetings
+            'helli': 'hello', 'hllo': 'hello', 'helo': 'hello', 'heelo': 'hello', 'helllo': 'hello',
+            'hi': 'hi', 'hii': 'hi', 'hie': 'hi', 'hy': 'hi', 'hai': 'hi',
+            'bye': 'bye', 'by': 'bye', 'bai': 'bye', 'bbye': 'bye', 'goodby': 'goodbye',
+            'goodnite': 'goodnight', 'gud': 'good', 'gd': 'good', 'goood': 'good',
+            
+            // Common typos and position errors
+            'heee': 'here', 'heer': 'here', 'hear': 'here', 'her': 'here', 'helo': 'hello',
+            'ther': 'there', 'thier': 'their', 'thre': 'there', 'tjere': 'there', 'thefe': 'there',
+            'wjen': 'when', 'wehn': 'when', 'whne': 'when', 'wen': 'when',
+            'wjere': 'where', 'whre': 'where', 'wher': 'where', 'were': 'where',
+            'wau': 'way', 'waay': 'way', 'weigh': 'way', 'wy': 'way',
+            'tjis': 'this', 'tihs': 'this', 'thsi': 'this', 'tis': 'this',
+            'besr': 'best', 'bets': 'best', 'bst': 'best', 'besst': 'best',
+            'righr': 'right', 'rght': 'right', 'riht': 'right', 'rightt': 'right',
+            'lefr': 'left', 'lft': 'left', 'leftt': 'left', 'lef': 'left', 'tonigh': 'tonight',
+            
+            // Time expressions
+            'tomoro': 'tomorrow', 'tomorow': 'tomorrow', 'tommorow': 'tomorrow', 'tomorroe': 'tomorrow',
+            'yestarday': 'yesterday', 'yesturday': 'yesterday', 'yestday': 'yesterday',
+            'nite': 'night', 'nigt': 'night', 'nigh': 'night', 'nightt': 'night',
+            'mornig': 'morning', 'mornnig': 'morning', 'moring': 'morning', 'moorning': 'morning',
+            
+            // Common actions
+            'walkig': 'walking', 'walkin': 'walking', 'wlaking': 'walking', 'wakking': 'walking',
+            'runig': 'running', 'runing': 'running', 'runnig': 'running', 'ruuning': 'running',
+            'siting': 'sitting', 'sitin': 'sitting', 'sittin': 'sitting', 'sittng': 'sitting',
+            'stading': 'standing', 'standin': 'standing', 'standng': 'standing', 'staanding': 'standing',
+            'eatig': 'eating', 'eatin': 'eating', 'eting': 'eating', 'eaating': 'eating',
+            'drikn': 'drinking', 'drinkin': 'drinking', 'drinkng': 'drinking', 'driking': 'drinking',
+            
+            // Weather and sensations
+            'coldd': 'cold', 'cod': 'cold', 'cool': 'cool', 'cld': 'cold',
+            'hott': 'hot', 'hooot': 'hot', 'ht': 'hot', 'warm': 'warm',
+            'sik': 'sick', 'sikk': 'sick', 'ill': 'ill', 'illl': 'ill',
+            'wel': 'well', 'wll': 'well', 'good': 'good', 'fine': 'fine',
+            
+            // Text speak and shortcuts
+            'ur': 'your', 'r': 'are', 'u': 'you', 'n': 'and', 'b4': 'before',
+            '2': 'to', '4': 'for', '2day': 'today', '2morrow': 'tomorrow', 'thru': 'through',
+            'w/': 'with', 'w/o': 'without', 'b/c': 'because', 'ppl': 'people',
+            'gonna': 'going to', 'wanna': 'want to', 'gotta': 'got to', 'hafta': 'have to',
+            'shoulda': 'should have', 'coulda': 'could have', 'woulda': 'would have',
+            
+            // Repeat letter corrections
+            'gooo': 'go', 'sooo': 'so', 'nooo': 'no', 'yeaaa': 'yeah', 'okkkk': 'okay',
+            'yesss': 'yes', 'noooo': 'no', 'whyyy': 'why', 'howww': 'how', 'whoooo': 'who'
+        };
+
+
+        function autocorrect(word) {
+            // Clean the word of punctuation but preserve it
+            const cleanWord = word.toLowerCase().replace(/[^\w]/g, '');
+            const punctuation = word.replace(/\w/g, '');
+            
+            // Check for direct match first
+            let corrected = commonMisspellings[cleanWord] || cleanWord;
+            
+            // If no direct match, try some advanced corrections
+            if (corrected === cleanWord) {
+                // Check for doubled letters (e.g., "goood" -> "good")
+                const withoutDoubles = cleanWord.replace(/(.)\1{2,}/g, '$1$1');
+                if (commonMisspellings[withoutDoubles]) {
+                    corrected = commonMisspellings[withoutDoubles];
+                }
+                
+                // Check for common letter swaps (e.g., "form" -> "from")
+                if (corrected === cleanWord) {
+                    const swapPatterns = [
+                        [/ro/, 'or'], [/or/, 'ro'], [/ei/, 'ie'], [/ie/, 'ei'],
+                        [/tion/, 'sion'], [/sion/, 'tion']
+                    ];
+                    
+                    for (const [pattern, replacement] of swapPatterns) {
+                        const swapped = cleanWord.replace(pattern, replacement);
+                        if (commonMisspellings[swapped]) {
+                            corrected = commonMisspellings[swapped];
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // Apply case formatting
+            if (isUpperCase) {
+                corrected = corrected.toUpperCase();
+            } else if (word[0] && word[0] === word[0].toUpperCase()) {
+                // Preserve original capitalization
+                corrected = corrected.charAt(0).toUpperCase() + corrected.slice(1).toLowerCase();
+            } else {
+                corrected = corrected.toLowerCase();
+            }
+            
+            // Add back punctuation
+            return corrected + punctuation.replace(/\w/g, '');
+        }
+
+
+        const predictionBar = document.getElementById('predictionBar');
+        
+        // Smart conversational prediction system
+        const contextualPhrases = {
+            // 3-word phrases (trigrams)
+            "i am going": ["to", "home", "out", "back"],
+            "i want to": ["go", "see", "eat", "get", "know", "say"],
+            "i need to": ["go", "get", "do", "find", "ask"],
+            "i have to": ["go", "be", "do", "get", "leave"],
+            "can you help": ["me", "us"],
+            "thank you for": ["your", "the", "everything", "helping"],
+            "what are you": ["doing", "saying", "thinking", "looking"],
+            "where are you": ["going", "from", "now"],
+            "how are you": ["feeling", "doing", "today"],
+
+            // 2-word phrases (bigrams)
+            "i am": ["feeling", "going", "hungry", "tired", "okay", "cold", "hot", "sick", "happy", "sad", "fine", "ready", "here", "sorry", "done", "busy", "free", "scared", "worried", "excited", "back"],
+            "i have": ["a", "been", "to", "some", "my", "pain", "problems", "questions", "time", "food", "water", "medicine", "work", "family", "friends", "an", "no"],
+            "i need": ["help", "water", "food", "medicine", "to", "some", "a", "rest", "sleep", "time", "space", "support", "care", "the"],
+            "i want": ["to", "some", "a", "food", "water", "help", "rest", "sleep", "medicine", "time", "space", "more", "less"],
+            "i feel": ["good", "bad", "sick", "tired", "hungry", "thirsty", "cold", "hot", "pain", "better", "worse", "okay", "fine", "sad", "happy", "a"],
+            "i can": ["see", "hear", "feel", "help", "do", "go", "come", "walk", "talk", "eat", "drink", "sleep", "work", "not"],
+            "i will": ["be", "go", "come", "help", "do", "take", "eat", "drink", "sleep", "work", "try", "call", "see", "need"],
+            "i would": ["like", "love", "prefer", "want", "need", "appreciate", "be", "go", "come", "help", "say"],
+            "can you": ["help", "please", "come", "go", "see", "hear", "feel", "do", "make", "get", "bring", "take", "tell"],
+            "could you": ["help", "please", "come", "go", "see", "do", "make", "get", "bring", "take", "tell"],
+            "would you": ["like", "please", "help", "come", "go", "mind", "be", "do", "make", "get", "tell"],
+            "do you": ["have", "know", "see", "hear", "feel", "want", "need", "like", "think", "understand"],
+            "are you": ["okay", "here", "there", "ready", "sure", "busy", "free", "coming", "going", "feeling", "done"],
+            "how are": ["you", "things", "we", "they"],
+            "how is": ["everything", "work", "family", "your", "the", "it"],
+            "what is": ["your", "the", "this", "that", "happening", "wrong", "going", "it"],
+            "what are": ["you", "we", "they", "these", "those"],
+            "where is": ["the", "my", "your", "it", "he", "she"],
+            "where are": ["you", "we", "they", "the", "my"],
+            "when is": ["the", "your", "our", "it"],
+            "when are": ["you", "we", "they"],
+            "why is": ["the", "it", "this", "that"],
+            "why are": ["you", "we", "they"],
+            "who is": ["this", "that", "the", "your"],
+            "who are": ["you", "they", "these"],
+            "there is": ["a", "no", "something", "someone", "nothing", "nobody", "one"],
+            "there are": ["some", "many", "no", "people", "things", "two"],
+            "it is": ["good", "bad", "okay", "fine", "hot", "cold", "warm", "cool", "big", "small", "time", "not", "important", "very"],
+            "this is": ["good", "bad", "okay", "fine", "my", "the", "important", "difficult", "easy", "not", "very"],
+            "that is": ["good", "bad", "okay", "fine", "right", "wrong", "true", "false", "not", "very"],
+            "my name": ["is"],
+            "my pain": ["is", "feels", "hurts", "getting"],
+            "my head": ["hurts", "aches", "feels"],
+            "my stomach": ["hurts", "aches", "feels"],
+            "my back": ["hurts", "aches", "feels"],
+            "the pain": ["is", "feels", "hurts", "started", "stopped", "getting"],
+            "thank you": ["for", "very", "so", "again"],
+            "please help": ["me", "us", "them"],
+            "excuse me": ["but", "please", "for"],
+            "good morning": ["doctor", "nurse", "everyone"],
+            "good afternoon": ["doctor", "nurse", "everyone"],
+            "good evening": ["doctor", "nurse", "everyone"],
+            "good night": ["everyone", "doctor", "nurse", "and"],
+            "see you": ["later", "soon", "tomorrow", "today", "then"],
+            "talk to": ["you", "me", "them", "the", "her", "him"],
+            "go to": ["the", "see", "bed", "sleep", "work", "home"],
+            "come back": ["later", "tomorrow", "soon", "here"],
+            "right now": ["please", "I", "it", "is"],
+            "very much": ["thank", "I", "for"],
+            "so much": ["thank", "I", "for"],
+            "a lot": ["of", "thank", "better", "worse"],
+            "not feeling": ["good", "well", "okay", "fine"],
+            "feeling better": ["now", "today", "thank"],
+            "feeling worse": ["now", "today", "since"],
+            "in pain": ["right", "and", "very", "so", "I'm"],
+            "much better": ["now", "today", "thank", "it's"],
+            "much worse": ["now", "today", "since", "it's"],
+            "getting better": ["slowly", "now", "I", "am"],
+            "getting worse": ["quickly", "now", "I", "am"],
+            "going to": ["be", "go", "get", "see", "do", "the"],
+            "for the": ["first", "last", "time", "moment", "record"],
+            "in the": ["morning", "afternoon", "evening", "meantime", "end"],
+            "on the": ["other", "way", "table", "phone"],
+            "to be": ["honest", "fair", "sure", "able"],
+            "to do": ["it", "that", "this", "something"],
+            "to get": ["a", "the", "some", "ready"],
+            "to go": ["home", "to", "out", "back"],
+            "of course": ["I", "it", "not", "we"],
+        };
+
+
+
+        // Common word completions for partial words
+        const commonWords = [
+            'a', 'about', 'after', 'again', 'there', 'all', 'also', 'and', 'any', 'are', 'as', 'at', 'back',
+            'be', 'because', 'been', 'before', 'being', 'but', 'by', 'call', 'came', 'can', 'come',
+            'could', 'day', 'did', 'do', 'down', 'each', 'even', 'every', 'feel', 'feeling', 'find',
+            'first', 'for', 'from', 'get', 'give', 'go', 'going', 'good', 'great', 'had', 'has',
+            'have', 'having', 'he', 'help', 'her', 'here', 'him', 'his', 'how', 'hungry', 'hurt',
+            'I', 'if', 'in', 'into', 'is', 'it', 'its', 'just', 'know', 'last', 'left', 'like',
+            'little', 'look', 'made', 'make', 'many', 'may', 'me', 'more', 'most', 'much', 'my',
+            'need', 'new', 'no', 'not', 'now', 'of', 'off', 'on', 'one', 'only', 'or', 'other',
+            'our', 'out', 'over', 'own', 'pain', 'people', 'please', 'right', 'said', 'same', 'say',
+            'see', 'she', 'should', 'sick', 'so', 'some', 'take', 'than', 'that', 'the', 'their',
+            'them', 'then', 'there', 'these', 'they', 'think', 'this', 'those', 'through', 'time',
+            'tired', 'to', 'today', 'too', 'two', 'up', 'us', 'use', 'very', 'want', 'was',
+            'water', 'way', 'we', 'well', 'went', 'were', 'what', 'when', 'where', 'which', 'who',
+            'will', 'with', 'work', 'would', 'yes', 'you', 'your',
+            // Medical/AAC specific words
+            'bathroom', 'bed', 'better', 'cold', 'comfortable', 'doctor', 'eat', 'food', 'hello', 'hey', 'hi',
+            'home', 'hot', 'medicine', 'nurse', 'okay', 'rest', 'sleep', 'sorry', 'thank', 'thanks',
+            'thirsty', 'toilet', 'uncomfortable', 'understand', 'walk', 'warm', 'worse',
+            // Expanded word list
+            'above', 'across', 'almost', 'along', 'always', 'another', 'around', 'away', 'become', 
+            'begin', 'between', 'both', 'bring', 'build', 'business', 'change', 'child', 'children', 
+            'city', 'close', 'company', 'country', 'different', 'during', 'early', 'end', 'enough', 
+            'example', 'face', 'family', 'far', 'father', 'few', 'follow', 'friend', 'further', 
+            'game', 'general', 'government', 'group', 'hand', 'happen', 'head', 'hear', 'high', 
+            'hour', 'house', 'however', 'human', 'idea', 'important', 'include', 'information', 
+            'issue', 'job', 'keep', 'kind', 'large', 'later', 'learn', 'leave', 'let', 'life', 
+            'line', 'long', 'lot', 'low', 'man', 'member', 'might', 'minute', 'money', 'month', 
+            'morning', 'mother', 'move', 'name', 'national', 'never', 'night', 'number', 'often', 
+            'once', 'open', 'order', 'part', 'pay', 'person', 'place', 'plan', 'play', 'point', 
+            'possible', 'power', 'president', 'problem', 'program', 'provide', 'public', 'question', 
+            'rather', 'read', 'really', 'reason', 'remember', 'result', 'room', 'run', 'school', 
+            'seem', 'sense', 'service', 'set', 'several', 'show', 'side', 'since', 'small', 'social', 
+            'something', 'sometimes', 'sound', 'speak', 'spend', 'stand', 'start', 'state', 'still', 
+            'stop', 'story', 'street', 'student', 'study', 'system', 'talk', 'tell', 'thing', 
+            'though', 'there', 'together', 'toward', 'try', 'turn', 'under', 'until', 'wait', 'watch', 
+            'while', 'white', 'whole', 'why', 'without', 'woman', 'word', 'world', 'write', 'year', 'young'
+        ];
+
+        // --- Pre-computation for Glide Swipe ---
+        const wordsByFirstLetter = {};
+        for (const word of commonWords) {
+            const firstLetter = word[0].toLowerCase();
+            if (!wordsByFirstLetter[firstLetter]) {
+                wordsByFirstLetter[firstLetter] = [];
+            }
+            wordsByFirstLetter[firstLetter].push(word);
+        }
+
+
+        function updatePredictions() {
+            // This function is now fully cursor-aware.
+            const cursor_pos = textElement ? getCaretPosition(textElement) : currentText.length;
+            const text_before_cursor = currentText.substring(0, cursor_pos);
+            
+            const endsWithSpace = /\s$/.test(text_before_cursor);
+            let predictions = [];
+            let isCompletion = false;
+
+            if (endsWithSpace || cursor_pos === 0) {
+                // Predict the NEXT word.
+                isCompletion = false;
+                const words = text_before_cursor.trim().split(/\s+/).filter(w => w.length > 0);
+                
+                // Try 3-word context
+                if (words.length >= 3) {
+                    const lastThreeWords = words.slice(-3).join(' ').toLowerCase();
+                    if (contextualPhrases[lastThreeWords]) predictions = contextualPhrases[lastThreeWords];
+                }
+                // Fallback to 2-word context
+                if (predictions.length === 0 && words.length >= 2) {
+                    const lastTwoWords = words.slice(-2).join(' ').toLowerCase();
+                    if (contextualPhrases[lastTwoWords]) predictions = contextualPhrases[lastTwoWords];
+                }
+                // Fallback to 1-word context
+                if (predictions.length === 0 && words.length >= 1) {
+                    const lastWord = words[words.length - 1].toLowerCase();
+                    if (contextualPhrases[lastWord]) predictions = contextualPhrases[lastWord];
+                }
+
+                } else {
+                // Offer COMPLETIONS for the current partial word.
+                isCompletion = true;
+                const wordStartIndex = text_before_cursor.lastIndexOf(' ') + 1;
+                const currentWord = text_before_cursor.substring(wordStartIndex).toLowerCase();
+
+                    if (currentWord.length > 0) {
+                        const completions = commonWords.filter(word => 
+                            word.toLowerCase().startsWith(currentWord) && 
+                            word.toLowerCase() !== currentWord
+                        );
+                        if (completions.length > 0) {
+                            predictions = completions;
+                    }
+                }
+            }
+           
+            const predictionElements = predictionBar.querySelectorAll('.prediction');
+            predictions = predictions.slice(0, 3);
+           
+            predictionElements.forEach((elem, index) => {
+                if (index < predictions.length && predictions[index]) {
+                    const predictionWord = predictions[index];
+                    const word = isUpperCase ? predictionWord.toUpperCase() : predictionWord.toLowerCase();
+                    elem.textContent = word;
+                    elem.style.opacity = '1';
+                    elem.style.pointerEvents = 'auto';
+                    elem.onclick = () => {
+                        // This new handler is cursor-aware and handles both completion and insertion.
+                        const currentPos = getCaretPosition(textElement);
+                        
+                        if (isCompletion) {
+                            // Replace the partial word before the cursor.
+                            const textBeforeCursor = currentText.substring(0, currentPos);
+                            const wordStartIndex = (textBeforeCursor.lastIndexOf(' ') === -1) ? 0 : textBeforeCursor.lastIndexOf(' ') + 1;
+                            
+                            const prefix = currentText.substring(0, wordStartIndex);
+                            const suffix = currentText.substring(currentPos);
+
+                            currentText = prefix + word + ' ' + suffix;
+                            cursorPosition = (prefix + word + ' ').length;
+                        } else {
+                            // Insert the new word at the cursor.
+                            let wordToInsert = word + ' ';
+                            // Only add a leading space if we're not at the beginning of the text
+                            // and the preceding character isn't already a space.
+                            if (currentPos > 0 && !/\s$/.test(currentText.substring(0, currentPos))) {
+                                wordToInsert = ' ' + wordToInsert;
+                            }
+                            
+                            const prefix = currentText.substring(0, currentPos);
+                            const suffix = currentText.substring(currentPos);
+                            currentText = prefix + wordToInsert + suffix;
+                            cursorPosition = currentPos + wordToInsert.length;
+                            }
+
+                        updateSelectedList();
+                        setTimeout(() => setCaretPosition(textElement, cursorPosition), 10);
+                    };
+                } else {
+                    elem.textContent = '';
+                    elem.style.opacity = '0.3';
+                    elem.style.pointerEvents = 'none';
+                    elem.onclick = null;
+                }
+            });
+        }
+        
+
+        
+
+
+
+        // Initial call to set up prediction boxes
+        updatePredictions();
+
+
+        function updateSelectedList() {
+            // Only apply autocorrect when a space is pressed or word is completed
+            let displayText = currentText;
+            
+            // Apply the current case to the entire text if shift is active
+            if (isUpperCase) {
+                displayText = displayText.toUpperCase();
+            }
+
+            // Create or update the editable text element
+            if (!textElement) {
+                selectedList.innerHTML = `<div class="selected-item" id="editableText"></div>`;
+                textElement = document.getElementById('editableText');
+                
+                // Remove interactivity to prevent native keyboard on mobile devices
+                textElement.removeAttribute('contenteditable');
+                textElement.style.cursor = 'default';
+            }
+            
+            // Update the text content directly without cursor management
+            textElement.textContent = displayText;
+            
+            // Add visual cursor at the end for user feedback
+            if (displayText.length === 0 || !displayText.endsWith(' ')) {
+                textElement.innerHTML = displayText + '<span class="cursor"></span>';
+            } else {
+                textElement.innerHTML = displayText + '<span class="cursor"></span>';
+            }
+            
+            updatePredictions();
+        }
+
+        // Remove all text input handlers since we don't want direct text input
+        function handleTextInput(e) {
+            // Disabled to prevent native keyboard
+        }
+
+        function handleTextClick(e) {
+            // Disabled to prevent native keyboard
+        }
+
+        function handleKeyDown(e) {
+            // Disabled to prevent native keyboard
+        }
+
+        function handlePaste(e) {
+            // Disabled to prevent native keyboard
+        }
+
+        // Get current cursor position - now just returns end of text
+        function getCaretPosition(element) {
+            return currentText.length;
+        }
+
+        // Set cursor position - disabled for mobile compatibility
+        function setCaretPosition(element, pos) {
+            // Disabled to prevent native keyboard focus
+        }
+
+        // Save selection state - disabled
+        function saveSelection(element) {
+            return currentText.length;
+        }
+
+        // Restore selection state - disabled
+        function restoreSelection(element, savedPos) {
+            // Disabled to prevent native keyboard focus
+        }
+
+        // Insert text at current cursor position
+        function insertTextAtCursor(text) {
+            // Always insert at the end since we don't have cursor management
+            currentText += text;
+            cursorPosition = currentText.length;
+            updateSelectedList();
+        }
+
+        // Perform a single backspace operation
+        function performBackspace() {
+            if (currentText.length > 0) {
+                currentText = currentText.slice(0, -1);
+                cursorPosition = currentText.length;
+                updateSelectedList();
+            }
+        }
+
+        // Start continuous backspace (for hold-and-repeat)
+        function startBackspaceRepeat() {
+            // Clear any existing intervals
+            stopBackspaceRepeat();
+            
+            // Perform initial backspace immediately
+            performBackspace();
+            
+            // Start repeating after a delay
+            backspaceTimeout = setTimeout(() => {
+                backspaceInterval = setInterval(performBackspace, 100); // Repeat every 100ms
+            }, 500); // Initial delay of 500ms before repeating
+        }
+
+        // Stop continuous backspace
+        function stopBackspaceRepeat() {
+            if (backspaceInterval) {
+                clearInterval(backspaceInterval);
+                backspaceInterval = null;
+            }
+            if (backspaceTimeout) {
+                clearTimeout(backspaceTimeout);
+                backspaceTimeout = null;
+            }
+        }
+
+        // Separate function for autocorrecting when space is pressed
+        function performAutocorrect() {
+            if (textElement) {
+                cursorPosition = getCaretPosition(textElement);
+            }
+            
+            // Find the word at or before cursor position
+            const beforeCursor = currentText.slice(0, cursorPosition);
+            const words = beforeCursor.split(' ');
+            const lastWordIndex = words.length - 1;
+            
+            if (lastWordIndex >= 0 && words[lastWordIndex]) {
+                const originalWord = words[lastWordIndex];
+                const correctedWord = autocorrect(originalWord);
+                
+                // Only replace if there was actually a correction
+                if (correctedWord.toLowerCase() !== originalWord.toLowerCase()) {
+                    const wordStart = beforeCursor.lastIndexOf(originalWord);
+                    const wordEnd = wordStart + originalWord.length;
+                    
+                    currentText = currentText.slice(0, wordStart) + correctedWord + currentText.slice(wordEnd);
+                    cursorPosition = wordStart + correctedWord.length;
+                    
+                    // Add visual feedback for autocorrection
+                    showAutocorrectFeedback(originalWord, correctedWord);
+                }
+            }
+        }
+
+        // Function to show autocorrect feedback
+        function showAutocorrectFeedback(original, corrected) {
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: var(--item-bg);
+                border: 1px solid var(--item-border);
+                border-radius: 10px;
+                padding: 10px 15px;
+                font-size: 0.9em;
+                z-index: 1000;
+                backdrop-filter: blur(10px);
+                animation: fadeInOut 2s ease-in-out;
+            `;
+            feedbackDiv.innerHTML = `"${original}" → "${corrected}"`;
+            document.body.appendChild(feedbackDiv);
+            
+            // Remove after 2 seconds
+            setTimeout(() => {
+                if (feedbackDiv.parentNode) {
+                    feedbackDiv.parentNode.removeChild(feedbackDiv);
+                }
+            }, 2000);
+        }
+
+        // Function to autocorrect current word manually (for double-tap feature)
+        function autocorrectCurrentWord() {
+            if (textElement) {
+                cursorPosition = getCaretPosition(textElement);
+            }
+            
+            // Find the word at cursor position
+            const beforeCursor = currentText.slice(0, cursorPosition);
+            const afterCursor = currentText.slice(cursorPosition);
+            
+            // Find word boundaries
+            const wordStart = Math.max(beforeCursor.lastIndexOf(' ') + 1, 0);
+            const nextSpaceAfter = afterCursor.indexOf(' ');
+            const wordEnd = nextSpaceAfter === -1 ? currentText.length : cursorPosition + nextSpaceAfter;
+            
+            const currentWord = currentText.slice(wordStart, wordEnd);
+            
+            if (currentWord) {
+                const correctedWord = autocorrect(currentWord);
+                
+                if (correctedWord.toLowerCase() !== currentWord.toLowerCase()) {
+                    currentText = currentText.slice(0, wordStart) + correctedWord + currentText.slice(wordEnd);
+                    cursorPosition = wordStart + correctedWord.length;
+                    
+                    showAutocorrectFeedback(currentWord, correctedWord);
+                    updateSelectedList();
+                    setTimeout(() => setCaretPosition(textElement, cursorPosition), 10);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Add double-tap to autocorrect feature
+        let lastTapTime = 0;
+        selectedList.addEventListener('click', function(e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTapTime;
+            
+            if (tapLength < 500 && tapLength > 0) {
+                // Double tap detected
+                if (!autocorrectCurrentWord()) {
+                    // If no autocorrection was made, show a brief message
+                    const noCorrectionsDiv = document.createElement('div');
+                    noCorrectionsDiv.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: var(--item-bg);
+                        border: 1px solid var(--item-border);
+                        border-radius: 10px;
+                        padding: 10px 15px;
+                        font-size: 0.9em;
+                        z-index: 1000;
+                        backdrop-filter: blur(10px);
+                        animation: fadeInOut 1.5s ease-in-out;
+                    `;
+                    noCorrectionsDiv.innerHTML = 'No corrections needed';
+                    document.body.appendChild(noCorrectionsDiv);
+                    
+                    setTimeout(() => {
+                        if (noCorrectionsDiv.parentNode) {
+                            noCorrectionsDiv.parentNode.removeChild(noCorrectionsDiv);
+                        }
+                    }, 1500);
+                }
+            }
+            lastTapTime = currentTime;
+        });
+
+
+        // Modify the key click event listener
+        document.querySelectorAll('.keyboard .key').forEach(key => {
+            key.addEventListener('click', () => {
+                if (key.id === 'switchToNumbers' || key.id === 'switchToAlphabet' || key.id === 'backspace') {
+                    return; // Do nothing for these keys (backspace is handled separately)
+                }
+                
+                console.log('Key clicked:', key.id || key.textContent, 'Action:', key.dataset.action);
+                
+                // Get current cursor position from editable element
+                if (textElement) {
+                    cursorPosition = getCaretPosition(textElement);
+                }
+                
+                // Use data-action attribute to determine behavior
+                if (key.dataset.action === 'clear') {
+                    currentText = '';
+                    cursorPosition = 0;
+                } else if (key.dataset.action === 'space' || key.textContent === keyboardLayouts[currentLanguage].spaceText) {
+                    // Apply autocorrect before adding space
+                    performAutocorrect();
+                    insertTextAtCursor(' ');
+                    return; // insertTextAtCursor handles the update
+                } else if (key.id === 'toggleCase') {
+                    // Do nothing, handled by separate event listener
+                } else {
+                    // Check if it's punctuation that should trigger autocorrect
+                    const punctuationTriggers = ['.', '!', '?', ',', ';', ':'];
+                    if (punctuationTriggers.includes(key.textContent)) {
+                        performAutocorrect();
+                }
+                    insertTextAtCursor(key.textContent);
+                    return; // insertTextAtCursor handles the update
+                }
+                
+                updateSelectedList();
+                // Restore cursor position after update
+                if (textElement) {
+                    setTimeout(() => setCaretPosition(textElement, cursorPosition), 10);
+                }
+            });
+        });
+
+        // Add hold-and-repeat functionality specifically for backspace buttons
+        document.querySelectorAll('#backspace').forEach(backspaceKey => {
+            let isHolding = false;
+            let holdStartTime = 0;
+            
+            // Mouse events
+            backspaceKey.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                isHolding = true;
+                holdStartTime = Date.now();
+                startBackspaceRepeat();
+            });
+            
+            backspaceKey.addEventListener('mouseup', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                stopBackspaceRepeat();
+                isHolding = false;
+            });
+            
+            backspaceKey.addEventListener('mouseleave', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                stopBackspaceRepeat();
+                isHolding = false;
+            });
+            
+            // Touch events for mobile devices
+            backspaceKey.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                isHolding = true;
+                holdStartTime = Date.now();
+                startBackspaceRepeat();
+            });
+            
+            backspaceKey.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                stopBackspaceRepeat();
+                isHolding = false;
+            });
+            
+            backspaceKey.addEventListener('touchcancel', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                stopBackspaceRepeat();
+                isHolding = false;
+            });
+            
+            // Override the click event to prevent double-firing
+            backspaceKey.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                // Only perform single backspace if it was a quick click (not a hold)
+                const holdDuration = Date.now() - holdStartTime;
+                if (holdDuration < 200 && !isHolding) {
+                    performBackspace();
+                }
+            });
+        });
+
+        // Global event listeners to stop backspace repeat when mouse/touch is released anywhere
+        document.addEventListener('mouseup', stopBackspaceRepeat);
+        document.addEventListener('touchend', stopBackspaceRepeat);
+        document.addEventListener('touchcancel', stopBackspaceRepeat);
+
+        // Audio context for wave reactivity
+        let audioContext = null;
+        let analyser = null;
+        let microphone = null;
+        let dataArray = null;
+        let animationId = null;
+
+        // Initialize audio context for wave reactivity
+        function initAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 256;
+                const bufferLength = analyser.frequencyBinCount;
+                dataArray = new Uint8Array(bufferLength);
+            }
+        }
+
+        // Function to update wave bars based on audio input
+        function updateWaveBars() {
+            const waveBars = document.querySelectorAll('.wave-bar');
+            
+            if (!analyser || !dataArray) {
+                // Fallback: use time-based animation when audio context is not available
+                const time = Date.now() * 0.005;
+                waveBars.forEach((bar, index) => {
+                    const wave = Math.sin(time + index * 0.5) * 0.5 + 0.5;
+                    const height = Math.max(12, Math.min(36, 12 + wave * 24));
+                    const opacity = Math.max(0.3, Math.min(1, 0.3 + wave * 0.7));
+                    
+                    bar.style.height = `${height}px`;
+                    bar.style.opacity = opacity;
+                    bar.style.transform = `scaleY(${0.5 + wave * 0.5})`;
+                });
+                
+                if (isSpeaking) {
+                    animationId = requestAnimationFrame(updateWaveBars);
+                }
+                return;
+            }
+
+            analyser.getByteFrequencyData(dataArray);
+            
+            // Calculate average frequency for reactivity
+            const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+            const scale = Math.max(0.5, average / 128);
+
+            waveBars.forEach((bar, index) => {
+                const frequency = dataArray[index * 5] || 0;
+                const height = Math.max(12, Math.min(36, 12 + (frequency / 255) * 24));
+                const opacity = Math.max(0.3, Math.min(1, frequency / 255));
+                
+                bar.style.height = `${height}px`;
+                bar.style.opacity = opacity;
+                bar.style.transform = `scaleY(${scale})`;
+            });
+
+            if (isSpeaking) {
+                animationId = requestAnimationFrame(updateWaveBars);
+            }
+        }
+
+        // Function to show microphone icon
+        function showMicrophone() {
+            const microphoneIcon = document.querySelector('.microphone-icon');
+            const waveContainer = document.getElementById('waveContainer');
+            
+            microphoneIcon.style.display = 'block';
+            waveContainer.classList.remove('active', 'speaking');
+            
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+        }
+
+        // Function to show wave animation
+        function showWaves() {
+            const microphoneIcon = document.querySelector('.microphone-icon');
+            const waveContainer = document.getElementById('waveContainer');
+            
+            microphoneIcon.style.display = 'none';
+            waveContainer.classList.add('active', 'speaking');
+            
+            // Start audio-reactive animation
+            initAudioContext();
+            updateWaveBars();
+        }
+
+        speakButton.addEventListener('click', () => {
+            const textToSpeak = currentText;
+            if (!textToSpeak.trim()) return;
+
+            // 1. Log the action directly using the global function
+            logAction(`Keyboard Spoken: "${textToSpeak}"`);
+
+            // 2. Speak the text using the global function
+            if (isSpeaking) {
+                window.speechSynthesis.cancel();
+                showMicrophone();
+            } else {
+                const callbacks = {
+                    onstart: () => {
+                        isSpeaking = true;
+                        showWaves();
+                    },
+                    onend: () => {
+                        isSpeaking = false;
+                        showMicrophone();
+                    },
+                    onerror: () => {
+                        isSpeaking = false;
+                        showMicrophone();
+                    }
+                };
+                // Assuming global 'speak' is from documentFunctions.js
+                window.speak(textToSpeak, callbacks);
+            }
+        });
+
+        function stopSpeaking() {
+            speechSynthesis.cancel();
+            resetSpeakButton();
+        }
+
+        function resetSpeakButton() {
+            isSpeaking = false;
+            showMicrophone();
+        }
+
+        const toggleSwitch = document.getElementById('switch');
+        const body = document.body;
+        const container = document.querySelector('.container');
+        
+        // Check the initial state from local storage
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            toggleSwitch.checked = true;
+            updateIconColors('white');
+        }
+
+        toggleSwitch.addEventListener('change', function() {
+            if (this.checked) {
+                console.log('Switch is ON - Dark Mode');
+                body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'enabled');
+                updateIconColors('white'); // Set icons to white
+            } else {
+                console.log('Switch is OFF - Light Mode');
+                body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'disabled');
+                updateIconColors('black'); // Set icons to black
+            }
+        });
+
+        function updateIconColors(color) {
+            const backspaceIcons = document.querySelectorAll('.backspace-icon');
+            backspaceIcons.forEach(icon => {
+                if (icon) {
+                    // Update the filter to change the icon color
+                    icon.style.filter = color === 'white' ? 'brightness(0) invert(1)' : 'brightness(0)';
+                }
+            });
+        }
+
+        const keyboardButton = document.querySelector('.nav-item[href="keyboard.html"]');
+
+        function updateKeyboardButtonBorder() {
+            if (body.classList.contains('dark-mode')) {
+                keyboardButton.style.border = '0px solid white';
+            } else {
+                keyboardButton.style.border = '0px solid black';
+            }
+        }
+
+        // Call the function initially to set the correct border color
+        updateKeyboardButtonBorder();
+
+        // Update the border color whenever the mode changes
+        toggleSwitch.addEventListener('change', updateKeyboardButtonBorder);
+
+        // Make all elements undraggable
+        document.querySelectorAll('*').forEach(element => {
+            element.setAttribute('draggable', 'false');
+        });
+
+        // The logAction function is in documentFunctions.js, so local versions are removed.
+
+        // No additional click logging needed - only log when text is spoken
+
+        // Add event listeners once DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize with English if no saved preference
+            currentLanguage = localStorage.getItem('keyboardLanguage') || 'en';
+            languageSelect.value = currentLanguage;
+            localStorage.setItem('selectedLanguage', currentLanguage); // Sync with global setting for TTS
+            
+            // Force complete keyboard update
+            updateKeyboardLayout();
+            
+            // Setup for Glide Swipe
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            keyboardWrapper.addEventListener('mousedown', startSwipe);
+            document.addEventListener('mousemove', moveSwipe);
+            document.addEventListener('mouseup', endSwipe);
+            keyboardWrapper.addEventListener('touchstart', startSwipe, { passive: false });
+            document.addEventListener('touchmove', moveSwipe, { passive: false });
+            document.addEventListener('touchend', endSwipe);
+        });
+        
+        // Add a comprehensive translation dictionary for many more words across all languages
+        const translations = {
+            // English to all other languages
+            en: {
+                // Greetings and common phrases
+                hello: { es: 'hola', fr: 'bonjour', de: 'hallo', it: 'ciao', pt: 'olá', ru: 'привет', zh: '你好', ja: 'こんにちは', ko: '안녕하세요', ar: 'مرحبا', hi: 'नमस्ते' },
+                hi: { es: 'hola', fr: 'salut', de: 'hi', it: 'ciao', pt: 'oi', ru: 'привет', zh: '嗨', ja: 'やあ', ko: '안녕', ar: 'أهلا', hi: 'नमस्कार' },
+                goodbye: { es: 'adiós', fr: 'au revoir', de: 'auf wiedersehen', it: 'arrivederci', pt: 'adeus', ru: 'до свидания', zh: '再见', ja: 'さようなら', ko: '안녕히 가세요', ar: 'وداعا', hi: 'अलविदा' },
+                bye: { es: 'adiós', fr: 'salut', de: 'tschüss', it: 'ciao', pt: 'tchau', ru: 'пока', zh: '拜拜', ja: 'バイバイ', ko: '잘 가', ar: 'باي', hi: 'बाय' },
+                yes: { es: 'sí', fr: 'oui', de: 'ja', it: 'sì', pt: 'sim', ru: 'да', zh: '是', ja: 'はい', ko: '예', ar: 'نعم', hi: 'हां' },
+                no: { es: 'no', fr: 'non', de: 'nein', it: 'no', pt: 'não', ru: 'нет', zh: '不', ja: 'いいえ', ko: '아니요', ar: 'لا', hi: 'नहीं' },
+                please: { es: 'por favor', fr: 's\'il vous plaît', de: 'bitte', it: 'per favore', pt: 'por favor', ru: 'пожалуйста', zh: '请', ja: 'お願いします', ko: '부탁합니다', ar: 'من فضلك', hi: 'कृपया' },
+                thanks: { es: 'gracias', fr: 'merci', de: 'danke', it: 'grazie', pt: 'obrigado', ru: 'спасибо', zh: '谢谢', ja: 'ありがとう', ko: '감사합니다', ar: 'شكرا', hi: 'धन्यवाद' },
+                thankyou: { es: 'gracias', fr: 'merci', de: 'danke', it: 'grazie', pt: 'obrigado', ru: 'спасибо', zh: '谢谢', ja: 'ありがとう', ko: '감사합니다', ar: 'شكرا', hi: 'धन्यवाद' },
+                sorry: { es: 'lo siento', fr: 'désolé', de: 'entschuldigung', it: 'scusa', pt: 'desculpe', ru: 'извините', zh: '对不起', ja: 'ごめんなさい', ko: '죄송합니다', ar: 'آسف', hi: 'माफ़ करें' },
+                excuse: { es: 'disculpe', fr: 'excusez-moi', de: 'entschuldigung', it: 'scusi', pt: 'com licença', ru: 'извините', zh: '打扰了', ja: 'すみません', ko: '실례합니다', ar: 'عذراً', hi: 'क्षमा करें' },
+                
+                // Question words
+                what: { es: 'qué', fr: 'quoi', de: 'was', it: 'cosa', pt: 'o que', ru: 'что', zh: '什么', ja: '何', ko: '무엇', ar: 'ماذا', hi: 'क्या' },
+                when: { es: 'cuándo', fr: 'quand', de: 'wann', it: 'quando', pt: 'quando', ru: 'когда', zh: '什么时候', ja: 'いつ', ko: '언제', ar: 'متى', hi: 'कब' },
+                where: { es: 'dónde', fr: 'où', de: 'wo', it: 'dove', pt: 'onde', ru: 'где', zh: '哪里', ja: 'どこ', ko: '어디', ar: 'أين', hi: 'कहां' },
+                who: { es: 'quién', fr: 'qui', de: 'wer', it: 'chi', pt: 'quem', ru: 'кто', zh: '谁', ja: '誰', ko: '누구', ar: 'من', hi: 'कौन' },
+                why: { es: 'por qué', fr: 'pourquoi', de: 'warum', it: 'perché', pt: 'por que', ru: 'почему', zh: '为什么', ja: 'なぜ', ko: '왜', ar: 'لماذا', hi: 'क्यों' },
+                how: { es: 'cómo', fr: 'comment', de: 'wie', it: 'come', pt: 'como', ru: 'как', zh: '怎么', ja: 'どうやって', ko: '어떻게', ar: 'كيف', hi: 'कैसे' },
+                
+                // Common words: health and medical
+                pain: { es: 'dolor', fr: 'douleur', de: 'schmerz', it: 'dolore', pt: 'dor', ru: 'боль', zh: '疼痛', ja: '痛み', ko: '통증', ar: 'ألم', hi: 'दर्द' },
+                hurt: { es: 'duele', fr: 'fait mal', de: 'schmerzt', it: 'fa male', pt: 'dói', ru: 'болит', zh: '疼', ja: '痛い', ko: '아프다', ar: 'يؤلم', hi: 'दर्द होना' },
+                sick: { es: 'enfermo', fr: 'malade', de: 'krank', it: 'malato', pt: 'doente', ru: 'больной', zh: '生病', ja: '病気', ko: '아픈', ar: 'مريض', hi: 'बीमार' },
+                doctor: { es: 'médico', fr: 'médecin', de: 'arzt', it: 'dottore', pt: 'médico', ru: 'врач', zh: '医生', ja: '医者', ko: '의사', ar: 'طبيب', hi: 'डॉक्टर' },
+                nurse: { es: 'enfermera', fr: 'infirmière', de: 'krankenschwester', it: 'infermiera', pt: 'enfermeira', ru: 'медсестра', zh: '护士', ja: '看護師', ko: '간호사', ar: 'ممرضة', hi: 'नर्स' },
+                hospital: { es: 'hospital', fr: 'hôpital', de: 'krankenhaus', it: 'ospedale', pt: 'hospital', ru: 'больница', zh: '医院', ja: '病院', ko: '병원', ar: 'مستشفى', hi: 'अस्पताल' },
+                medicine: { es: 'medicina', fr: 'médicament', de: 'medizin', it: 'medicina', pt: 'remédio', ru: 'лекарство', zh: '药', ja: '薬', ko: '약', ar: 'دواء', hi: 'दवा' },
+                headache: { es: 'dolor de cabeza', fr: 'mal de tête', de: 'kopfschmerzen', it: 'mal di testa', pt: 'dor de cabeça', ru: 'головная боль', zh: '头痛', ja: '頭痛', ko: '두통', ar: 'صداع', hi: 'सिरदर्द' },
+                stomachache: { es: 'dolor de estómago', fr: 'mal d\'estomac', de: 'bauchschmerzen', it: 'mal di stomaco', pt: 'dor de estômago', ru: 'боль в животе', zh: '胃痛', ja: '腹痛', ko: '복통', ar: 'وجع معدة', hi: 'पेट दर्द' },
+                fever: { es: 'fiebre', fr: 'fièvre', de: 'fieber', it: 'febbre', pt: 'febre', ru: 'жар', zh: '发烧', ja: '熱', ko: '열', ar: 'حمى', hi: 'बुखार' },
+                cold: { es: 'resfriado', fr: 'rhume', de: 'erkältung', it: 'raffreddore', pt: 'resfriado', ru: 'простуда', zh: '感冒', ja: '風邪', ko: '감기', ar: 'زكام', hi: 'जुकाम' },
+                allergy: { es: 'alergia', fr: 'allergie', de: 'allergie', it: 'allergia', pt: 'alergia', ru: 'аллергия', zh: '过敏', ja: 'アレルギー', ko: '알레르기', ar: 'حساسية', hi: 'एलर्जी' },
+                
+                // Basic needs and feelings
+                water: { es: 'agua', fr: 'eau', de: 'wasser', it: 'acqua', pt: 'água', ru: 'вода', zh: '水', ja: '水', ko: '물', ar: 'ماء', hi: 'पानी' },
+                food: { es: 'comida', fr: 'nourriture', de: 'essen', it: 'cibo', pt: 'comida', ru: 'еда', zh: '食物', ja: '食べ物', ko: '음식', ar: 'طعام', hi: 'खाना' },
+                hungry: { es: 'hambriento', fr: 'faim', de: 'hungrig', it: 'affamato', pt: 'com fome', ru: 'голодный', zh: '饿', ja: 'お腹がすいた', ko: '배고픈', ar: 'جائع', hi: 'भूखा' },
+                thirsty: { es: 'sediento', fr: 'soif', de: 'durstig', it: 'assetato', pt: 'com sede', ru: 'жаждущий', zh: '渴', ja: '喉が渇いた', ko: '목마른', ar: 'عطشان', hi: 'प्यासा' },
+                toilet: { es: 'baño', fr: 'toilettes', de: 'toilette', it: 'bagno', pt: 'banheiro', ru: 'туалет', zh: '厕所', ja: 'トイレ', ko: '화장실', ar: 'مرحاض', hi: 'शौचालय' },
+                bathroom: { es: 'baño', fr: 'salle de bain', de: 'badezimmer', it: 'bagno', pt: 'banheiro', ru: 'ванная', zh: '浴室', ja: '浴室', ko: '욕실', ar: 'حمام', hi: 'स्नानघर' },
+                tired: { es: 'cansado', fr: 'fatigué', de: 'müde', it: 'stanco', pt: 'cansado', ru: 'уставший', zh: '累', ja: '疲れた', ko: '피곤한', ar: 'متعب', hi: 'थका हुआ' },
+                sleep: { es: 'dormir', fr: 'dormir', de: 'schlafen', it: 'dormire', pt: 'dormir', ru: 'спать', zh: '睡觉', ja: '眠る', ko: '잠', ar: 'نوم', hi: 'नींद' },
+                hot: { es: 'caliente', fr: 'chaud', de: 'heiß', it: 'caldo', pt: 'quente', ru: 'горячий', zh: '热', ja: '暑い', ko: '뜨거운', ar: 'حار', hi: 'गरम' },
+                cold: { es: 'frío', fr: 'froid', de: 'kalt', it: 'freddo', pt: 'frio', ru: 'холодный', zh: '冷', ja: '寒い', ko: '추운', ar: 'بارد', hi: 'ठंडा' },
+                happy: { es: 'feliz', fr: 'heureux', de: 'glücklich', it: 'felice', pt: 'feliz', ru: 'счастливый', zh: '开心', ja: '幸せ', ko: '행복한', ar: 'سعيد', hi: 'खुश' },
+                sad: { es: 'triste', fr: 'triste', de: 'traurig', it: 'triste', pt: 'triste', ru: 'грустный', zh: '伤心', ja: '悲しい', ko: '슬픈', ar: 'حزين', hi: 'दुखी' },
+                scared: { es: 'asustado', fr: 'effrayé', de: 'verängstigt', it: 'spaventato', pt: 'assustado', ru: 'испуганный', zh: '害怕', ja: '怖い', ko: '무서운', ar: 'خائف', hi: 'डरा हुआ' },
+                angry: { es: 'enojado', fr: 'en colère', de: 'wütend', it: 'arrabbiato', pt: 'bravo', ru: 'сердитый', zh: '生气', ja: '怒った', ko: '화난', ar: 'غاضب', hi: 'नाराज' },
+                
+                // Time expressions
+                today: { es: 'hoy', fr: 'aujourd\'hui', de: 'heute', it: 'oggi', pt: 'hoje', ru: 'сегодня', zh: '今天', ja: '今日', ko: '오늘', ar: 'اليوم', hi: 'आज' },
+                yesterday: { es: 'ayer', fr: 'hier', de: 'gestern', it: 'ieri', pt: 'ontem', ru: 'вчера', zh: '昨天', ja: '昨日', ko: '어제', ar: 'أمس', hi: 'कल' },
+                tomorrow: { es: 'mañana', fr: 'demain', de: 'morgen', it: 'domani', pt: 'amanhã', ru: 'завтра', zh: '明天', ja: '明日', ko: '내일', ar: 'غدا', hi: 'कल' },
+                now: { es: 'ahora', fr: 'maintenant', de: 'jetzt', it: 'ora', pt: 'agora', ru: 'сейчас', zh: '现在', ja: '今', ko: '지금', ar: 'الآن', hi: 'अब' },
+                later: { es: 'después', fr: 'plus tard', de: 'später', it: 'dopo', pt: 'depois', ru: 'позже', zh: '稍后', ja: '後で', ko: '나중에', ar: 'لاحقا', hi: 'बाद में' },
+                
+                // Numbers
+                one: { es: 'uno', fr: 'un', de: 'eins', it: 'uno', pt: 'um', ru: 'один', zh: '一', ja: '一', ko: '하나', ar: 'واحد', hi: 'एक' },
+                two: { es: 'dos', fr: 'deux', de: 'zwei', it: 'due', pt: 'dois', ru: 'два', zh: '二', ja: '二', ko: '둘', ar: 'اثنان', hi: 'दो' },
+                three: { es: 'tres', fr: 'trois', de: 'drei', it: 'tre', pt: 'três', ru: 'три', zh: '三', ja: '三', ko: '셋', ar: 'ثلاثة', hi: 'तीन' },
+                four: { es: 'cuatro', fr: 'quatre', de: 'vier', it: 'quattro', pt: 'quatro', ru: 'четыре', zh: '四', ja: '四', ko: '넷', ar: 'أربعة', hi: 'चार' },
+                five: { es: 'cinco', fr: 'cinq', de: 'fünf', it: 'cinque', pt: 'cinco', ru: 'пять', zh: '五', ja: '五', ko: '다섯', ar: 'خمسة', hi: 'पांच' },
+                
+                // Common verbs
+                want: { es: 'querer', fr: 'vouloir', de: 'wollen', it: 'volere', pt: 'querer', ru: 'хотеть', zh: '想要', ja: '欲しい', ko: '원하다', ar: 'يريد', hi: 'चाहना' },
+                need: { es: 'necesitar', fr: 'avoir besoin', de: 'brauchen', it: 'avere bisogno', pt: 'precisar', ru: 'нуждаться', zh: '需要', ja: '必要', ko: '필요하다', ar: 'يحتاج', hi: 'जरूरत' },
+                help: { es: 'ayuda', fr: 'aide', de: 'hilfe', it: 'aiuto', pt: 'ajuda', ru: 'помощь', zh: '帮助', ja: '助け', ko: '도움', ar: 'مساعدة', hi: 'मदद' },
+                go: { es: 'ir', fr: 'aller', de: 'gehen', it: 'andare', pt: 'ir', ru: 'идти', zh: '去', ja: '行く', ko: '가다', ar: 'يذهب', hi: 'जाना' },
+                come: { es: 'venir', fr: 'venir', de: 'kommen', it: 'venire', pt: 'vir', ru: 'приходить', zh: '来', ja: '来る', ko: '오다', ar: 'يأتي', hi: 'आना' },
+                see: { es: 'ver', fr: 'voir', de: 'sehen', it: 'vedere', pt: 'ver', ru: 'видеть', zh: '看', ja: '見る', ko: '보다', ar: 'يرى', hi: 'देखना' },
+                understand: { es: 'entender', fr: 'comprendre', de: 'verstehen', it: 'capire', pt: 'entender', ru: 'понимать', zh: '理解', ja: '理解する', ko: '이해하다', ar: 'يفهم', hi: 'समझना' },
+                speak: { es: 'hablar', fr: 'parler', de: 'sprechen', it: 'parlare', pt: 'falar', ru: 'говорить', zh: '说话', ja: '話す', ko: '말하다', ar: 'يتكلم', hi: 'बोलना' },
+                
+                // Other common phrases
+                good: { es: 'bueno', fr: 'bon', de: 'gut', it: 'buono', pt: 'bom', ru: 'хороший', zh: '好', ja: '良い', ko: '좋은', ar: 'جيد', hi: 'अच्छा' },
+                bad: { es: 'malo', fr: 'mauvais', de: 'schlecht', it: 'cattivo', pt: 'ruim', ru: 'плохой', zh: '坏', ja: '悪い', ko: '나쁜', ar: 'سيء', hi: 'बुरा' },
+                more: { es: 'más', fr: 'plus', de: 'mehr', it: 'più', pt: 'mais', ru: 'больше', zh: '更多', ja: 'もっと', ko: '더', ar: 'أكثر', hi: 'अधिक' },
+                less: { es: 'menos', fr: 'moins', de: 'weniger', it: 'meno', pt: 'menos', ru: 'меньше', zh: '更少', ja: 'より少ない', ko: '덜', ar: 'أقل', hi: 'कम' }
+            },
+            // Add more languages as needed...
+        };
+
+        // Improved function to attempt basic translation between languages
+        function translateText(text, fromLang, toLang) {
+            if (fromLang === toLang) return text;
+            
+            // If we don't have translation support for the source language, return original
+            if (!translations[fromLang]) {
+                console.log(`No translation dictionary for ${fromLang}`);
+                return text;
+            }
+            
+            // Split text into words, keeping spaces and punctuation
+            const words = text.split(/(\s+|\b)/);
+            const translatedWords = words.map(word => {
+                // Skip empty strings, spaces, and punctuation
+                if (!word.trim() || /^[\s.,!?;:'"()[\]{}]+$/.test(word)) {
+                    return word;
+                }
+                
+                // Try to find translation for this word (case insensitive)
+                const cleanWord = word.toLowerCase().trim().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
+                
+                // Look for exact match first
+                if (translations[fromLang][cleanWord] && translations[fromLang][cleanWord][toLang]) {
+                    // Preserve capitalization if possible
+                    if (word[0] === word[0].toUpperCase()) {
+                        const translated = translations[fromLang][cleanWord][toLang];
+                        return translated.charAt(0).toUpperCase() + translated.slice(1);
+                    }
+                    return translations[fromLang][cleanWord][toLang];
+                }
+                
+                // Try additional lookups for common variants
+                // Check for plurals (very simple approach - just remove trailing 's')
+                if (cleanWord.endsWith('s') && translations[fromLang][cleanWord.slice(0, -1)]) {
+                    const singularForm = cleanWord.slice(0, -1);
+                    if (translations[fromLang][singularForm] && translations[fromLang][singularForm][toLang]) {
+                        return translations[fromLang][singularForm][toLang];
+                    }
+                }
+                
+                // Keep original if no translation found
+                return word;
+            });
+            
+            return translatedWords.join('');
+        }
+
+        // Google Cloud Translation API integration
+        async function translateWithAPI(text, targetLang) {
+          if (!text.trim()) return text;
+          const codeMap = {
+            en:'en', es:'es', fr:'fr', de:'de', it:'it',
+            pt:'pt', ru:'ru', zh:'zh', ja:'ja', ko:'ko',
+            ar:'ar', hi:'hi'
+          };
+          const apiKey = 'AIzaSyC1RWlflkLkg10IB6zv4HNzzq1y5qJgoh0';
+          const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+          const payload = {
+            q: text,
+            target: codeMap[targetLang] || 'en',
+            format: 'text'
+          };
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error(res.status);
+          const data = await res.json();
+          return data.data.translations[0].translatedText;
+        }
+
+        // Add translation cache
+        const translationCache = new Map();
+        const MAX_CACHE_SIZE = 1000;
+
+        // Function to manage cache size
+        function manageCache() {
+            if (translationCache.size > MAX_CACHE_SIZE) {
+                const keysToDelete = Array.from(translationCache.keys()).slice(0, 100);
+                keysToDelete.forEach(key => translationCache.delete(key));
+            }
+        }
+
+        // Helper function to translate navigation bar items
+        async function translateNavBar(targetLang) {
+            const navItems = document.querySelectorAll('.navigation .nav-item');
+            for (const item of navItems) {
+                const original = item.getAttribute('data-original') || item.textContent;
+                item.setAttribute('data-original', original);
+                // Use the same API as translateWithAPI
+                try {
+                    const translated = await translateWithAPI(original, targetLang);
+                    item.textContent = translated;
+                } catch (e) {
+                    item.textContent = original;
+                }
+            }
+        }
+
+        // On page load, translate nav bar if language is not English
+        window.addEventListener('DOMContentLoaded', async function() {
+            const lang = localStorage.getItem('keyboardLanguage') || 'en';
+            if (lang !== 'en') {
+                await translateNavBar(lang);
+            }
+        });
+
+        // --- Glide Swipe (Gesture Typing) Implementation ---
+
+        const keyboardWrapper = document.querySelector('.keyboard-wrapper');
+        let isSwiping = false;
+        let swipePath = [];
+        let swipePoints = [];
+        let lastKeyElement = null;
+        const swipeableLanguages = ['en', 'es', 'fr', 'de', 'it', 'pt', 'ru'];
+
+        // Create a canvas for drawing the swipe path
+        const canvas = document.createElement('canvas');
+        canvas.style.position = 'absolute';
+        canvas.style.top = '0';
+        canvas.style.left = '0';
+        canvas.style.pointerEvents = 'none'; // Essential: lets clicks pass through to keys
+        canvas.style.zIndex = '10'; // Make sure it's on top of keys
+        keyboardWrapper.style.position = 'relative'; // Needed for absolute positioning of canvas
+        keyboardWrapper.appendChild(canvas);
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = keyboardWrapper.clientWidth;
+            canvas.height = keyboardWrapper.clientHeight;
+        }
+
+        // Helper to get consistent event coordinates for mouse and touch
+        function getEventPoint(e) {
+            if (e.touches && e.touches.length > 0) {
+                return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }
+            return { x: e.clientX, y: e.clientY };
+        }
+
+        // Helper to get coordinates relative to the canvas/wrapper
+        function getRelativePoint(point, element) {
+            const rect = element.getBoundingClientRect();
+            return { x: point.x - rect.left, y: point.y - rect.top };
+        }
+
+        function startSwipe(e) {
+            if (!swipeableLanguages.includes(currentLanguage) || alphabetKeyboard.style.display === 'none') {
+                return;
+            }
+            isSwiping = true;
+            swipePath = [];
+            swipePoints = [];
+            lastKeyElement = null;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const point = getEventPoint(e);
+            swipePoints.push(getRelativePoint(point, keyboardWrapper));
+        }
+
+        function moveSwipe(e) {
+            if (!isSwiping) return;
+            e.preventDefault(); // Prevent page scrolling/text selection on swipe
+
+            const point = getEventPoint(e);
+            const keyElement = document.elementFromPoint(point.x, point.y);
+
+            if (keyElement && keyElement.classList.contains('key') && keyElement !== lastKeyElement) {
+                // Only track single-character keys that are not special/wide buttons
+                const isActionKey = keyElement.dataset.action || keyElement.id === 'switchToNumbers' || keyElement.id === 'toggleCase' || keyElement.id === 'backspace';
+                if (!isActionKey && keyElement.textContent.trim().length > 0) {
+                    const keyChar = keyElement.textContent.trim().toLowerCase();
+                    // Add to path if it's a new character
+                    if (swipePath.length === 0 || swipePath[swipePath.length - 1] !== keyChar) {
+                        swipePath.push(keyChar);
+                    }
+                }
+                lastKeyElement = keyElement;
+            }
+
+            swipePoints.push(getRelativePoint(point, keyboardWrapper));
+            drawSwipePath();
+        }
+
+        function endSwipe(e) {
+            if (!isSwiping) return;
+            isSwiping = false;
+
+            if (swipePath.length > 2) {
+                const scoredMatches = findWordsFromSwipe(swipePath);
+                if (scoredMatches.length > 0) {
+                    const bestMatch = scoredMatches[0];
+                    const secondMatch = scoredMatches.length > 1 ? scoredMatches[1] : null;
+
+                    // Confidence check: if the best match has a significantly lower score (is much better)
+                    // than the second match, or if it's the only match, insert it directly.
+                    const isConfident = !secondMatch || bestMatch.score < secondMatch.score * 0.5;
+
+                    if (isConfident) {
+                        // High confidence: directly insert the word
+                        const casedWord = isUpperCase ? bestMatch.word.toUpperCase() :
+                            (currentText.length === 0 || currentText.endsWith('. ') || currentText.endsWith('! ') || currentText.endsWith('? ') ? bestMatch.word.charAt(0).toUpperCase() + bestMatch.word.slice(1) : bestMatch.word.toLowerCase());
+                        
+                        insertTextAtCursor(casedWord + ' ');
+                    } else {
+                        // Low confidence: show top 3 suggestions in the prediction bar
+                        const suggestionWords = scoredMatches.map(m => m.word).slice(0, 3);
+                        updateSwipePredictions(suggestionWords);
+                    }
+                }
+            }
+
+            // Animate the path fading out
+            let opacity = 1;
+            const fadeOut = setInterval(() => {
+                opacity -= 0.1;
+                if (opacity <= 0) {
+                    clearInterval(fadeOut);
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                } else {
+                    drawSwipePath(opacity);
+                }
+            }, 25);
+        }
+
+        function drawSwipePath(opacity = 0.7) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (swipePoints.length < 2) return;
+
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const trailColor = isDarkMode ? `rgba(255, 255, 255, ${opacity})` : `rgba(51, 51, 51, ${opacity})`;
+
+            ctx.strokeStyle = trailColor;
+            ctx.lineWidth = 6;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            ctx.beginPath();
+            ctx.moveTo(swipePoints[0].x, swipePoints[0].y);
+            for (let i = 1; i < swipePoints.length; i++) {
+                ctx.lineTo(swipePoints[i].x, swipePoints[i].y);
+            }
+            ctx.stroke();
+        }
+
+        function scoreMatch(word, swipeSkeleton) {
+            const wordSkeleton = [...new Set(word)];
+            const lastLetter = swipeSkeleton[swipeSkeleton.length - 1];
+            
+            let score = 0;
+
+            // Penalty for extra letters in the swipe that are not in the word.
+            score += swipeSkeleton.filter(c => !wordSkeleton.includes(c)).length * 0.5;
+
+            // Penalty for length difference.
+            score += Math.abs(word.length - swipeSkeleton.length);
+
+            // Penalty if the word doesn't end near the swipe end.
+            if (word[word.length - 1] !== lastLetter) {
+                score += 2;
+            }
+
+            return score;
+        }
+
+        function findWordsFromSwipe(path) {
+            // Create a "skeleton" of the swipe path with unique letters in order.
+            const swipeSkeleton = [...new Set(path.filter(char => char.match(/^[a-z]$/)))];
+            if (swipeSkeleton.length < 2) return [];
+
+            const firstLetter = swipeSkeleton[0];
+            const potentialWords = wordsByFirstLetter[firstLetter] || [];
+
+            const potentialMatches = potentialWords.filter(word => {
+                word = word.toLowerCase();
+                if (word.length < 2) return false;
+
+                const wordSkeleton = [...new Set(word)];
+
+                // 1. All unique letters of the word must be in the swipe path.
+                for (const char of wordSkeleton) {
+                    if (!swipeSkeleton.includes(char)) {
+                        return false;
+                    }
+                }
+
+                // 2. The unique letters of the word must appear in the same order as they do in the swipe path.
+                let lastPathIndex = -1;
+                for (const char of wordSkeleton) {
+                    const currentPathIndex = swipeSkeleton.indexOf(char, lastPathIndex + 1);
+                    if (currentPathIndex > lastPathIndex) {
+                        lastPathIndex = currentPathIndex;
+                    } else {
+                        return false; // Letters are out of order.
+                    }
+                }
+
+                return true;
+            });
+
+            // Score and sort the matches
+            const scoredMatches = potentialMatches.map(word => ({
+                word: word,
+                score: scoreMatch(word.toLowerCase(), swipeSkeleton)
+            }));
+            
+            scoredMatches.sort((a, b) => a.score - b.score);
+
+            return scoredMatches;
+        }
+
+        function updateSwipePredictions(words) {
+            const predictionElements = predictionBar.querySelectorAll('.prediction');
+            predictionElements.forEach((elem, index) => {
+                if (index < words.length) {
+                    const word = words[index];
+                    const casedWord = isUpperCase ? word.toUpperCase() :
+                        (currentText.length === 0 || currentText.endsWith('. ') ? word.charAt(0).toUpperCase() + word.slice(1) : word.toLowerCase());
+
+                    elem.textContent = casedWord;
+                    elem.style.opacity = '1';
+                    elem.style.pointerEvents = 'auto';
+                    elem.onclick = () => {
+                        insertTextAtCursor(casedWord + ' ');
+                        updatePredictions(); // Show next-word predictions
+                    };
+                } else {
+                    elem.textContent = '';
+                    elem.style.opacity = '0.3';
+                    elem.style.pointerEvents = 'none';
+                    elem.onclick = null;
+                }
+            });
+        }
+        
+        // --- End of Glide Swipe Implementation ---
+
+        // --- Zoom Functionality ---
+        let currentZoom = parseFloat(localStorage.getItem('keyboard-zoom-level')) || 1.0;
+        const minZoom = 0.5; // 50%
+        const maxZoom = 2.0; // 200%
+        const zoomStep = 0.1; // 10% increments
+
+        // Apply saved zoom level on page load
+        document.documentElement.style.fontSize = `${currentZoom * 16}px`;
+
+        // Get zoom control buttons
+        const zoomInButton = document.getElementById('zoomIn');
+        const zoomOutButton = document.getElementById('zoomOut');
+
+        // Zoom in functionality
+        zoomInButton.addEventListener('click', () => {
+            if (currentZoom < maxZoom) {
+                currentZoom = Math.min(currentZoom + zoomStep, maxZoom);
+                applyZoom();
+            }
+        });
+
+        // Zoom out functionality
+        zoomOutButton.addEventListener('click', () => {
+            if (currentZoom > minZoom) {
+                currentZoom = Math.max(currentZoom - zoomStep, minZoom);
+                applyZoom();
+            }
+        });
+
+        // Apply zoom and save to localStorage
+        function applyZoom() {
+            document.documentElement.style.fontSize = `${currentZoom * 16}px`;
+            localStorage.setItem('keyboard-zoom-level', currentZoom.toFixed(1));
+            
+            // Update button states
+            zoomInButton.style.opacity = currentZoom >= maxZoom ? '0.5' : '1';
+            zoomOutButton.style.opacity = currentZoom <= minZoom ? '0.5' : '1';
+            zoomInButton.style.cursor = currentZoom >= maxZoom ? 'not-allowed' : 'pointer';
+            zoomOutButton.style.cursor = currentZoom <= minZoom ? 'not-allowed' : 'pointer';
+            
+            // Adjust icon and wave sizes based on zoom level
+            adjustIconSizes();
+        }
+
+        // Function to adjust icon and wave sizes based on zoom level
+        function adjustIconSizes() {
+            const microphoneIcon = document.querySelector('.microphone-icon');
+            const waveContainer = document.getElementById('waveContainer');
+            const waveBars = document.querySelectorAll('.wave-bar');
+            
+            if (microphoneIcon) {
+                const iconSize = Math.max(2.5, Math.min(4, 3 * currentZoom));
+                microphoneIcon.style.width = `${iconSize}rem`;
+                microphoneIcon.style.height = `${iconSize}rem`;
+            }
+            
+            if (waveContainer) {
+                const containerHeight = Math.max(30, Math.min(48, 36 * currentZoom));
+                waveContainer.style.height = `${containerHeight}px`;
+                waveContainer.style.gap = `${Math.max(2, Math.min(4, 3 * currentZoom))}px`;
+            }
+            
+            if (waveBars.length > 0) {
+                const barWidth = Math.max(3, Math.min(5, 4 * currentZoom));
+                const maxHeight = Math.max(12, Math.min(36, 24 * currentZoom));
+                
+                waveBars.forEach((bar, index) => {
+                    bar.style.width = `${barWidth}px`;
+                    // Update default heights for wave bars
+                    const heights = [12, 18, 24, 18, 12];
+                    const scaledHeight = Math.max(8, Math.min(maxHeight, heights[index] * currentZoom));
+                    if (!bar.style.height || bar.style.height.includes('px')) {
+                        bar.style.height = `${scaledHeight}px`;
+                    }
+                });
+            }
+        }
+
+        // Initialize button states on page load
+        applyZoom();
+        
+        // Ensure proper icon sizing on initial load
+        setTimeout(adjustIconSizes, 100);
+
+        // Optional: Reset zoom on double-click of either button
+        zoomInButton.addEventListener('dblclick', () => {
+            currentZoom = 1.0;
+            applyZoom();
+        });
+
+        zoomOutButton.addEventListener('dblclick', () => {
+            currentZoom = 1.0;
+            applyZoom();
+        });
+        // --- End of Zoom Functionality ---
+    </script>
+</body>
+</html>

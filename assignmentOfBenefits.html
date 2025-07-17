@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment of Benefits</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background-color: white;
+            --text-color: black;
+        }
+
+        [data-theme="dark"] {
+            --background-color: black;
+            --text-color: white;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.25rem;
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+
+        p, ul {
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .signature-container {
+            margin: 20px 0;
+        }
+
+        .signature-canvas {
+            border: 1px solid var(--text-color);
+            background: var(--background-color);
+            cursor: crosshair;
+        }
+
+        .clear-signature {
+            display: block;
+            margin: 10px 0;
+            padding: 8px 16px;
+            background: var(--background-color);
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .clear-signature:hover {
+            background: var(--text-color);
+            color: var(--background-color);
+        }
+
+        .clear-signature:active {
+            transform: scale(0.98);
+        }
+
+        .form-input {
+            background: var(--background-color);
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            padding: 5px;
+            margin: 5px 0;
+            width: 300px;
+        }
+
+        .save-button {
+            display: block;
+            margin: 30px auto;
+            padding: 12px 24px;
+            background: var(--background-color);
+            color: var(--text-color);
+            border: 2px solid var(--text-color);
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .save-button:hover {
+            background: var(--text-color);
+            color: var(--background-color);
+        }
+
+        .save-button:active {
+            transform: scale(0.98);
+        }
+
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            
+            #pdf-content {
+                width: 100%;
+                padding: 0;
+            }
+
+            .signature-container {
+                page-break-inside: avoid;
+            }
+
+            h1, h2, h3 {
+                page-break-after: avoid;
+            }
+
+            p {
+                orphans: 3;
+                widows: 3;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="pdf-content">
+        <h1>Assignment of Benefits</h1>
+
+        <h2>Purpose</h2>
+        <p>This form authorizes healthcare providers to bill and receive payments directly from your insurance company for medical services rendered, simplifying the payment process for both parties.</p>
+
+        <h2>Patient Information</h2>
+        <ul>
+            <li>Full Name: <span class="text-field" data-placeholder="Enter your full name"></span></li>
+            <li>Date of Birth: <span class="text-field" data-placeholder="MM/DD/YYYY"></span></li>
+            <li>Address: <span class="text-field" data-placeholder="Enter your address"></span></li>
+            <li>Insurance Provider: <span class="text-field" data-placeholder="Enter insurance provider"></span></li>
+            <li>Policy Number: <span class="text-field" data-placeholder="Enter policy number"></span></li>
+        </ul>
+
+        <h2>Assignment Agreement</h2>
+        <p>I, <span class="text-field" data-placeholder="Patient's Full Name"></span>, hereby assign all benefits payable by my insurance provider to:</p>
+        <p><span class="text-field" data-placeholder="Healthcare Provider's Name"></span></p>
+        <p>Address: <span class="text-field" data-placeholder="Provider's Address"></span></p>
+        <p>Contact Information: <span class="text-field" data-placeholder="Phone Number, Email"></span></p>
+
+        <h2>Terms and Conditions</h2>
+        <h3>Scope of Assignment:</h3>
+        <p>This assignment applies to all medical services rendered by <span class="text-field" data-placeholder="Healthcare Provider's Name"></span> from <span class="text-field" data-placeholder="Start Date"></span> to <span class="text-field" data-placeholder="End Date"></span>.</p>
+
+        <h3>Payment Authorization:</h3>
+        <p>I authorize my insurance provider to release payments directly to the healthcare provider for covered services. I understand that I am responsible for any deductibles, copayments, or services not covered by my insurance.</p>
+
+        <h3>Revocation:</h3>
+        <p>I reserve the right to revoke this assignment in writing at any time, except to the extent that payment has already been made to the provider.</p>
+
+        <h3>Compliance:</h3>
+        <p>This assignment complies with all applicable federal and state laws governing health insurance and patient privacy.</p>
+
+        <h2>Acknowledgment</h2>
+        <p>I acknowledge that I have read and understand this Assignment of Benefits and agree to its terms.</p>
+
+        <h2>Signatures</h2>
+        <p>Patient's Signature:</p>
+        <div class="signature-field"></div>
+        <p>Date: <span class="text-field" data-placeholder="MM/DD/YYYY"></span></p>
+
+        <h3>Insurance Provider's Authorization:</h3>
+        <p>I, <span class="text-field" data-placeholder="Insurance Representative's Name"></span>, authorize the assignment of benefits as described above.</p>
+        <p>Representative's Signature:</p>
+        <div class="signature-field"></div>
+        <p>Date: <span class="text-field" data-placeholder="MM/DD/YYYY"></span></p>
+
+        <button id="savePDF" class="save-button">Save as PDF</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="documentFunctions.js"></script>
+</body>
+</html>
